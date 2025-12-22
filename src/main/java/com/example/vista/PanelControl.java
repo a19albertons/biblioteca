@@ -71,7 +71,8 @@ public class PanelControl {
 
         JLabel tema2 = new JLabel("Pendientes");
         tema2.setBounds(10, 10, 150, 30);
-        tema2.setFont(new Font("Dialog", Font.PLAIN, 12));
+        // Fuente Open Sans, texto normal
+        tema2.setFont(com.example.utilities.Fonts.openSans(12f));
         card2.add(tema2);
 
         JLabel valor2 = new JLabel("8");
@@ -92,7 +93,8 @@ public class PanelControl {
 
         JLabel tema3 = new JLabel("Socios activos");
         tema3.setBounds(10, 10, 150, 30);
-        tema3.setFont(new Font("Dialog", Font.PLAIN, 12));
+        // Fuente Open Sans, texto normal
+        tema3.setFont(com.example.utilities.Fonts.openSans(12f));
         card3.add(tema3);
 
         JLabel valor3 = new JLabel("102");

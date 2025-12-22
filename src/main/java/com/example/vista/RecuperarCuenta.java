@@ -93,7 +93,8 @@ public class RecuperarCuenta {
         JLabel volver = new JLabel(
                 "<html>¿Recordaste tu contraseña? <span style='color:#468DAE; font-weight:bold'>Volver al inicio</span></html>");
         volver.setBounds(30, 170, 240, 22);
-        volver.setFont(new Font("Dialog", Font.PLAIN, 11));
+        // Usar Open Sans en estilo normal
+        volver.setFont(com.example.utilities.Fonts.openSans(11f));
         // Cambiar cursor y manejar click
         volver.addMouseListener(new MouseAdapter() {
             @Override

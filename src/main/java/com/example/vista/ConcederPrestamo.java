@@ -42,13 +42,13 @@ public class ConcederPrestamo {
         encabezado.add(titulo);
 
         // Boton nueva publicacion
-        JButton btnNuevaPub = new JButton("Formulario dar de baja");
-        btnNuevaPub.setBounds(430, 15, 150, 30);
-        btnNuevaPub.setBackground(Color.white);
-        btnNuevaPub.setForeground(Color.decode("#468DAE"));
-        btnNuevaPub.setFocusPainted(false);
-        btnNuevaPub.setBorder(null);
-        encabezado.add(btnNuevaPub);
+        JButton btnFormularioDevolver = new JButton("Formulario dar de baja");
+        btnFormularioDevolver.setBounds(430, 15, 150, 30);
+        btnFormularioDevolver.setBackground(Color.white);
+        btnFormularioDevolver.setForeground(Color.decode("#468DAE"));
+        btnFormularioDevolver.setFocusPainted(false);
+        btnFormularioDevolver.setBorder(null);
+        encabezado.add(btnFormularioDevolver);
 
         // Panel de contenido
         JPanel contenido = new JPanel();
@@ -83,7 +83,8 @@ public class ConcederPrestamo {
 
         JLabel resultadoSocio = new JLabel("");
         resultadoSocio.setBounds(20, 150, 400, 40);
-        resultadoSocio.setText("<html>Usuario: Estudiante) : <span style='color:#2BC187; font-weight:bold'>Sin sanciones</span></html>");
+        resultadoSocio.setText(
+                "<html>Usuario: Estudiante) : <span style='color:#2BC187; font-weight:bold'>Sin sanciones</span></html>");
         resultadoSocio.setBackground(Color.decode("#EDF3F6"));
         resultadoSocio.setOpaque(true);
         // Pequeño margen izquierdo para separar el texto del borde (10px)
@@ -154,10 +155,15 @@ public class ConcederPrestamo {
         btnRegistrarPrestamo.setBorder(null);
         contenido.add(btnRegistrarPrestamo);
 
-                // Eventos botones
+        // Eventos botones
+        btnFormularioDevolver.addActionListener(e -> {
+            controlador.getControladorNavegacion().cambiarPantallaHijo("devolverPrestamo");
+        });
+
         btnBuscarSocio.addActionListener(e -> {
             // placeholder: en el futuro buscar en BD por ID/DNI
-            resultadoSocio.setText("<html>Usuario: (Estudiante) - <span style='color:#2BC187; font-weight:bold'>Sin Sanciones</span></html>");
+            resultadoSocio.setText(
+                    "<html>Usuario: (Estudiante) - <span style='color:#2BC187; font-weight:bold'>Sin Sanciones</span></html>");
         });
 
         btnCancelar.addActionListener(e -> {

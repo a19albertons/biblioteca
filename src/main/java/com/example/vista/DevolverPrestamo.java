@@ -127,15 +127,19 @@ public class DevolverPrestamo {
 
         // Boton Devolver Prestamo
         JButton btnDevolverPrestamo = new JButton("DEVOLVER PRESTAMO");
-        btnDevolverPrestamo.setBounds(370, 412, 150, 42);
+        btnDevolverPrestamo.setBounds(370, 420, 120, 35);
         btnDevolverPrestamo.setBackground(Color.decode("#F4791B"));
         btnDevolverPrestamo.setForeground(Color.WHITE);
         btnDevolverPrestamo.setFocusPainted(false);
         btnDevolverPrestamo.setBorder(null);
-        btnDevolverPrestamo.setFont(btnDevolverPrestamo.getFont().deriveFont(Font.BOLD, 13f));
+        btnDevolverPrestamo.setFont(new Font("Open Sans", Font.PLAIN, 11));
         contenido.add(btnDevolverPrestamo);
 
         // Eventos botones
+        btnFormularioRegistrar.addActionListener(e -> {
+            controlador.getControladorNavegacion().cambiarPantallaHijo("concederPrestamo");
+        });
+
         btnBuscarSocio.addActionListener(e -> {
             // placeholder: en el futuro buscar en BD por ID/DNI
             resultadoSocio.setText("<html>Usuario: (Estudiante) - <span style='color:#2BC187; font-weight:bold'>Sin Sanciones</span></html>");
