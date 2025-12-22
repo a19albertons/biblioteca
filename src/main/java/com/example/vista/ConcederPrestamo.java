@@ -154,6 +154,21 @@ public class ConcederPrestamo {
         btnRegistrarPrestamo.setBorder(null);
         contenido.add(btnRegistrarPrestamo);
 
+                // Eventos botones
+        btnBuscarSocio.addActionListener(e -> {
+            // placeholder: en el futuro buscar en BD por ID/DNI
+            resultadoSocio.setText("<html>Usuario: (Estudiante) - <span style='color:#2BC187; font-weight:bold'>Sin Sanciones</span></html>");
+        });
+
+        btnCancelar.addActionListener(e -> {
+            controlador.getControladorNavegacion().cambiarPantallaHijo("panelControl");
+        });
+
+        btnRegistrarPrestamo.addActionListener(e -> {
+            // placeholder: ejecutar devolución y volver al panel de control
+            controlador.getControladorNavegacion().cambiarPantallaHijo("panelControl");
+        });
+
         // Añadir los dos subpaneles al principal
         panel.add(encabezado);
         panel.add(contenido);
