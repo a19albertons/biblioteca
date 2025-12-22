@@ -1,0 +1,150 @@
+package com.example.vista;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagLayout;
+import java.net.URL;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import com.example.controlador.Controlador;
+
+/**
+ * Clase para la vista Recuperar cuenta
+ */
+public class RecuperarCuenta {
+
+    Controlador controlador;
+
+    public RecuperarCuenta(Controlador controlador) {
+        this.controlador = controlador;
+    }
+
+    public JPanel pantalla() {
+        // Panel principal
+        JPanel panel = new JPanel();
+        panel.setSize(800, 600);
+        panel.setLayout(new GridBagLayout());
+        panel.setBackground(Color.decode("#EDF3F6"));
+
+        // Tarjeta central
+        JPanel tarjeta = new JPanel();
+        tarjeta.setPreferredSize(new Dimension(300, 360));
+        tarjeta.setBackground(Color.decode("#EDF3F6"));
+        tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
+
+        // Encabezado con logo
+        JPanel encabezado = new JPanel();
+        encabezado.setLayout(new BorderLayout());
+        encabezado.setPreferredSize(new Dimension(300, 70));
+        encabezado.setBackground(Color.decode("#468DAE"));
+        URL imgUrl = getClass().getResource("/logo.png");
+        if (imgUrl != null) {
+            ImageIcon icon = new ImageIcon(imgUrl);
+            JLabel lblLogo = new JLabel(icon);
+            lblLogo.setHorizontalAlignment(JLabel.CENTER);
+            lblLogo.setVerticalAlignment(JLabel.CENTER);
+            encabezado.add(lblLogo, BorderLayout.CENTER);
+        } else {
+            JLabel lblAlt = new JLabel("Logo no encontrado");
+            lblAlt.setHorizontalAlignment(JLabel.CENTER);
+            encabezado.add(lblAlt, BorderLayout.CENTER);
+        }
+        tarjeta.add(encabezado);
+
+        // Panel blanco con campos
+        JPanel login = new JPanel();
+        login.setPreferredSize(new Dimension(300, 290));
+        login.setBackground(Color.white);
+        login.setLayout(null);
+        tarjeta.add(login);
+
+        // Etiqueta
+        JLabel etiqueta = new JLabel("Correo Electrónico o Usuario");
+        etiqueta.setBounds(30, 30, 240, 20);
+        // Asegurar estilo de fuente normal (no negrita)
+        etiqueta.setFont(etiqueta.getFont().deriveFont(Font.PLAIN));
+        login.add(etiqueta);
+
+        // Campo de entrada
+        JTextField campo = new JTextField();
+        campo.setBounds(30, 70, 240, 35);
+        login.add(campo);
+
+        // Botón ENVIAR
+        JButton btnEnviar = new JButton("ENVIAR");
+        btnEnviar.setBounds(30, 120, 240, 40);
+        btnEnviar.setBorder(null);
+        btnEnviar.setBackground(Color.decode("#F4791B"));
+        btnEnviar.setForeground(Color.white);
+        login.add(btnEnviar);
+
+        // Texto con enlace a volver al inicio
+        JLabel volver = new JLabel(
+                "<html>¿Recordaste tu contraseña? <span style='color:#468DAE; font-weight:bold'>Volver al inicio</span></html>");
+        volver.setBounds(30, 170, 240, 22);
+        volver.setFont(new Font("Dialog", Font.PLAIN, 11));
+        // Cambiar cursor y manejar click
+        volver.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                controlador.getControladorNavegacion().cambiarPantallaPadre("inicioSesion");
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                volver.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                volver.setCursor(Cursor.getDefaultCursor());
+            }
+        });
+        login.add(volver);
+
+        // Versión (bajada un poco para evitar solapamiento)
+        JLabel version = new JLabel("Sistema de Gestión Académica v1.0");
+        version.setBounds(40, 195, 240, 20);
+        version.setFont(version.getFont().deriveFont(Font.PLAIN));
+        login.add(version);
+
+        panel.add(tarjeta);
+
+        // Eventos (sin lógica de backend)
+        btnEnviar.addActionListener(e -> {
+            // Por ahora no hay backend; regresamos a la pantalla de inicio
+            controlador.getControladorNavegacion().cambiarPantallaPadre("inicioSesion");
+        });
+
+        volver.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                controlador.getControladorNavegacion().cambiarPantallaPadre("inicioSesion");
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                volver.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                volver.setCursor(Cursor.getDefaultCursor());
+            }
+        });
+
+        return panel;
+    }
+
+}
