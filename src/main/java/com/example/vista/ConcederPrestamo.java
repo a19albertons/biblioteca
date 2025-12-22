@@ -94,6 +94,7 @@ public class ConcederPrestamo {
         btnBuscarSocio.setBorder(null);
         contenido.add(btnBuscarSocio);
 
+        // Resultado búsqueda socio
         JLabel resultadoSocio = new JLabel("");
         resultadoSocio.setBounds(20, 150, 400, 40);
         resultadoSocio.setText(
