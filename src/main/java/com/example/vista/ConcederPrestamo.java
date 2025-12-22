@@ -38,7 +38,7 @@ public class ConcederPrestamo {
         // Titulo
         JLabel titulo = new JLabel("Nuevo prestamo");
         titulo.setFont(titulo.getFont().deriveFont(24f));
-        titulo.setBounds(10, 10, 300, 40);
+        titulo.setBounds(30, 10, 300, 40);
         encabezado.add(titulo);
 
         // Boton nueva publicacion
@@ -55,7 +55,7 @@ public class ConcederPrestamo {
         contenido.setSize(540, 480);
         contenido.setLayout(null);
         contenido.setBackground(Color.white);
-        contenido.setBounds(30, 100, 540, 480);
+        contenido.setBounds(30, 80, 540, 480);
 
         // Componentes del formulario
         // Paso 1: Identificar socio
@@ -73,7 +73,7 @@ public class ConcederPrestamo {
         txtDniID.setBounds(20, 100, 300, 35);
         contenido.add(txtDniID);
 
-        JButton btnBuscarSocio = new JButton("Buscar Socio");
+        JButton btnBuscarSocio = new JButton("Buscar");
         btnBuscarSocio.setBounds(330, 100, 90, 35);
         btnBuscarSocio.setBackground(Color.decode("#468DAE"));
         btnBuscarSocio.setForeground(Color.WHITE);
@@ -97,6 +97,64 @@ public class ConcederPrestamo {
         paso2.setFont(paso2.getFont().deriveFont(16f));
         contenido.add(paso2);
 
+        // ID Ejemplar
+        JLabel idEjemplar = new JLabel("ID Ejemplar:");
+        idEjemplar.setBounds(20, 250, 100, 25);
+        contenido.add(idEjemplar);
+
+        JTextField txtIdEjemplar = new JTextField();
+        txtIdEjemplar.setBounds(20, 280, 200, 35);
+        contenido.add(txtIdEjemplar);
+
+        // Publicacion
+        JLabel publicacion = new JLabel("Publicacion");
+        publicacion.setBounds(230, 250, 300, 35);
+        contenido.add(publicacion);
+
+        JLabel txtPublicacion = new JLabel();
+        txtPublicacion.setBounds(230, 280, 200, 35);
+        txtPublicacion.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 0, Color.white));
+        contenido.add(txtPublicacion);
+
+        // Fecha Inicio
+        JLabel fechaInicio = new JLabel("Fecha Inicio");
+        fechaInicio.setBounds(20, 330, 300, 35);
+        contenido.add(fechaInicio);
+
+        JLabel txtFechaInicio = new JLabel();
+        txtFechaInicio.setBounds(20, 360, 200, 35);
+        txtFechaInicio.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 0, Color.white));
+        contenido.add(txtFechaInicio);
+
+        // Fecha Fin
+        JLabel fechaFin = new JLabel("Fecha Devolucion Prevista");
+        fechaFin.setBounds(230, 330, 300, 35);
+        contenido.add(fechaFin);
+
+        JLabel txtFechaFin = new JLabel();
+        txtFechaFin.setBounds(230, 360, 200, 35);
+        txtFechaFin.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 0, Color.white));
+        contenido.add(txtFechaFin);
+
+        // Boton cancelar
+        JButton btnCancelar = new JButton("Cancelar");
+        btnCancelar.setBounds(250, 420, 100, 35);
+        btnCancelar.setBackground(Color.white);
+        btnCancelar.setForeground(Color.BLACK);
+        btnCancelar.setFocusPainted(false);
+        btnCancelar.setBorder(null);
+        contenido.add(btnCancelar);
+
+        // Boton Registar Prestamo
+        JButton btnRegistrarPrestamo = new JButton("Registrar Préstamo");
+        btnRegistrarPrestamo.setBounds(370, 420, 120, 35);
+        btnRegistrarPrestamo.setBackground(Color.decode("#F4791B"));
+        btnRegistrarPrestamo.setForeground(Color.WHITE);
+        btnRegistrarPrestamo.setFocusPainted(false);
+        btnRegistrarPrestamo.setBorder(null);
+        contenido.add(btnRegistrarPrestamo);
+
+        // Añadir los dos subpaneles al principal
         panel.add(encabezado);
         panel.add(contenido);
         return panel;
