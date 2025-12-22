@@ -25,15 +25,23 @@ Short, targeted guidance to help an AI agent be productive immediately in this p
 - Run tests:
   - mvn test
 
-Important: the project currently does NOT declare a MySQL JDBC dependency in `pom.xml`. Without `mysql-connector-java` you will get a "No suitable driver" SQLException at runtime. Add this dependency to `pom.xml` (example):
+Note: the project already includes the MySQL JDBC driver (`mysql-connector-java` 8.0.33) in `pom.xml`.
 
-```xml
-<dependency>
-  <groupId>com.mysql</groupId>
-  <artifactId>mysql-connector-j</artifactId>
-  <version>8.0.34</version>
-</dependency>
+If you experience driver/connection errors, confirm the DB container is running via `docker-compose up -d` and that `src/main/resources/application.properties` matches the container credentials (example values already present):
+
+```properties
+mysql.url = jdbc:mysql://localhost:3306/biblioteca
+mysql.user = biblioteca_user
+mysql.password = abc123.
 ```
+
+If you need a newer driver, update the dependency version in `pom.xml`.
+
+## Local debugging tips 🐞
+- Run `com.example.App` from your IDE (set the main class to `com.example.App`). Ensure the MySQL container is up first (`docker-compose up -d`).
+- Use phpMyAdmin at http://localhost:8080 to inspect and modify seeded test data (schema is seeded from `inicializacion.sql`).
+- If UI fonts don't render as expected, confirm the Open Sans TTF files exist in `src/main/resources/fonts/`; `App.main` calls `Fonts.applyDefaultOpenSans()` early.
+- For DB-only validation in CI or locally, start the DB (`docker-compose up -d`) and run the integration test (recommended) or `mvn test`.
 
 ## Project-specific conventions & gotchas ⚠️
 - Language: code and comments are in **Spanish**; prefer Spanish for variable names and UI strings when adding new code or tests.
@@ -63,7 +71,7 @@ Important: the project currently does NOT declare a MySQL JDBC dependency in `po
   2. Instantiate and register it in `ControladorNavegacion` (e.g., `panelPrincipal.add(miVista.pantalla(), "miVista");`).
   3. Navigate: `controlador.getControladorNavegacion().cambiarPantallaHijo("miVista");`.
 
-- Fix DB driver error: add `mysql-connector-j` dependency to `pom.xml` and run `mvn package`.
+- Fix DB connection issues: ensure the DB container is running (`docker-compose up -d`), confirm `src/main/resources/application.properties` matches the container credentials, and verify `mysql-connector-java` exists in `pom.xml` (currently 8.0.33). To change the driver version, update `pom.xml` and run `mvn package`.
 
 ## Where to look to learn more
 - Start at `App.java` → `Controlador` → `ControladorNavegacion` → `vista/*` classes.
@@ -71,7 +79,7 @@ Important: the project currently does NOT declare a MySQL JDBC dependency in `po
 
 ---
 If you'd like, I can:
-- add the missing `mysql-connector-j` dependency to `pom.xml` and open a small PR, or
-- add a short integration test that spins up a MySQL container via `docker-compose` and asserts a `getConnection()` works.
+- add a short integration test that spins up the MySQL container via `docker-compose` and asserts the `DBConnection.getConnection()` works (good for CI), or
+- add a minimal GitHub Actions workflow that runs `docker-compose up -d` and the integration test so PRs validate DB connectivity.
 
 Is anything important missing from this file or would you like a different format or more examples? ✍️
