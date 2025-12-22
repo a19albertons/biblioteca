@@ -1,8 +1,23 @@
 package com.example.vista;
 
-import com.example.controlador.Controlador;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.Insets;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+
+import com.example.controlador.Controlador;
 
 /**
  * Clase para la vista Gestión de usuarios
@@ -30,8 +45,174 @@ public class GestionUsuarios {
      */
     public JPanel pantalla() {
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Pantalla de Gestión de Usuarios"));
+        panel.setPreferredSize(new Dimension(600, 600));
+        panel.setBackground(Color.decode("#EDF3F6"));
+        panel.setLayout(null);
+
+        // Panel de encabezado con título
+        JPanel encabezado = new JPanel();
+        encabezado.setSize(new Dimension(600, 60));
+        encabezado.setBackground(Color.white);
+        encabezado.setLayout(null);
+        encabezado.setBounds(0, 0, 600, 60);
+
+        // Titulo
+        JLabel titulo = new JLabel("Gestión de Usuarios");
+        titulo.setFont(titulo.getFont().deriveFont(24f));
+        titulo.setBounds(30, 10, 300, 40);
+        encabezado.add(titulo);
+
+        // Botón nuevo socio
+        JButton btnNuevoPub = new JButton("+ NUEVO SOCIO");
+        btnNuevoPub.setBounds(420, 15, 140, 30);
+        btnNuevoPub.setBackground(Color.decode("#F4791B"));
+        btnNuevoPub.setForeground(Color.WHITE);
+        btnNuevoPub.setFocusPainted(false);
+        btnNuevoPub.setBorder(null);
+        encabezado.add(btnNuevoPub);
+
+        // Listado usuarios
+        JPanel listaUsuarios = new JPanel();
+        listaUsuarios.setSize(540, 480);
+        listaUsuarios.setBackground(Color.white);
+        listaUsuarios.setLayout(null);
+        listaUsuarios.setBounds(20, 80, 540, 480);
+
+
+
+        // Tabla con columnas y datos de ejemplo
+        String[] cols = new String[] {"DNI", "NOMBRE Y APELLIDO", "TIPO", "ESTADO", "ACCIONES"};
+        Object[][] data = new Object[][] {
+                {"87654321Z", "García, María", "Profesor", "ACTIVO", null},
+                {"12345678X", "Pérez, Juan", "Estudiante", "ACTIVO", null},
+                {"44556677L", "López, Carlos", "Estudiante", "SANCIONADO", null}
+        };
+
+        DefaultTableModel model = new DefaultTableModel(data, cols) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        JTable table = new JTable(model);
+        table.setRowHeight(48);
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(0, 0));
+
+        class StatusRenderer extends JLabel implements TableCellRenderer {
+            public StatusRenderer() {
+                setOpaque(true);
+                setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                String s = (value != null) ? value.toString() : "";
+                setText(s);
+                switch (s) {
+                    case "ACTIVO":
+                        setBackground(Color.decode("#E6FFF0"));
+                        setForeground(Color.decode("#2BC187"));
+                        break;
+                    case "SANCIONADO":
+                        setBackground(Color.decode("#FFF4E6"));
+                        setForeground(Color.decode("#F4791B"));
+                        break;
+                    default:
+                        setBackground(Color.white);
+                        setForeground(Color.black);
+                }
+                setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+                return this;
+            }
+        }
+
+        class ActionsRenderer implements TableCellRenderer {
+            private final JPanel panelCell = new JPanel();
+
+            public ActionsRenderer() {
+                panelCell.setOpaque(false);
+                panelCell.setLayout(new FlowLayout(FlowLayout.RIGHT, 6, 6));
+
+                // Edit button (translucent)
+                java.net.URL editarIconUrl = getClass().getResource("/editar.png");
+                final JButton editBtn = new JButton() {
+                    @Override
+                    protected void paintComponent(java.awt.Graphics g) {
+                        java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+                        g2.setComposite(java.awt.AlphaComposite.SrcOver);
+                        g2.setColor(new Color(70, 141, 174, 102));
+                        g2.fillRect(0, 0, getWidth(), getHeight());
+                        g2.dispose();
+                        super.paintComponent(g);
+                    }
+                };
+                if (editarIconUrl != null) {
+                    Image img = new ImageIcon(editarIconUrl).getImage().getScaledInstance(12, 12,
+                            Image.SCALE_SMOOTH);
+                    editBtn.setIcon(new ImageIcon(img));
+                }
+                editBtn.setPreferredSize(new Dimension(24, 24));
+                editBtn.setToolTipText("Editar");
+                editBtn.setBorder(null);
+                editBtn.setFocusPainted(false);
+                editBtn.setContentAreaFilled(false);
+                editBtn.setOpaque(false);
+                editBtn.setMargin(new Insets(0, 0, 0, 0));
+
+                // Delete button (translucent)
+                java.net.URL borrarIconUrl = getClass().getResource("/borrar.png");
+                final JButton delBtn = new JButton() {
+                    @Override
+                    protected void paintComponent(java.awt.Graphics g) {
+                        java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+                        g2.setComposite(java.awt.AlphaComposite.SrcOver);
+                        g2.setColor(new Color(192, 57, 43, 102));
+                        g2.fillRect(0, 0, getWidth(), getHeight());
+                        g2.dispose();
+                        super.paintComponent(g);
+                    }
+                };
+                if (borrarIconUrl != null) {
+                    Image img = new ImageIcon(borrarIconUrl).getImage().getScaledInstance(12, 12,
+                            Image.SCALE_SMOOTH);
+                    delBtn.setIcon(new ImageIcon(img));
+                }
+                delBtn.setPreferredSize(new Dimension(24, 24));
+                delBtn.setToolTipText("Eliminar");
+                delBtn.setBorder(null);
+                delBtn.setFocusPainted(false);
+                delBtn.setContentAreaFilled(false);
+                delBtn.setOpaque(false);
+                delBtn.setMargin(new Insets(0, 0, 0, 0));
+
+                panelCell.add(editBtn);
+                panelCell.add(delBtn);
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                return panelCell;
+            }
+        }
+
+        table.getColumnModel().getColumn(3).setCellRenderer(new StatusRenderer());
+        table.getColumnModel().getColumn(4).setCellRenderer(new ActionsRenderer());
+
+        // Scroll que contiene la tabla (ocupa la parte superior del panel ahora que no hay detalle)
+        JScrollPane scroll = new JScrollPane(table);
+        scroll.setBounds(10, 10, 520, 460);
+        scroll.setBorder(null);
+        listaUsuarios.add(scroll);
+
+        // Agregar paneles al panel principal
+        panel.add(encabezado);
+        panel.add(listaUsuarios);
+
         return panel;
     }
 
-}  
+}
