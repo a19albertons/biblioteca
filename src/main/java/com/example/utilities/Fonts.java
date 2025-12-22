@@ -1,6 +1,13 @@
 package com.example.utilities;
 
 import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.swing.UIManager;
 
 /**
@@ -8,26 +15,60 @@ import javax.swing.UIManager;
  */
 public final class Fonts {
 
+    private static final Logger LOGGER = Logger.getLogger(Fonts.class.getName());
+    private static Font openSansRegular = null;
+
     private Fonts() {}
 
+    private static Font loadAndRegister(String resourceName) {
+        try (InputStream is = Fonts.class.getResourceAsStream("/fonts/" + resourceName)) {
+            if (is == null) {
+                LOGGER.log(Level.FINE, "Fuente no encontrada en recursos: {0}", resourceName);
+                return null;
+            }
+            Font f = Font.createFont(Font.TRUETYPE_FONT, is);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(f);
+            LOGGER.log(Level.INFO, "Fuente registrada: {0}", resourceName);
+            return f;
+        } catch (IOException | FontFormatException e) {
+            LOGGER.log(Level.WARNING, "No se pudo cargar la fuente {0}: {1}", new Object[]{resourceName, e.getMessage()});
+            return null;
+        }
+    }
+
     public static Font openSans(float size) {
+        if (openSansRegular != null) {
+            return openSansRegular.deriveFont(Font.PLAIN, Math.round(size));
+        }
         return new Font("Open Sans", Font.PLAIN, Math.round(size));
     }
 
     /**
      * Aplica Open Sans (texto normal) como fuente por defecto para JLabel y JButton.
-     * Si la fuente no está instalada en el sistema, Swing usará la fuente por defecto
-     * y la familia será ignorada, pero el estilo y tamaño se aplicarán.
+     * Intentará cargar las TTF desde `resources/fonts/` si existen y registrar las fuentes.
      */
     public static void applyDefaultOpenSans() {
+        // Intentar cargar las fuentes embebidas (si existen en recursos)
+        openSansRegular = loadAndRegister("OpenSans-Regular.ttf");
+
         Font labelFont = UIManager.getFont("Label.font");
         int size = (labelFont != null) ? labelFont.getSize() : 12;
-        Font open = new Font("Open Sans", Font.PLAIN, size);
-        UIManager.put("Label.font", open);
-        UIManager.put("Button.font", open);
-        UIManager.put("TextField.font", open);
-        UIManager.put("TextArea.font", open);
-        UIManager.put("ComboBox.font", open);
-        UIManager.put("CheckBox.font", open);
+
+        Font base;
+        if (openSansRegular != null) {
+            base = openSansRegular.deriveFont(Font.PLAIN, size);
+        } else {
+            // Fallback: intentar usar familia por nombre (si está instalada)
+            base = new Font("Open Sans", Font.PLAIN, size);
+            LOGGER.log(Level.INFO, "Usando fallback de familia 'Open Sans' o la fuente por defecto del sistema");
+        }
+
+        UIManager.put("Label.font", base);
+        UIManager.put("Button.font", base);
+        UIManager.put("TextField.font", base);
+        UIManager.put("TextArea.font", base);
+        UIManager.put("ComboBox.font", base);
+        UIManager.put("CheckBox.font", base);
     }
 }
