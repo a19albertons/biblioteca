@@ -17,12 +17,25 @@ import com.example.controlador.Controlador;
  */
 public class DevolverPrestamo {
 
+    /**
+     * Controlador de la aplicación
+     */
     Controlador controlador;
 
+    /**
+     * Constructor de la vista DevolverPrestamo
+     *
+     * @param controlador controlador principal
+     */
     public DevolverPrestamo(Controlador controlador) {
         this.controlador = controlador;
     }
 
+    /**
+     * Muestra la pantalla para gestionar devoluciones de préstamo
+     *
+     * @return JPanel con la vista de devolución de préstamos
+     */
     public JPanel pantalla() {
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(600, 600));

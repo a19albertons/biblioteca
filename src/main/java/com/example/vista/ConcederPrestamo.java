@@ -16,12 +16,25 @@ import com.example.controlador.Controlador;
  */
 public class ConcederPrestamo {
 
+    /**
+     * Controlador de la aplicación
+     */
     Controlador controlador;
 
+    /**
+     * Constructor de la vista ConcederPrestamo
+     *
+     * @param controlador controlador principal
+     */
     public ConcederPrestamo(Controlador controlador) {
         this.controlador = controlador;
     }
 
+    /**
+     * Muestra la pantalla para conceder un préstamo
+     *
+     * @return JPanel con la vista de concesión de préstamos
+     */
     public JPanel pantalla() {
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(600, 600));

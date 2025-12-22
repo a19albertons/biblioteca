@@ -17,12 +17,25 @@ import com.example.controlador.Controlador;
  */
 public class CatalogoLibros {
 
+    /**
+     * Controlador de la aplicación
+     */
     Controlador controlador;
 
+    /**
+     * Constructor de la vista CatalogoLibros
+     *
+     * @param controlador controlador principal
+     */
     public CatalogoLibros(Controlador controlador) {
         this.controlador = controlador;
     }
 
+    /**
+     * Muestra la pantalla del catálogo de publicaciones/libros
+     *
+     * @return JPanel con la lista y filtros del catálogo
+     */
     public JPanel pantalla() {
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(600, 600));
@@ -110,6 +123,26 @@ public class CatalogoLibros {
         disponibilidad1.setHorizontalAlignment(JLabel.CENTER);
         disponibilidad1.setVerticalAlignment(JLabel.CENTER);
         cardEjemplo1.add(disponibilidad1);
+
+        // Hacer la tarjeta clicable: al click ir a la vista de Ejemplares
+        cardEjemplo1.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        cardEjemplo1.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                controlador.getControladorNavegacion().cambiarPantallaHijo("ejemplares");
+            }
+
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                // ligero efecto hover
+                cardEjemplo1.setBackground(Color.decode("#F6F9FB"));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                cardEjemplo1.setBackground(Color.white);
+            }
+        });
 
         // Card Ejemplo 2 (centrada)
         JPanel cardEjemplo2 = new JPanel();

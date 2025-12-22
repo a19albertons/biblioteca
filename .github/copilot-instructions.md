@@ -46,6 +46,13 @@ Important: the project currently does NOT declare a MySQL JDBC dependency in `po
 - Runtime config keys in `application.properties`: `mysql.url`, `mysql.user`, `mysql.password` (example values already set for the docker-compose service).
 - Static resources (logo) are loaded with `getResource("/logo.png")`. Place resources in `src/main/resources` so they end up in `target/classes` at runtime.
 
+## Fonts & UI styling 🔤
+- This project includes embedded **Open Sans** TTF files in `src/main/resources/fonts/` (e.g. `OpenSans-Regular.ttf`, `OpenSans-Bold.ttf`).
+- Use `com.example.utilities.Fonts.applyDefaultOpenSans()` early in `main` (it is already called in `App.main`) to register the bundled fonts and apply **Open Sans (plain)** as the UI default via `UIManager`.
+- Prefer the helper over hard-coding font names/sizes in views. Use `Fonts.openSans(size)` when you need a specific size, or rely on UI defaults (labels/buttons will inherit Open Sans).
+- If you need additional variants (italic, semibold), add the corresponding TTF into `resources/fonts/` — `Fonts` will attempt to load `OpenSans-Regular.ttf` by default; extend it if you need automatic mapping of other variants.
+- Rationale: embedding the TTFs ensures consistent rendering across developer machines and CI environments when the OS does not have Open Sans installed.
+
 ## Tests & CI notes
 - Unit tests use JUnit 4.11. Current tests are minimal (`AppTest`).
 - There is no CI configuration in the repo yet; recommended quick checks for a PR: `mvn -DskipTests=false test` and `mvn -DskipTests package`.

@@ -15,12 +15,25 @@ import com.example.controlador.Controlador;
  */
 public class PanelControl {
 
+    /**
+     * Controlador de la aplicación
+     */
     Controlador controlador;
 
+    /**
+     * Constructor de la vista PanelControl
+     *
+     * @param controlador controlador principal
+     */
     public PanelControl(Controlador controlador) {
         this.controlador = controlador;
     }
 
+    /**
+     * Muestra la pantalla del panel de control con tarjetas y resúmenes
+     *
+     * @return JPanel con el panel de control
+     */
     public JPanel pantalla() {
         // Panel principal
         JPanel panel = new JPanel();

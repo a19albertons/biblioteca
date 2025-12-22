@@ -17,15 +17,28 @@ import com.example.controlador.Controlador;
  */
 public class BarraLateral {
 
+    /**
+     * Controlador de la aplicación
+     */
     Controlador controlador;
 
+    /**
+     * Constructor de la vista BarraLateral
+     * 
+     * @param controlador
+     */
     public BarraLateral(Controlador controlador) {
         this.controlador = controlador;
     }
 
+    /**
+     * Muestra la pantalla de la barra lateral con opciones de navegación
+     * 
+     * @return
+     */
     public JPanel pantalla() {
         JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(200,600));
+        panel.setPreferredSize(new Dimension(200, 600));
         panel.setBackground(Color.decode("#468DAE"));
         URL imgUrl = getClass().getResource("/logo.png");
         if (imgUrl != null) {
@@ -95,7 +108,6 @@ public class BarraLateral {
         btnSanciones.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         opciones.add(btnSanciones);
 
-
         panel.add(opciones);
 
         // Eventos de los botones (gestión de estado activo/inactivo)
@@ -127,7 +139,13 @@ public class BarraLateral {
         return panel;
     }
 
-    // Helper para marcar un botón como activo y dejar el resto en estilo inactivo
+    /**
+     * Marca un botón como activo y restablece el estilo del resto de botones a
+     * inactivo.
+     *
+     * @param active  botón que debe quedar marcado como activo
+     * @param buttons lista completa de botones a evaluar y actualizar
+     */
     private void setActiveButton(javax.swing.JButton active, javax.swing.JButton... buttons) {
         for (javax.swing.JButton b : buttons) {
             if (b == active) {
@@ -142,4 +160,4 @@ public class BarraLateral {
         }
     }
 
-}  
+}

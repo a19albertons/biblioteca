@@ -24,12 +24,25 @@ import com.example.controlador.Controlador;
  */
 public class RecuperarCuenta {
 
+    /**
+     * Controlador de la aplicación
+     */
     Controlador controlador;
 
+    /**
+     * Constructor de la vista RecuperarCuenta
+     *
+     * @param controlador controlador principal
+     */
     public RecuperarCuenta(Controlador controlador) {
         this.controlador = controlador;
     }
 
+    /**
+     * Muestra la pantalla de recuperación de cuenta
+     *
+     * @return JPanel con el formulario de recuperación
+     */
     public JPanel pantalla() {
         // Panel principal
         JPanel panel = new JPanel();

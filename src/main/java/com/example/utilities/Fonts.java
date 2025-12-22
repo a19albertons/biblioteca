@@ -14,12 +14,27 @@ import javax.swing.UIManager;
  * Utilidades para fuente Open Sans en la UI.
  */
 public final class Fonts {
-
+    /**
+     * Logger para la clase Fonts
+     */
     private static final Logger LOGGER = Logger.getLogger(Fonts.class.getName());
+    /**
+     * Fuente Open Sans (texto normal)
+     */
     private static Font openSansRegular = null;
 
-    private Fonts() {}
+    /**
+     * Constructor privado para evitar instanciación
+     */
+    private Fonts() {
+    }
 
+    /**
+     * Carga y registra una fuente desde recursos embebidos
+     * 
+     * @param resourceName
+     * @return
+     */
     private static Font loadAndRegister(String resourceName) {
         try (InputStream is = Fonts.class.getResourceAsStream("/fonts/" + resourceName)) {
             if (is == null) {
@@ -32,11 +47,20 @@ public final class Fonts {
             LOGGER.log(Level.INFO, "Fuente registrada: {0}", resourceName);
             return f;
         } catch (IOException | FontFormatException e) {
-            LOGGER.log(Level.WARNING, "No se pudo cargar la fuente {0}: {1}", new Object[]{resourceName, e.getMessage()});
+            LOGGER.log(Level.WARNING, "No se pudo cargar la fuente {0}: {1}",
+                    new Object[] { resourceName, e.getMessage() });
             return null;
         }
     }
 
+    /**
+     * Obtiene la fuente Open Sans en tamaño específico (texto normal).
+     * Si la fuente no está cargada, devuelve una fuente por defecto con familia
+     * "Open Sans".
+     * 
+     * @param size
+     * @return
+     */
     public static Font openSans(float size) {
         if (openSansRegular != null) {
             return openSansRegular.deriveFont(Font.PLAIN, Math.round(size));
@@ -45,8 +69,10 @@ public final class Fonts {
     }
 
     /**
-     * Aplica Open Sans (texto normal) como fuente por defecto para JLabel y JButton.
-     * Intentará cargar las TTF desde `resources/fonts/` si existen y registrar las fuentes.
+     * Aplica Open Sans (texto normal) como fuente por defecto para JLabel y
+     * JButton.
+     * Intentará cargar las TTF desde `resources/fonts/` si existen y registrar las
+     * fuentes.
      */
     public static void applyDefaultOpenSans() {
         // Intentar cargar las fuentes embebidas (si existen en recursos)
