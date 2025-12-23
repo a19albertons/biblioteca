@@ -3,6 +3,8 @@ package com.example.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Date;
+import java.sql.Statement; 
 import java.util.ArrayList;
 
 import com.example.conexiones.MySQLConnection;
@@ -52,7 +54,7 @@ public class PublicacionDAO {
         try (Connection conexion = new MySQLConnection().getConnection();
                 PreparedStatement ps = conexion.prepareStatement(
                         "INSERT INTO publicaciones (titulo, editorial, codigo_isbn, idioma, tipo) VALUES (?, ?, ?, ?, ?)",
-                        java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                        Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, titulo);
             ps.setString(2, editorial);
             ps.setString(3, codigoIsbn);
@@ -78,7 +80,7 @@ public class PublicacionDAO {
     public int insertarPublicacion(Connection conexion, String titulo, String editorial, String codigoIsbn, String idioma, char tipo) {
         try (PreparedStatement ps = conexion.prepareStatement(
                 "INSERT INTO publicaciones (titulo, editorial, codigo_isbn, idioma, tipo) VALUES (?, ?, ?, ?, ?)",
-                java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, titulo);
             ps.setString(2, editorial);
             ps.setString(3, codigoIsbn);
@@ -105,7 +107,7 @@ public class PublicacionDAO {
      * @param fechaPublicacion fecha SQL (java.sql.Date)
      * @return true si ok
      */
-    public boolean insertarLibro(int idPublicacion, int numEdicion, java.sql.Date fechaPublicacion) {
+    public boolean insertarLibro(int idPublicacion, int numEdicion, Date fechaPublicacion) {
         try (Connection conexion = new MySQLConnection().getConnection();
                 PreparedStatement ps = conexion.prepareStatement(
                         "INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES (?, ?, ?)") ) {
@@ -124,7 +126,7 @@ public class PublicacionDAO {
     /**
      * Variante que utiliza una Connection existente (transacción)
      */
-    public boolean insertarLibro(Connection conexion, int idPublicacion, int numEdicion, java.sql.Date fechaPublicacion) {
+    public boolean insertarLibro(Connection conexion, int idPublicacion, int numEdicion, Date fechaPublicacion) {
         try (PreparedStatement ps = conexion.prepareStatement(
                 "INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES (?, ?, ?)") ) {
             ps.setInt(1, idPublicacion);
@@ -567,7 +569,7 @@ public class PublicacionDAO {
     /**
      * Actualiza o inserta la fila en `libros` para la publicación dada.
      */
-    public boolean actualizarLibro(Connection conexion, int idPublicacion, int numEdicion, java.sql.Date fechaPublicacion) {
+    public boolean actualizarLibro(Connection conexion, int idPublicacion, int numEdicion, Date fechaPublicacion) {
         try (PreparedStatement ps = conexion.prepareStatement(
                 "UPDATE libros SET num_edicion = ?, fecha_publicacion = ? WHERE id_publicacion = ?")) {
             ps.setInt(1, numEdicion);

@@ -1,12 +1,14 @@
 package com.example.controlador;
 
+import java.sql.Connection;
+import java.sql.Date;
+import java.time.LocalDate;
+
 import com.example.dao.AutorDAO;
 import com.example.dao.CicloDAO;
 import com.example.dao.ModuloDAO;
 import com.example.dao.PublicacionDAO;
 import com.example.dao.TemaDAO;
-
-import java.time.LocalDate;
 
 /**
  * Controlador responsable de la creación y persistencia de nuevas publicaciones.
@@ -16,7 +18,9 @@ import java.time.LocalDate;
  * ciclos, temas y autores).
  */
 public class ControladorNuevaPublicacionDialog {
-
+    /**
+     * Controlador principal de la aplicación
+     */
     private Controlador controlador;
 
     /**
@@ -28,24 +32,6 @@ public class ControladorNuevaPublicacionDialog {
         this.controlador = controlador;
     }
 
-    /**
-     * Crea una publicación de tipo Libro y la persiste en la base de datos junto con
-     * sus relaciones (módulos, ciclos, temas y autores). Todas las inserciones son
-     * simples y no se realiza transacción distribuida; en caso de fallo devuelve
-     * false.
-     *
-     * @param isbn         código ISBN o identificador
-     * @param titulo       título de la publicación
-     * @param idioma       idioma
-     * @param temasCsv     lista de temas separados por comas
-     * @param modulosCsv   lista de módulos separados por comas
-     * @param ciclosCsv    lista de ciclos separados por comas
-     * @param editorial    editorial
-     * @param numEdicion   número de edición (>0)
-     * @param fechaPublic  fecha publicación (java.time.LocalDate)
-     * @param autoresCsv   lista de autores separados por comas
-     * @return true si la creación fue satisfactoria
-     */
     /**
      * Versión transaccional: crea una publicación de tipo Libro usando una única
      * Connection y commit/rollback. Esto asegura consistencia si alguna inserción
@@ -71,7 +57,7 @@ public class ControladorNuevaPublicacionDialog {
         TemaDAO temaDAO = new TemaDAO();
         CicloDAO cicloDAO = new CicloDAO();
 
-        java.sql.Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
         if (conexion == null) {
             System.out.println("No se puede obtener conexión a BD");
             return false;
@@ -86,7 +72,7 @@ public class ControladorNuevaPublicacionDialog {
             }
 
             // Insertar libro
-            boolean okLib = publicacionDAO.insertarLibro(conexion, idPub, numEdicion, java.sql.Date.valueOf(fechaPublic));
+            boolean okLib = publicacionDAO.insertarLibro(conexion, idPub, numEdicion, Date.valueOf(fechaPublic));
             if (!okLib) {
                 conexion.rollback();
                 return false;
@@ -191,21 +177,6 @@ public class ControladorNuevaPublicacionDialog {
     }
 
     /**
-     * Crea una publicación de tipo Revista y la persiste en la base de datos junto
-     * con sus relaciones (módulos, ciclos, temas). Devuelve true si todo fue
-     * correcto.
-     *
-     * @param isbn         código o identificador
-     * @param titulo       título
-     * @param idioma       idioma
-     * @param temasCsv     temas separados por comas
-     * @param modulosCsv   módulos separados por comas
-     * @param ciclosCsv    ciclos separados por comas
-     * @param editorial    editorial
-     * @param periodicidad texto de periodicidad
-     * @return true si la creación fue satisfactoria
-     */
-    /**
      * Versión transaccional para crear una revista. Usa una única Connection y
      * commit/rollback para asegurar consistencia.
      *
@@ -226,7 +197,7 @@ public class ControladorNuevaPublicacionDialog {
         TemaDAO temaDAO = new TemaDAO();
         CicloDAO cicloDAO = new CicloDAO();
 
-        java.sql.Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
         if (conexion == null) {
             System.out.println("No se puede obtener conexión a BD");
             return false;

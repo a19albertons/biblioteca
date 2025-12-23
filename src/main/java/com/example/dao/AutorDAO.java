@@ -3,6 +3,7 @@ package com.example.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 import com.example.conexiones.MySQLConnection;
 
@@ -66,7 +67,7 @@ public class AutorDAO {
     public int crearAutor(String nombre, String nacionalidad) {
         try (Connection conexion = new MySQLConnection().getConnection();
                 PreparedStatement ps = conexion.prepareStatement("INSERT INTO autores (nombre, nacionalidad) VALUES (?, ?)",
-                        java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                        Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, nombre);
             ps.setString(2, nacionalidad == null || nacionalidad.trim().isEmpty() ? "ES" : nacionalidad);
             ps.executeUpdate();
@@ -93,7 +94,7 @@ public class AutorDAO {
      */
     public int crearAutor(Connection conexion, String nombre, String nacionalidad) {
         try (PreparedStatement ps = conexion.prepareStatement("INSERT INTO autores (nombre, nacionalidad) VALUES (?, ?)",
-                java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, nombre);
             ps.setString(2, nacionalidad == null || nacionalidad.trim().isEmpty() ? "ES" : nacionalidad);
             ps.executeUpdate();

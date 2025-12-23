@@ -1,13 +1,9 @@
 package com.example.controlador;
 
-import com.example.dao.AutorDAO;
 import com.example.dao.CicloDAO;
-import com.example.dao.ModuloDAO;
 import com.example.dao.PrestamoDAO;
 import com.example.dao.PublicacionDAO;
-import com.example.dao.TemaDAO;
 import com.example.dao.UsuarioDAO;
-import java.time.LocalDate;
 
 /**
  * Controlador para el panel de control

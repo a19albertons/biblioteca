@@ -3,6 +3,7 @@ package com.example.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import com.example.conexiones.MySQLConnection;
@@ -52,7 +53,7 @@ public class CicloDAO {
                 }
             }
             // Si no existe, insertamos
-            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO ciclos (nombre) VALUES (?)", java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO ciclos (nombre) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
                 ins.setString(1, nombre);
                 ins.executeUpdate();
                 try (ResultSet rs2 = ins.getGeneratedKeys()) {
@@ -79,7 +80,7 @@ public class CicloDAO {
                     return rs.getInt("id");
                 }
             }
-            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO ciclos (nombre) VALUES (?)", java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO ciclos (nombre) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
                 ins.setString(1, nombre);
                 ins.executeUpdate();
                 try (ResultSet rs2 = ins.getGeneratedKeys()) {

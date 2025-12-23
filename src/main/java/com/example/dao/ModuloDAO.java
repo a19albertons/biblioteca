@@ -3,6 +3,7 @@ package com.example.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 import com.example.conexiones.MySQLConnection;
 
@@ -37,7 +38,7 @@ public class ModuloDAO {
      */
     public int crearModulo(String nombre) {
         try (Connection conexion = new MySQLConnection().getConnection();
-                PreparedStatement ps = conexion.prepareStatement("INSERT INTO modulo (nombre) VALUES (?)", java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conexion.prepareStatement("INSERT INTO modulo (nombre) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, nombre);
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -69,7 +70,7 @@ public class ModuloDAO {
                 if (rs.next())
                     return rs.getInt("id");
             }
-            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO modulo (nombre) VALUES (?)", java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO modulo (nombre) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
                 ins.setString(1, nombre);
                 ins.executeUpdate();
                 try (ResultSet rs2 = ins.getGeneratedKeys()) {

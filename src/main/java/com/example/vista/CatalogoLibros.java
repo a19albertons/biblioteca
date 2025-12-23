@@ -30,12 +30,33 @@ public class CatalogoLibros {
     Controlador controlador;
 
     // Componentes que se mantienen como campo para permitir refresco dinámico
+    /**
+     * Panel principal de la vista CatalogoLibros
+     */
     private JPanel panel;
+    /**
+     * Campo de búsqueda
+     */
     private JTextField buscadorField;
+    /**
+     * ComboBox de ciclos para filtro
+     */
     private JComboBox<String> comboCiclosField;
+    /**
+     * ComboBox de editoriales para filtro
+     */
     private JComboBox<String> comboEditorialField;
+    /**
+     * Contenedor de las cards de publicaciones
+     */
     private JPanel cardsContainer;
+    /**
+     * Scroll que contiene las cards de publicaciones
+     */
     private JScrollPane scrollPublicaciones;
+    /**
+     * Datos resumen de publicaciones (sin filtrar)
+     */
     private String[][] resumenPublicacionesField;
 
     /**

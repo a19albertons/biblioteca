@@ -1,12 +1,15 @@
 package com.example.controlador;
 
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.time.LocalDate;
+
 import com.example.dao.AutorDAO;
 import com.example.dao.CicloDAO;
 import com.example.dao.ModuloDAO;
 import com.example.dao.PublicacionDAO;
 import com.example.dao.TemaDAO;
-
-import java.time.LocalDate;
 
 /**
  * Controlador responsable de la edición de publicaciones.
@@ -17,9 +20,16 @@ import java.time.LocalDate;
  * relacionadas (publicaciones, libros/revistas y las tablas multivaluadas).
  */
 public class ControladorEditarPublicacionDialog {
-
+    /**
+     * Controlador principal de la aplicación
+     */
     private Controlador controlador;
 
+    /**
+     * Constructor
+     * 
+     * @param controlador
+     */
     public ControladorEditarPublicacionDialog(Controlador controlador) {
         this.controlador = controlador;
     }
@@ -52,7 +62,8 @@ public class ControladorEditarPublicacionDialog {
      * @param numEdicion    número de edición
      * @param fechaPublic   fecha de publicación
      * @param autoresCsv    CSV de autores
-     * @return true si la edición fue satisfactoria (commit realizado), false en caso de error
+     * @return true si la edición fue satisfactoria (commit realizado), false en
+     *         caso de error
      */
     public boolean editarPublicacionLibro(int idPublicacion, String isbn, String titulo, String idioma,
             String temasCsv, String modulosCsv, String ciclosCsv, String editorial, int numEdicion,
@@ -63,7 +74,7 @@ public class ControladorEditarPublicacionDialog {
         TemaDAO temaDAO = new TemaDAO();
         CicloDAO cicloDAO = new CicloDAO();
 
-        java.sql.Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
         if (conexion == null) {
             System.out.println("No se puede obtener conexión a BD");
             return false;
@@ -79,13 +90,15 @@ public class ControladorEditarPublicacionDialog {
             }
 
             // Actualizar o insertar fila libros
-            if (!publicacionDAO.actualizarLibro(conexion, idPublicacion, numEdicion, java.sql.Date.valueOf(fechaPublic))) {
+            if (!publicacionDAO.actualizarLibro(conexion, idPublicacion, numEdicion, Date.valueOf(fechaPublic))) {
                 conexion.rollback();
                 return false;
             }
 
-            // Si estamos convirtiendo a Libro, asegurarnos de eliminar la fila en revistas (si existía)
-            try (java.sql.PreparedStatement delRev = conexion.prepareStatement("DELETE FROM revistas WHERE id_publicacion = ?")) {
+            // Si estamos convirtiendo a Libro, asegurarnos de eliminar la fila en revistas
+            // (si existía)
+            try (PreparedStatement delRev = conexion
+                    .prepareStatement("DELETE FROM revistas WHERE id_publicacion = ?")) {
                 delRev.setInt(1, idPublicacion);
                 delRev.executeUpdate();
             } catch (Exception ex) {
@@ -216,7 +229,7 @@ public class ControladorEditarPublicacionDialog {
         TemaDAO temaDAO = new TemaDAO();
         CicloDAO cicloDAO = new CicloDAO();
 
-        java.sql.Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
         if (conexion == null) {
             System.out.println("No se puede obtener conexión a BD");
             return false;
@@ -238,7 +251,7 @@ public class ControladorEditarPublicacionDialog {
             }
 
             // Si estamos convirtiendo a Revista, eliminar la fila en libros si existiera
-            try (java.sql.PreparedStatement delLib = conexion.prepareStatement("DELETE FROM libros WHERE id_publicacion = ?")) {
+            try (PreparedStatement delLib = conexion.prepareStatement("DELETE FROM libros WHERE id_publicacion = ?")) {
                 delLib.setInt(1, idPublicacion);
                 delLib.executeUpdate();
             } catch (Exception ex) {
@@ -312,6 +325,7 @@ public class ControladorEditarPublicacionDialog {
             return true;
         } catch (Exception e) {
             try {
+                // Rollback en caso de error
                 conexion.rollback();
             } catch (Exception ex) {
                 System.out.println("Error al hacer rollback: " + ex.getMessage());

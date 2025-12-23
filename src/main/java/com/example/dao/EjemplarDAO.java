@@ -3,6 +3,7 @@ package com.example.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class EjemplarDAO {
                 while (rs.next()) {
                     String id = String.valueOf(rs.getInt("id"));
                     String num = String.valueOf(rs.getInt("num_ejemplar"));
-                    java.sql.Date fecha = rs.getDate("fecha_adquisicion");
+                    Date fecha = rs.getDate("fecha_adquisicion");
                     String fechaStr = (fecha != null) ? fecha.toString() : "";
                     boolean enServicio = rs.getBoolean("en_servicio");
                     int prestamosActivos = rs.getInt("prestamos_activos");
