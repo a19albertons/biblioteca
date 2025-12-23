@@ -52,7 +52,8 @@ public class Ejemplares {
      */
     private JLabel autoresPublicacion;
 
-    // Tabla de ejemplares (modelo y tabla como campos para actualizar dinámicamente)
+    // Tabla de ejemplares (modelo y tabla como campos para actualizar
+    // dinámicamente)
     /**
      * Modelo de la tabla de ejemplares
      */
@@ -61,6 +62,7 @@ public class Ejemplares {
      * Tabla de ejemplares
      */
     private JTable ejemplaresTable;
+
     /**
      * Constructor de la vista Ejemplares
      *
@@ -102,6 +104,10 @@ public class Ejemplares {
         btnFormularioRegistrar.setForeground(Color.decode("#468DAE"));
         btnFormularioRegistrar.setFocusPainted(false);
         btnFormularioRegistrar.setBorder(null);
+        // Navegar de vuelta al catálogo de publicaciones
+        btnFormularioRegistrar
+                .addActionListener(evt -> controlador.getControladorNavegacion().cambiarPantallaHijo("publicaciones"));
+        btnFormularioRegistrar.setToolTipText("Volver al catálogo");
         encabezado.add(btnFormularioRegistrar);
 
         // Panel de publicacion
@@ -114,8 +120,8 @@ public class Ejemplares {
         // Placeholder lo que va aqui aún no ha sido definido
         JPanel placeholder = new JPanel();
         placeholder.setBackground(Color.decode("#EEEEEE"));
-        placeholder.setSize(50,70);
-        placeholder.setBounds(10,15,50,70);
+        placeholder.setSize(50, 70);
+        placeholder.setBounds(10, 15, 50, 70);
         publicacionPanel.add(placeholder);
 
         // Datos publicacion
@@ -198,7 +204,6 @@ public class Ejemplares {
         btnEliminarEjemplar.setMargin(new Insets(0, 0, 0, 0));
         publicacionPanel.add(btnEliminarEjemplar);
 
-
         // Panel de ejemplares
         JPanel ejemplares = new JPanel();
         ejemplares.setSize(new Dimension(560, 380));
@@ -220,8 +225,9 @@ public class Ejemplares {
         btnNuevoEjemplar.setBorder(null);
         ejemplares.add(btnNuevoEjemplar);
 
-        // Tabla de ejemplares (modelo dinámico, se actualizará cuando se cargue una publicación)
-        String[] cols = new String[] {"ID", "num_ejemplar", "FECHA", "ESTADO", "ACCIONES"};
+        // Tabla de ejemplares (modelo dinámico, se actualizará cuando se cargue una
+        // publicación)
+        String[] cols = new String[] { "ID", "num_ejemplar", "FECHA", "ESTADO", "ACCIONES" };
 
         ejemplaresModel = new DefaultTableModel(new Object[0][0], cols) {
             @Override
@@ -302,7 +308,7 @@ public class Ejemplares {
                 editBtn.setFocusPainted(false);
                 editBtn.setContentAreaFilled(false);
                 editBtn.setOpaque(false);
-                editBtn.setMargin(new Insets(0,0,0,0));
+                editBtn.setMargin(new Insets(0, 0, 0, 0));
 
                 // Botón eliminar con fondo translúcido pintado manualmente
                 URL borrarIconUrl = getClass().getResource("/borrar.png");
@@ -327,7 +333,7 @@ public class Ejemplares {
                 delBtn.setFocusPainted(false);
                 delBtn.setContentAreaFilled(false);
                 delBtn.setOpaque(false);
-                delBtn.setMargin(new Insets(0,0,0,0));
+                delBtn.setMargin(new Insets(0, 0, 0, 0));
 
                 panelCell.add(editBtn);
                 panelCell.add(delBtn);
@@ -348,14 +354,11 @@ public class Ejemplares {
         scroll.setBorder(null);
         ejemplares.add(scroll);
 
-
         // Añadir paneles principales al panel principal
         panel.add(encabezado);
         panel.add(publicacionPanel);
         panel.add(ejemplares);
 
-
-        
         return panel;
     }
 
@@ -409,4 +412,4 @@ public class Ejemplares {
 
     }
 
-}  
+}

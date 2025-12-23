@@ -85,7 +85,7 @@ create table
         id_publicacion int NOT NULL,
         num_ejemplar int NOT NULL,
         fecha_adquisicion date NOT NULL,
-        estado Boolean NOT NULL DEFAULT TRUE,
+        estado Boolean NOT NULL DEFAULT TRUE, /* TRUE=en servicio, FALSE=fuera de servicio */
         FOREIGN KEY (id_publicacion) REFERENCES publicaciones (id)
     );
 
@@ -334,6 +334,81 @@ INSERT INTO prestamos (id, id_usuario, id_ejemplar, fecha_inicio, fecha_fin, est
 -- Préstamo dinámico: usa la fecha de importación (CURDATE()) para fecha_inicio y fecha_fin = fecha_inicio + 14 días
 INSERT INTO prestamos (id_usuario, id_ejemplar, fecha_inicio, fecha_fin, estado) VALUES
 (1, 10, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 14 DAY), TRUE);
+
+-- ==========================
+-- Datos adicionales de prueba: más publicaciones, ejemplares y préstamos
+-- ==========================
+
+-- Nuevos autores
+INSERT INTO autores (id, nombre, nacionalidad) VALUES
+(6,'Lucía Gómez','ES'),
+(7,'Diego Fernández','ES'),
+(8,'Alice Smith','US'),
+(9,'Mohamed Ali','TN');
+
+-- Nuevas publicaciones (libros y revistas)
+INSERT INTO publicaciones (id, titulo, editorial, codigo_isbn, idioma, tipo, estado) VALUES
+(7,'Python Avanzado: Buenas prácticas','Editorial Py','978-1-23456-789-4','Español','l',TRUE),
+(8,'Internet de las Cosas: Diseño y Prácticas','IoTPress','978-1-23456-789-5','Español','l',TRUE),
+(9,'Revista IA Aplicada Vol.2','Revista IA','RV-2025-010','Español','r',TRUE),
+(10,'Bases de Datos NoSQL','NoSQL Books','978-1-23456-789-6','Español','l',TRUE),
+(11,'Desarrollo Mobile en Android','MovilPress','978-1-23456-789-7','Español','l',TRUE),
+(12,'Revista Seguridad Informática Vol.4','Revista Security','RV-2025-020','Español','r',TRUE);
+
+-- Detalles para libros
+INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES
+(7,1,'2023-10-05'),
+(8,2,'2022-06-12'),
+(10,1,'2021-11-01'),
+(11,3,'2024-02-20');
+
+-- Detalles para revistas
+INSERT INTO revistas (id_publicacion, periodicidad, num_revista) VALUES
+(9,'Trimestral',2),
+(12,'Mensual',4);
+
+-- Relaciones módulo / ciclo / tema para las nuevas publicaciones
+INSERT INTO publicacion_modulo (id_publicacion, id_modulo) VALUES
+(7,1),(7,7),(8,6),(10,2),(11,4),(9,4),(12,6);
+
+INSERT INTO publicacion_ciclo (id_publicacion, id_ciclo) VALUES
+(7,1),(7,2),(8,3),(9,2),(10,1),(11,1),(12,3);
+
+INSERT INTO publicacion_tema (id_publicacion, id_tema) VALUES
+(7,9),(7,1),(8,7),(10,2),(11,4),(9,5),(12,7);
+
+-- Relación libros <-> autores
+INSERT INTO libros_autores (id_libro, id_autor) VALUES
+(7,6),(8,7),(10,2),(11,8);
+
+-- Nuevos ejemplares
+INSERT INTO ejemplares (id, id_publicacion, num_ejemplar, fecha_adquisicion, estado) VALUES
+(11,7,1,'2023-10-15',TRUE),
+(12,7,2,'2023-11-01',TRUE),
+(13,8,1,'2022-07-01',TRUE),
+(14,8,2,'2022-07-02',FALSE), -- baja
+(15,9,1,'2025-03-01',TRUE),
+(16,10,1,'2021-12-01',TRUE),
+(17,10,2,'2022-01-15',TRUE),
+(18,11,1,'2024-03-01',TRUE),
+(19,11,2,'2024-03-05',TRUE),
+(20,12,1,'2025-02-01',TRUE);
+
+-- Préstamos asociados a los nuevos ejemplares (activos y cerrados)
+INSERT INTO prestamos (id, id_usuario, id_ejemplar, fecha_inicio, fecha_fin, estado) VALUES
+(8,4,11,'2025-12-10','2025-12-24',TRUE), -- préstamo activo (ejemplar 11)
+(9,5,14,'2025-10-01','2025-10-15',FALSE), -- préstamo cerrado en ejemplar 14 (baja)
+(10,6,12,'2025-11-01','2025-11-15',FALSE),
+(11,2,15,'2025-12-01','2025-12-14',TRUE),
+(12,3,16,'2024-06-05','2024-06-19',FALSE),
+(13,9,19,'2025-12-08','2025-12-22',TRUE);
+-- Publicación nueva sin ejemplares asociados
+INSERT INTO publicaciones (id, titulo, editorial, codigo_isbn, idioma, tipo, estado) VALUES
+(13,'Introducción a Rust: programación segura','Rust Press','978-1-23456-789-8','Español','l',TRUE);
+
+-- Detalle de libro (no se crean ejemplares para esta publicación)
+INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES
+(13,1,'2025-05-10');
 
 -- Fin de datos de prueba
 
