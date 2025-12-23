@@ -7,9 +7,16 @@ import com.example.modelo.Usuario;
  * Clase para el controlador de inicio de sesión
  */
 public class ControladorInicioSesion {
-    
+
+    /**
+     * Inicia sesión con las credenciales proporcionadas
+     * 
+     * @param usuario
+     * @param contrasena
+     * @return
+     */
     public Usuario iniciarSesion(String usuario, String contrasena) {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         return usuarioDAO.consultaInicioSesion(usuario, contrasena);
-    } 
+    }
 }
