@@ -15,6 +15,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -62,6 +63,11 @@ public class Ejemplares {
      * Tabla de ejemplares
      */
     private JTable ejemplaresTable;
+
+    /**
+     * Id de la publicación actualmente cargada en la vista (para acciones como editar)
+     */
+    private int currentPublicacionId = -1;
 
     /**
      * Constructor de la vista Ejemplares
@@ -172,6 +178,18 @@ public class Ejemplares {
         btnEditarEjemplar.setToolTipText("Editar ejemplar");
         btnEditarEjemplar.setMargin(new Insets(0, 0, 0, 0));
         publicacionPanel.add(btnEditarEjemplar);
+
+        // Abrir diálogo de edición al pulsar editar (si hay una publicación cargada)
+        btnEditarEjemplar.addActionListener(evt -> {
+            if (currentPublicacionId > 0) {
+                EditarPublicacionDialog dialog = new EditarPublicacionDialog(controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
+                dialog.setVisible(true);
+                // refrescar la vista de ejemplares para mostrar cambios
+                controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(publicacionPanel, "No hay publicación seleccionada para editar", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+            }
+        });
 
         JButton btnEliminarEjemplar = new JButton() {
             // Asegura que el color de la opacidad sea el debido
@@ -310,6 +328,18 @@ public class Ejemplares {
                 editBtn.setOpaque(false);
                 editBtn.setMargin(new Insets(0, 0, 0, 0));
 
+                // Abrir diálogo de edición de la publicación actual (usa `currentPublicacionId`)
+                editBtn.addActionListener(evt -> {
+                    if (currentPublicacionId > 0) {
+                        EditarPublicacionDialog d = new EditarPublicacionDialog(controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
+                        d.setVisible(true);
+                        // refrescar para mostrar posibles cambios
+                        controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
+                    } else {
+                        JOptionPane.showMessageDialog(panelCell, "No hay publicación seleccionada para editar", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+                    }
+                });
+
                 // Botón eliminar con fondo translúcido pintado manualmente
                 URL borrarIconUrl = getClass().getResource("/borrar.png");
                 final JButton delBtn = new JButton() {
@@ -363,7 +393,9 @@ public class Ejemplares {
     }
 
     /**
-     * Carga los datos del resumen de la publicación en la vista
+     * Carga los datos del resumen de la publicación en la vista.
+     * También almacena el id de la publicación en `currentPublicacionId` para
+     * que acciones como "Editar" puedan abrir el diálogo apropiado.
      *
      * @param resumen arreglo: titulo,isbn,autores,ciclos,editorial,disponibles,id
      */
@@ -396,6 +428,9 @@ public class Ejemplares {
             id = -1;
         }
         if (id > 0) {
+            // almacenar el id cargado para acciones posteriores (editar)
+            this.currentPublicacionId = id;
+
             String[][] ejemplaresData = controlador.getControladorEjemplares().obtenerEjemplaresPorPublicacion(id);
             // Limpiar modelo
             for (int i = ejemplaresModel.getRowCount() - 1; i >= 0; i--) {

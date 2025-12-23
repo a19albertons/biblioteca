@@ -34,6 +34,10 @@ public class Controlador {
      */
     ControladorNuevaPublicacionDialog controladorNuevaPublicacionDialog;
     /**
+     * Controlador para editar publicaciones (diálogo de edición)
+     */
+    ControladorEditarPublicacionDialog controladorEditarPublicacionDialog;
+    /**
      * Controlador de gestión de usuarios
      */
     ControladorGestionUsuarios controladorGestionUsuarios = new ControladorGestionUsuarios();
@@ -179,6 +183,24 @@ public class Controlador {
         this.controladorNuevaPublicacionDialog = controladorNuevaPublicacionDialog;
     }
 
+    /**
+     * Obtiene el controlador encargado de la edición de publicaciones.
+     *
+     * @return controlador de edición de publicaciones
+     */
+    public ControladorEditarPublicacionDialog getControladorEditarPublicacionDialog() {
+        return controladorEditarPublicacionDialog;
+    }
+
+    /**
+     * Establece el controlador encargado de la edición de publicaciones.
+     *
+     * @param controladorEditarPublicacionDialog controlador de edición
+     */
+    public void setControladorEditarPublicacionDialog(ControladorEditarPublicacionDialog controladorEditarPublicacionDialog) {
+        this.controladorEditarPublicacionDialog = controladorEditarPublicacionDialog;
+    }
+
     // Constructores
     /**
      * Constructor por defecto
@@ -191,6 +213,7 @@ public class Controlador {
         this.controladorEjemplares = new ControladorEjemplares();
         this.controladorGestionUsuarios = new ControladorGestionUsuarios();
         this.controladorNuevaPublicacionDialog = new ControladorNuevaPublicacionDialog(this);
+        this.controladorEditarPublicacionDialog = new ControladorEditarPublicacionDialog(this);
         this.controladorNavegacion = new ControladorNavegacion(this);
         
     }

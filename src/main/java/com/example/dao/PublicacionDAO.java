@@ -468,5 +468,173 @@ public class PublicacionDAO {
         return null;
     }
 
-    
+    /**
+     * Obtiene detalles completos de una publicación (para edición).
+     *
+     * @param id id de la publicación
+     * @return arreglo con campos en el orden: tipo, titulo, codigo_isbn, idioma,
+     *         temasCSV, modulosCSV, ciclosCSV, editorial, num_edicion,
+     *         fecha_publicacion (YYYY-MM-DD), autoresCSV, periodicidad, id
+     *         (o null si no existe la publicación)
+     */
+    public String[] obtenerPublicacionDetallesPorId(int id) {
+        String sql = "SELECT p.id, p.titulo, p.codigo_isbn, p.idioma, p.tipo, "
+                + "COALESCE(GROUP_CONCAT(DISTINCT t.nombre SEPARATOR ', '),'') AS temas, "
+                + "COALESCE(GROUP_CONCAT(DISTINCT m.nombre SEPARATOR ', '),'') AS modulos, "
+                + "COALESCE(GROUP_CONCAT(DISTINCT c.nombre SEPARATOR ', '),'') AS ciclos, "
+                + "p.editorial, l.num_edicion, l.fecha_publicacion, "
+                + "COALESCE(GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', '),'') AS autores, "
+                + "r.periodicidad "
+                + "FROM publicaciones p "
+                + "LEFT JOIN libros l ON p.id = l.id_publicacion "
+                + "LEFT JOIN revistas r ON p.id = r.id_publicacion "
+                + "LEFT JOIN libros_autores la ON p.id = la.id_libro "
+                + "LEFT JOIN autores a ON la.id_autor = a.id "
+                + "LEFT JOIN publicacion_tema pt ON p.id = pt.id_publicacion "
+                + "LEFT JOIN temas t ON pt.id_tema = t.id "
+                + "LEFT JOIN publicacion_modulo pm ON p.id = pm.id_publicacion "
+                + "LEFT JOIN modulo m ON pm.id_modulo = m.id "
+                + "LEFT JOIN publicacion_ciclo pc ON p.id = pc.id_publicacion "
+                + "LEFT JOIN ciclos c ON pc.id_ciclo = c.id "
+                + "WHERE p.id = ? "
+                + "GROUP BY p.id";
+
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String tipo = rs.getString("tipo");
+                    String titulo = rs.getString("titulo");
+                    String isbn = rs.getString("codigo_isbn");
+                    String idioma = rs.getString("idioma");
+                    String temas = rs.getString("temas");
+                    String modulos = rs.getString("modulos");
+                    String ciclos = rs.getString("ciclos");
+                    String editorial = rs.getString("editorial");
+                    String numEd = rs.getString("num_edicion");
+                    String fechaPub = rs.getString("fecha_publicacion");
+                    String autores = rs.getString("autores");
+                    String periodicidad = rs.getString("periodicidad");
+
+                    return new String[] { tipo == null ? "" : tipo, titulo == null ? "" : titulo,
+                            isbn == null ? "" : isbn, idioma == null ? "" : idioma,
+                            temas == null ? "" : temas, modulos == null ? "" : modulos,
+                            ciclos == null ? "" : ciclos, editorial == null ? "" : editorial,
+                            numEd == null ? "" : numEd, fechaPub == null ? "" : fechaPub,
+                            autores == null ? "" : autores, periodicidad == null ? "" : periodicidad,
+                            String.valueOf(id) };
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return null;
+    }
+
+    /**
+     * Actualiza los campos base de la tabla `publicaciones`.
+     *
+     * @param conexion   Connection en contexto transaccional
+     * @param id         id de la publicación a actualizar
+     * @param titulo     nuevo título
+     * @param editorial  nueva editorial
+     * @param codigoIsbn nuevo código ISBN
+     * @param idioma     nuevo idioma
+     * @param tipo       tipo ('L' o 'R')
+     * @return true si la actualización tuvo éxito (o no hubo cambios), false en caso de error
+     */
+    public boolean actualizarPublicacion(Connection conexion, int id, String titulo, String editorial,
+            String codigoIsbn, String idioma, char tipo) {
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "UPDATE publicaciones SET titulo = ?, editorial = ?, codigo_isbn = ?, idioma = ?, tipo = ? WHERE id = ?")) {
+            ps.setString(1, titulo);
+            ps.setString(2, editorial);
+            ps.setString(3, codigoIsbn);
+            ps.setString(4, idioma);
+            ps.setString(5, String.valueOf(Character.toUpperCase(tipo)));
+            ps.setInt(6, id);
+            int updated = ps.executeUpdate();
+            return updated >= 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza o inserta la fila en `libros` para la publicación dada.
+     */
+    public boolean actualizarLibro(Connection conexion, int idPublicacion, int numEdicion, java.sql.Date fechaPublicacion) {
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "UPDATE libros SET num_edicion = ?, fecha_publicacion = ? WHERE id_publicacion = ?")) {
+            ps.setInt(1, numEdicion);
+            ps.setDate(2, fechaPublicacion);
+            ps.setInt(3, idPublicacion);
+            int updated = ps.executeUpdate();
+            if (updated == 0) {
+                // No existe, insertar
+                return insertarLibro(conexion, idPublicacion, numEdicion, fechaPublicacion);
+            }
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza o inserta la fila en `revistas` para la publicación dada.
+     */
+    public boolean actualizarRevista(Connection conexion, int idPublicacion, String periodicidad) {
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "UPDATE revistas SET periodicidad = ? WHERE id_publicacion = ?")) {
+            ps.setString(1, periodicidad);
+            ps.setInt(2, idPublicacion);
+            int updated = ps.executeUpdate();
+            if (updated == 0) {
+                // necesitar asignar num_revista; usar siguienteNumRevista
+                int numRev = siguienteNumRevista(conexion);
+                return insertarRevista(conexion, idPublicacion, periodicidad, numRev);
+            }
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Elimina relaciones multivaluadas (módulos, ciclos, temas, autores) para una
+     * publicación dada. Usar en contexto transaccional (no hace commit/rollback).
+     *
+     * @param conexion      Connection en uso
+     * @param idPublicacion id de la publicación
+     * @return true si las eliminaciones se realizaron correctamente, false en caso de error
+     */
+    public boolean eliminarRelacionesPublicacion(Connection conexion, int idPublicacion) {
+        try (PreparedStatement ps1 = conexion.prepareStatement("DELETE FROM publicacion_modulo WHERE id_publicacion = ?");
+                PreparedStatement ps2 = conexion.prepareStatement("DELETE FROM publicacion_ciclo WHERE id_publicacion = ?");
+                PreparedStatement ps3 = conexion.prepareStatement("DELETE FROM publicacion_tema WHERE id_publicacion = ?");
+                PreparedStatement ps4 = conexion.prepareStatement("DELETE FROM libros_autores WHERE id_libro = ?")) {
+            ps1.setInt(1, idPublicacion);
+            ps1.executeUpdate();
+            ps2.setInt(1, idPublicacion);
+            ps2.executeUpdate();
+            ps3.setInt(1, idPublicacion);
+            ps3.executeUpdate();
+            ps4.setInt(1, idPublicacion);
+            ps4.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
 }
