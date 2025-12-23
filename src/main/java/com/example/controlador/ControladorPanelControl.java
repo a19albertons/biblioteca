@@ -1,8 +1,9 @@
 package com.example.controlador;
 
+import com.example.dao.CicloDAO;
 import com.example.dao.PrestamoDAO;
+import com.example.dao.PublicacionDAO;
 import com.example.dao.UsuarioDAO;
-import com.example.modelo.Usuario;
 
 /**
  * Controlador para el panel de control
@@ -42,11 +43,43 @@ public class ControladorPanelControl {
 
     /**
      * Obtiene los últimos movimientos de préstamos
+     * 
      * @return
      */
     public String[][] obtenerUltimosMovimientos() {
         PrestamoDAO prestamoDAO = new PrestamoDAO();
         return prestamoDAO.ultimosMovimientos();
+    }
+
+    /**
+     * Obtiene la lista de ciclos
+     * 
+     * @return
+     */
+    public String[] listaCiclos() {
+        CicloDAO cicloDAO = new CicloDAO();
+        String[] listaCiclos = cicloDAO.listaCiclos();
+        return listaCiclos;
+    }
+
+    /**
+     * Obtiene la lista de editoriales
+     * 
+     * @return
+     */
+    public String[] listaEditoriales() {
+        PublicacionDAO publicacionDAO = new PublicacionDAO();
+        String[] listaEditoriales = publicacionDAO.listaEditoriales();
+        return listaEditoriales;
+    }
+    
+    /**
+     * Obtiene el resumen de publicaciones
+     */
+    public String[][] listaPublicacionesResumen() {
+        PublicacionDAO publicacionDAO = new PublicacionDAO();
+        String[][] resumen = publicacionDAO.listaPublicacionesResumen();
+        return resumen;
     }
 
 }

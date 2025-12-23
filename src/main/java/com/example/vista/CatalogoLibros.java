@@ -1,13 +1,20 @@
 package com.example.vista;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import com.example.controlador.Controlador;
@@ -64,10 +71,28 @@ public class CatalogoLibros {
         btnNuevaPub.setBorder(null);
         encabezado.add(btnNuevaPub);
 
-        // Buscador 
-        JTextField buscador = new JTextField();
+        // Buscador con hint y padding izquierdo
+        JTextField buscador = new JTextField() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (getText().isEmpty()) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setColor(Color.decode("#000000"));
+                    g2.setFont(getFont().deriveFont(Font.PLAIN, getFont().getSize()));
+                    Insets insets = getInsets();
+                    int y = (getHeight() - g2.getFontMetrics().getHeight()) / 2 + g2.getFontMetrics().getAscent();
+                    g2.drawString("Buscar por Título, ISBN o Autor...", insets.left + 5, y);
+                    g2.dispose();
+                }
+            }
+        };
         buscador.setBounds(30, 80, 350, 40);
-        buscador.setBorder(null);
+        buscador.setFont(com.example.utilities.Fonts.openSans(12f));
+        buscador.setBackground(Color.white);
+        buscador.setForeground(Color.decode("#000000"));
+        // padding izquierdo 8px y borde para el input
+        buscador.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.decode("#ffffff")), BorderFactory.createEmptyBorder(0, 8, 0, 0)));
 
         // Buscar 
         JButton btnBuscar = new JButton("Buscar");
@@ -85,139 +110,133 @@ public class CatalogoLibros {
         JComboBox<String> comboCiclos = new JComboBox<>();
         comboCiclos.setBounds(110, 130, 100, 20);
         comboCiclos.addItem("Ciclos");
+        String[] listaCiclos = controlador.getControladorPanelControl().listaCiclos();
+        for (String ciclo : listaCiclos) {
+            comboCiclos.addItem(ciclo);
+        }
 
         JComboBox<String> comboEditorial = new JComboBox<>();
         comboEditorial.setBounds(230, 130, 100, 20);
         comboEditorial.addItem("Editorial");
+        String[] listaEditoriales = controlador.getControladorPanelControl().listaEditoriales();
+        for (String editorial : listaEditoriales) {
+            comboEditorial.addItem(editorial);
+        }
 
-        // Cards de ejemplo
-        JPanel cardEjemplo1 = new JPanel();
-        cardEjemplo1.setSize(170, 220);
-        cardEjemplo1.setLayout(null);
-        cardEjemplo1.setBackground(Color.white);
-        cardEjemplo1.setBounds(30, 170, 170, 220);
-        cardEjemplo1.setBorder(null);
+        // Seccion de las cards de publicaciones
+        // Cards dinámicos: contenedor con grid de 3 columnas y scroll
+        JPanel cardsContainer = new JPanel(new java.awt.GridLayout(0, 3, 15, 15));
+        cardsContainer.setBackground(Color.decode("#EDF3F6"));
 
-        JPanel placeholder1 = new JPanel();
-        placeholder1.setBackground(Color.decode("#EEEEEE"));
-        placeholder1.setBounds(0, 0, 170, 100);
-        cardEjemplo1.add(placeholder1);
+        // Obtener resumen de publicaciones
+        String[][] resumenPublicaciones = controlador.getControladorPanelControl().listaPublicacionesResumen();
 
-        // JLabel con info del libro
-        JLabel titulo1 = new JLabel("Ingenieria de S.");
-        titulo1.setBounds(10, 110, 150, 20);
-        cardEjemplo1.add(titulo1);
-        JLabel isbn = new JLabel("ISBN: 1234567890");
-        isbn.setBounds(10, 140, 150, 20);
-        cardEjemplo1.add(isbn);
+        // Comprueba que hay contenido
+        if (resumenPublicaciones != null) {
+            for (String[] fila : resumenPublicaciones) {
+                // Extraer datos de la fila y comprobaciones null
+                String tituloTxt = fila[0] != null ? fila[0] : "";
+                String isbnTxt = fila[1] != null ? fila[1] : "";
+                String autoresTxt = fila[2] != null ? fila[2] : "";
+                String ciclosTxt = fila[3] != null ? fila[3] : "";
+                String editorialTxt = fila[4] != null ? fila[4] : "";
+                int disponiblesNum = 0;
+                try {
+                    disponiblesNum = Integer.parseInt(fila[5]);
+                } catch (Exception ex) {
+                    disponiblesNum = 0;
+                }
+                String idPub = fila[6] != null ? fila[6] : "";
 
-        JLabel editorial1 = new JLabel("Ed: Ejemplo");
-        editorial1.setBounds(10, 170, 150, 20);
-        cardEjemplo1.add(editorial1);
+                // Construir card por publicación
+                JPanel card = new JPanel();
+                card.setPreferredSize(new Dimension(170, 220));
+                card.setLayout(null);
+                card.setBackground(Color.white);
+                card.setBorder(null);
 
-        // Disponibilidad
-        JLabel disponibilidad1 = new JLabel("3 Disponible");
-        disponibilidad1.setBounds(10, 200, 150, 20);
-        disponibilidad1.setForeground(Color.decode("#2BC187"));
-        disponibilidad1.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#2BC187")));
-        disponibilidad1.setHorizontalAlignment(JLabel.CENTER);
-        disponibilidad1.setVerticalAlignment(JLabel.CENTER);
-        cardEjemplo1.add(disponibilidad1);
+                JPanel placeholder = new JPanel();
+                placeholder.setBackground(Color.decode("#EEEEEE"));
+                placeholder.setBounds(0, 0, 170, 100);
+                card.add(placeholder);
 
-        // Hacer la tarjeta clicable: al click ir a la vista de Ejemplares
-        cardEjemplo1.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
-        cardEjemplo1.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                controlador.getControladorNavegacion().cambiarPantallaHijo("ejemplares");
+                JLabel tituloLabel = new JLabel(tituloTxt);
+                tituloLabel.setBounds(10, 110, 150, 20);
+                card.add(tituloLabel);
+
+                JLabel isbnLabel = new JLabel("ISBN: " + isbnTxt);
+                isbnLabel.setBounds(10, 135, 150, 16);
+                isbnLabel.setFont(isbnLabel.getFont().deriveFont(11f));
+                card.add(isbnLabel);
+
+                JLabel autoresLabel = new JLabel("Autor(es): " + autoresTxt);
+                autoresLabel.setBounds(10, 150, 150, 18);
+                autoresLabel.setFont(autoresLabel.getFont().deriveFont(10f));
+                autoresLabel.setForeground(Color.decode("#666666"));
+                card.add(autoresLabel);
+
+                JLabel ciclosLabel = new JLabel("Ciclos: " + ciclosTxt);
+                ciclosLabel.setBounds(10, 165, 150, 18);
+                ciclosLabel.setFont(ciclosLabel.getFont().deriveFont(10f));
+                ciclosLabel.setForeground(Color.decode("#666666"));
+                card.add(ciclosLabel);
+
+                JLabel editorialLabel = new JLabel("Ed: " + editorialTxt);
+                editorialLabel.setBounds(10, 180, 150, 18);
+                card.add(editorialLabel);
+
+                JLabel disponibilidadLabel = new JLabel();
+                disponibilidadLabel.setBounds(10, 198, 150, 18);
+                disponibilidadLabel.setHorizontalAlignment(JLabel.CENTER);
+                disponibilidadLabel.setVerticalAlignment(JLabel.CENTER);
+                disponibilidadLabel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#2BC187")));
+                // Establecer texto y color según disponibilidad
+                if (disponiblesNum > 0) {
+                    disponibilidadLabel.setText(disponiblesNum + " disponibles");
+                    disponibilidadLabel.setForeground(Color.decode("#2BC187"));
+                } else {
+                    disponibilidadLabel.setText("AGOTADO");
+                    disponibilidadLabel.setForeground(Color.decode("#F4791B"));
+                    disponibilidadLabel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#F4791B")));
+                }
+                card.add(disponibilidadLabel);
+
+                // Click para ir a ejemplares
+                card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                card.addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        // por ahora solo navegamos a la pantalla de ejemplares; el id está disponible en idPub si se necesita usar
+                        controlador.getControladorNavegacion().cambiarPantallaHijo("ejemplares");
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        card.setBackground(Color.decode("#F6F9FB"));
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        card.setBackground(Color.white);
+                    }
+                });
+
+                cardsContainer.add(card);
             }
+        }
 
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-                // ligero efecto hover
-                cardEjemplo1.setBackground(Color.decode("#F6F9FB"));
-            }
-
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-                cardEjemplo1.setBackground(Color.white);
-            }
-        });
-
-        // Card Ejemplo 2 (centrada)
-        JPanel cardEjemplo2 = new JPanel();
-        cardEjemplo2.setSize(170, 220);
-        cardEjemplo2.setLayout(null);
-        cardEjemplo2.setBackground(Color.white);
-        cardEjemplo2.setBounds(215, 170, 170, 220);
-        cardEjemplo2.setBorder(null);
-
-        JPanel placeholder2 = new JPanel();
-        placeholder2.setBackground(Color.decode("#EEEEEE"));
-        placeholder2.setBounds(0, 0, 170, 100);
-        cardEjemplo2.add(placeholder2);
-
-        JLabel titulo2 = new JLabel("Historia del Arte");
-        titulo2.setBounds(10, 110, 150, 20);
-        cardEjemplo2.add(titulo2);
-        JLabel isbn2 = new JLabel("ISBN: 978-0-00-000");
-        isbn2.setBounds(10, 140, 150, 20);
-        cardEjemplo2.add(isbn2);
-
-        JLabel editorial2 = new JLabel("Ed: Cultura");
-        editorial2.setBounds(10, 170, 150, 20);
-        cardEjemplo2.add(editorial2);
-
-        JLabel disponibilidad2 = new JLabel("AGOTADO");
-        disponibilidad2.setBounds(10, 200, 150, 20);
-        disponibilidad2.setForeground(Color.decode("#F4791B"));
-        disponibilidad2.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#F4791B")));
-        disponibilidad2.setHorizontalAlignment(JLabel.CENTER);
-        disponibilidad2.setVerticalAlignment(JLabel.CENTER);
-        cardEjemplo2.add(disponibilidad2);
-
-        // Card Ejemplo 3 (derecha)
-        JPanel cardEjemplo3 = new JPanel();
-        cardEjemplo3.setSize(170, 220);
-        cardEjemplo3.setLayout(null);
-        cardEjemplo3.setBackground(Color.white);
-        cardEjemplo3.setBounds(400, 170, 170, 220);
-        cardEjemplo3.setBorder(null);
-
-        JPanel placeholder3 = new JPanel();
-        placeholder3.setBackground(Color.decode("#EEEEEE"));
-        placeholder3.setBounds(0, 0, 170, 100);
-        cardEjemplo3.add(placeholder3);
-
-        JLabel titulo3 = new JLabel("Matemáticas I");
-        titulo3.setBounds(10, 110, 150, 20);
-        cardEjemplo3.add(titulo3);
-        JLabel isbn3 = new JLabel("ISBN: 978-1-23-456");
-        isbn3.setBounds(10, 140, 150, 20);
-        cardEjemplo3.add(isbn3);
-
-        JLabel editorial3 = new JLabel("Ed: Ejemplo");
-        editorial3.setBounds(10, 170, 150, 20);
-        cardEjemplo3.add(editorial3);
-
-        JLabel disponibilidad3 = new JLabel("12 DISPONIBLES");
-        disponibilidad3.setBounds(10, 200, 150, 20);
-        disponibilidad3.setForeground(Color.decode("#2BC187"));
-        disponibilidad3.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.decode("#2BC187")));
-        disponibilidad3.setHorizontalAlignment(JLabel.CENTER);
-        disponibilidad3.setVerticalAlignment(JLabel.CENTER);
-        cardEjemplo3.add(disponibilidad3);
-
-
+        JScrollPane scrollPublicaciones = new JScrollPane(cardsContainer);
+        scrollPublicaciones.setBounds(20, 170, 570, 380);
+        scrollPublicaciones.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        
+        // Agregar componentes al panel principal
         panel.add(encabezado);
         panel.add(buscador);
         panel.add(btnBuscar);
         panel.add(filtros);
         panel.add(comboCiclos);
         panel.add(comboEditorial);
-        panel.add(cardEjemplo1);
-        panel.add(cardEjemplo2);
-        panel.add(cardEjemplo3);
+        panel.add(scrollPublicaciones);
 
         return panel;
     }
