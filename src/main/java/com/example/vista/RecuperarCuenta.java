@@ -14,10 +14,13 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.example.controlador.Controlador;
+import com.example.modelo.TipoUsuario;
+import com.example.modelo.Usuario;
 
 /**
  * Clase para la vista Recuperar cuenta
@@ -137,8 +140,40 @@ public class RecuperarCuenta {
 
         // Eventos (sin lógica de backend)
         btnEnviar.addActionListener(e -> {
-            // Por ahora no hay backend; regresamos a la pantalla de inicio
-            controlador.getControladorNavegacion().cambiarPantallaPadre("inicioSesion");
+            // Logica de backend para iniciar sesion
+            // Se comprueban el campo de formulario
+            if (!campo.getText().trim().isEmpty()) {
+                // Invocamos al usuario desde el controlador
+                Usuario usuario = controlador.getControladorRecuperarCuenta().recuperarCuenta(campo.getText().trim());
+                // Comprobar si el usuario es null (credenciales incorrectas)
+                if (controlador.getControladorRecuperarCuenta().usuarioNoValido(usuario)) {
+                    JOptionPane.showMessageDialog(version, "Ingrese un usuario o correo electrónico válido.",
+                            "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                // Si da true, la cuenta está desactivada. Mantener signo de exclamación
+                if (controlador.getControladorRecuperarCuenta().cuentaDesactivada(usuario)) {
+                    JOptionPane.showMessageDialog(version, "La cuenta está desactivada. Contacte con el administrador.",
+                            "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                // Solo los conserjes pueden recuperar la contraseña
+                if (controlador.getControladorRecuperarCuenta().usuarioNoConserje(usuario)) {
+                    JOptionPane.showMessageDialog(version, "Actualmente esto no le afecta.",
+                            "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                // Simular envío de correo y volver al inicio de sesión
+                // En un mundo bonito habría un plugin que mandaría tal correo
+                JOptionPane.showMessageDialog(version,
+                        "Debería haber recibido un correo electronico con su contraseña.",
+                        "Recuperar cuenta", JOptionPane.INFORMATION_MESSAGE);
+                controlador.getControladorNavegacion().cambiarPantallaPadre("inicioSesion");
+            } else {
+                JOptionPane.showMessageDialog(version, "Por favor, ingrese un usuario o correo electrónico.",
+                        "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
+            }
+
         });
 
         volver.addMouseListener(new MouseAdapter() {
