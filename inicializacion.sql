@@ -12,10 +12,10 @@ create table
         /* calculado: formato AYYNombreIJ .
            Ejemplo: A25JuanLP -> 'A' + 25 (año 2025) + Nombre (Juan) + 1ª letra apellido1 (L) + 1ª letra apellido2 (P) */
         usuario varchar(100) NOT NULL DEFAULT '' UNIQUE,
-        email varchar(100) UNIQUE,
+        email varchar(100) NOT NULL UNIQUE,
         contrasena varchar(50) NOT NULL,
         /* E=Estudiante, P=Profesor, A=Administrativo, C=Conserje, L=Limpiador */
-        Tipo char(1) NOT NULL CHECK (Tipo IN ('E', 'P', 'A', 'C', 'L')),
+        tipo char(1) NOT NULL CHECK (Tipo IN ('E', 'P', 'A', 'C', 'L')),
         estado Boolean NOT NULL DEFAULT TRUE
     );
 
@@ -262,17 +262,26 @@ INSERT INTO ejemplares (id, id_publicacion, num_ejemplar, fecha_adquisicion, est
 (10,1,3,'2024-09-12',TRUE);
 
 -- Usuarios (alumnos A, profesores P, empleados E, conserje C, limpiador L)
-INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, contrasena, Tipo, estado) VALUES
-(1,'11111111A','Juan','Pérez','García','passJuan1','A',TRUE),
-(2,'22222222B','Lucía','Martínez','Sánchez','passLucia2','A',TRUE),
-(3,'33333333C','Miguel','López','Pena','passMiguel3','P',TRUE),
-(4,'44444444D','Ana','García','Ramírez','passAna4','P',TRUE),
-(5,'55555555E','Carlos','Ruiz','Fernández','passCarlos5','E',TRUE),
-(6,'66666666F','Laura','Díaz','Torres','passLaura6','C',TRUE),
-(7,'77777777G','Sergio','Navarro','Gómez','passSergio7','L',TRUE),
-(8,'88888888H','Marta','Ortega','Sanz','passMarta8','A',TRUE),
-(9,'99999999I','Isabel','Soto','Molina','passIsabel9','A',TRUE),
-(10,'00000000J','David','Giménez','Ruano','passDavid10','P',TRUE);
+INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, Tipo, estado) VALUES
+(1,'11111111A','Juan','Pérez','García','juan.perez@example.com','passJuan1','A',TRUE),
+(2,'22222222B','Lucía','Martínez','Sánchez','lucia.martinez@example.com','passLucia2','A',TRUE),
+(3,'33333333C','Miguel','López','Pena','miguel.lopez@example.com','passMiguel3','P',TRUE),
+(4,'44444444D','Ana','García','Ramírez','ana.garcia@example.com','passAna4','P',TRUE),
+(5,'55555555E','Carlos','Ruiz','Fernández','carlos.ruiz@example.com','passCarlos5','E',TRUE),
+(6,'66666666F','Laura','Díaz','Torres','laura.conserje@example.com','passLaura6','C',TRUE),
+(7,'77777777G','Sergio','Navarro','Gómez','sergio.navarro@example.com','passSergio7','L',TRUE),
+(8,'88888888H','Marta','Ortega','Sanz','marta.ortega@example.com','passMarta8','A',TRUE),
+(9,'99999999I','Isabel','Soto','Molina','isabel.soto@example.com','passIsabel9','A',TRUE),
+(10,'00000000J','David','Giménez','Ruano','david.gimenez@example.com','passDavid10','P',TRUE);
+
+-- Usuarios de prueba adicionales para tests de inicio de sesión
+-- id 11: cuenta desactivada (para probar mensaje de cuenta desactivada)
+-- id 12: contraseña vacía (para probar validaciones de formulario)
+-- id 13: conserje de prueba (para probar la restricción de acceso de conserjes)
+INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, Tipo, estado) VALUES
+(11,'12121212K','Bloqueado','Usuario','Test','bloqueado.usuario@example.com','passBloq11','A',FALSE),
+(12,'13131313L','NoPass','Usuario','Test','nopass.usuario@example.com','','A',TRUE),
+(13,'14141414M','ConserjePrueba','Soler','Márquez','conserje@example.com','conserje123','C',TRUE);
 
 -- Préstamos (algunos abiertos, algunos cerrados)
 INSERT INTO prestamos (id, id_usuario, id_ejemplar, fecha_inicio, fecha_fin, estado) VALUES

@@ -9,6 +9,10 @@ public class Controlador {
      * Controlador de navegación
      */
     ControladorNavegacion controladorNavegacion;
+    /**
+     * Controlador de inicio de sesión
+     */
+    ControladorInicioSesion controladorInicioSesion;
 
     // Getters y Setters
     /**
@@ -29,12 +33,31 @@ public class Controlador {
         this.controladorNavegacion = controladorNavegacion;
     }
 
+    /**
+     * Obtiene el controlador de inicio de sesión
+     * 
+     * @return
+     */
+    public ControladorInicioSesion getControladorInicioSesion() {
+        return controladorInicioSesion;
+    }
+
+    /**
+     * Establece el controlador de inicio de sesión
+     * 
+     * @param controladorInicioSesion
+     */
+    public void setControladorInicioSesion(ControladorInicioSesion controladorInicioSesion) {
+        this.controladorInicioSesion = controladorInicioSesion;
+    }
+
     // Constructores
     /**
      * Constructor por defecto
      */
     public Controlador() {
         this.controladorNavegacion = new ControladorNavegacion(this);
+        this.controladorInicioSesion = new ControladorInicioSesion();
     }
 
     // Metodos del controlador

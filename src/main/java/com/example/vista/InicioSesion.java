@@ -14,10 +14,13 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.example.controlador.Controlador;
+import com.example.modelo.TipoUsuario;
+import com.example.modelo.Usuario;
 
 /**
  * Clase para la vista de inicio de sesión
@@ -135,8 +138,33 @@ public class InicioSesion {
 
         // Eventos
         btnAcceder.addActionListener(e -> {
-            // temporal no hay logica de backend aun
-            controlador.getControladorNavegacion().cambiarPantallaPadre("entrarSistema");
+            // Logica de backend para iniciar sesion
+            // Se comprueban los 2 campos del formulario
+            if (!usuarioField.getText().trim().isEmpty() && !contrasenaField.getText().trim().isEmpty()) {
+                // Invocamos al usuario desde el controlador
+                Usuario usuario = controlador.getControladorInicioSesion().iniciarSesion(usuarioField.getText().trim(), contrasenaField.getText().trim());
+                // Comprobar si el usuario es null (credenciales incorrectas)
+                if (usuario == null) {
+                    JOptionPane.showMessageDialog(version, "Usuario o contraseña incorrectos.", "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                // Si da true, la cuenta está desactivada. Mantener signo de exclamación
+                if (!usuario.getEstado()) {
+                    JOptionPane.showMessageDialog(version, "La cuenta está desactivada. Contacte con el administrador.", "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                // Solo los conserjes pueden acceder al sistema
+                if (usuario.getTipo() != TipoUsuario.C) {
+                    JOptionPane.showMessageDialog(version, "Solo los conserjes tienen acceso al sistema.", "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                // Si todo es correcto, navegar a la pantalla principal
+                controlador.getControladorNavegacion().cambiarPantallaPadre("entrarSistema");
+            }
+            else {
+                JOptionPane.showMessageDialog(version, "Por favor, ingrese usuario y contraseña.", "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
+            }
+            
         });
         return panel;
     }
