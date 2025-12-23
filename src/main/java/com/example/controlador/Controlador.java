@@ -30,6 +30,10 @@ public class Controlador {
      */
     ControladorEjemplares controladorEjemplares;
     /**
+     * Controlador de nueva publicación (encapsula la lógica de persistencia de publicaciones)
+     */
+    ControladorNuevaPublicacionDialog controladorNuevaPublicacionDialog;
+    /**
      * Controlador de gestión de usuarios
      */
     ControladorGestionUsuarios controladorGestionUsuarios = new ControladorGestionUsuarios();
@@ -157,6 +161,24 @@ public class Controlador {
         this.controladorGestionUsuarios = controladorGestionUsuarios;
     }
 
+    /**
+     * Obtiene el controlador de nueva publicación
+     *
+     * @return controlador de nueva publicación
+     */
+    public ControladorNuevaPublicacionDialog getControladorNuevaPublicacionDialog() {
+        return controladorNuevaPublicacionDialog;
+    }
+
+    /**
+     * Establece el controlador de nueva publicación
+     *
+     * @param controladorNuevaPublicacionDialog
+     */
+    public void setControladorNuevaPublicacionDialog(ControladorNuevaPublicacionDialog controladorNuevaPublicacionDialog) {
+        this.controladorNuevaPublicacionDialog = controladorNuevaPublicacionDialog;
+    }
+
     // Constructores
     /**
      * Constructor por defecto
@@ -168,6 +190,7 @@ public class Controlador {
         this.controladorPanelControl = new ControladorPanelControl();
         this.controladorEjemplares = new ControladorEjemplares();
         this.controladorGestionUsuarios = new ControladorGestionUsuarios();
+        this.controladorNuevaPublicacionDialog = new ControladorNuevaPublicacionDialog(this);
         this.controladorNavegacion = new ControladorNavegacion(this);
         
     }

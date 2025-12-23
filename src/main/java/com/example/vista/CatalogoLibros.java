@@ -29,6 +29,15 @@ public class CatalogoLibros {
      */
     Controlador controlador;
 
+    // Componentes que se mantienen como campo para permitir refresco dinámico
+    private JPanel panel;
+    private JTextField buscadorField;
+    private JComboBox<String> comboCiclosField;
+    private JComboBox<String> comboEditorialField;
+    private JPanel cardsContainer;
+    private JScrollPane scrollPublicaciones;
+    private String[][] resumenPublicacionesField;
+
     /**
      * Constructor de la vista CatalogoLibros
      *
@@ -71,8 +80,14 @@ public class CatalogoLibros {
         btnNuevaPub.setBorder(null);
         encabezado.add(btnNuevaPub);
 
+        // Abrir modal para nueva publicación
+        btnNuevaPub.addActionListener(e -> {
+            NuevaPublicacionDialog dialog = new NuevaPublicacionDialog(controlador.getControladorNavegacion().getVentana(), controlador);
+            dialog.setVisible(true);
+        });
+
         // Buscador con hint y padding izquierdo
-        JTextField buscador = new JTextField() {
+        buscadorField = new JTextField() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -87,12 +102,12 @@ public class CatalogoLibros {
                 }
             }
         };
-        buscador.setBounds(30, 80, 350, 40);
-        buscador.setFont(com.example.utilities.Fonts.openSans(12f));
-        buscador.setBackground(Color.white);
-        buscador.setForeground(Color.decode("#000000"));
+        buscadorField.setBounds(30, 80, 350, 40);
+        buscadorField.setFont(com.example.utilities.Fonts.openSans(12f));
+        buscadorField.setBackground(Color.white);
+        buscadorField.setForeground(Color.decode("#000000"));
         // padding izquierdo 8px y borde para el input
-        buscador.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.decode("#ffffff")), BorderFactory.createEmptyBorder(0, 8, 0, 0)));
+        buscadorField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.decode("#ffffff")), BorderFactory.createEmptyBorder(0, 8, 0, 0)));
 
         // Buscar 
         JButton btnBuscar = new JButton("Buscar");
@@ -107,34 +122,92 @@ public class CatalogoLibros {
         filtros.setBounds(30, 130, 80, 20);
 
         // JcomboBox ciclos y editorial
-        JComboBox<String> comboCiclos = new JComboBox<>();
-        comboCiclos.setBounds(110, 130, 100, 20);
-        comboCiclos.addItem("Ciclos");
+        comboCiclosField = new JComboBox<>();
+        comboCiclosField.setBounds(110, 130, 100, 20);
+        comboCiclosField.addItem("Ciclos");
         String[] listaCiclos = controlador.getControladorPanelControl().listaCiclos();
         for (String ciclo : listaCiclos) {
-            comboCiclos.addItem(ciclo);
+            comboCiclosField.addItem(ciclo);
         }
 
-        JComboBox<String> comboEditorial = new JComboBox<>();
-        comboEditorial.setBounds(230, 130, 100, 20);
-        comboEditorial.addItem("Editorial");
+        comboEditorialField = new JComboBox<>();
+        comboEditorialField.setBounds(230, 130, 100, 20);
+        comboEditorialField.addItem("Editorial");
         String[] listaEditoriales = controlador.getControladorPanelControl().listaEditoriales();
         for (String editorial : listaEditoriales) {
-            comboEditorial.addItem(editorial);
+            comboEditorialField.addItem(editorial);
         }
 
         // Seccion de las cards de publicaciones
         // Cards dinámicos: contenedor con grid de 3 columnas y scroll
-        JPanel cardsContainer = new JPanel(new java.awt.GridLayout(0, 3, 15, 15));
+        cardsContainer = new JPanel(new java.awt.GridLayout(0, 3, 15, 15));
         cardsContainer.setBackground(Color.decode("#EDF3F6"));
 
-        // Obtener resumen de publicaciones
-        String[][] resumenPublicaciones = controlador.getControladorPanelControl().listaPublicacionesResumen();
+        // Obtener resumen de publicaciones (datos sin filtrar)
+        resumenPublicacionesField = controlador.getControladorPanelControl().listaPublicacionesResumen();
 
-        // Comprueba que hay contenido
-        if (resumenPublicaciones != null) {
-            for (String[] fila : resumenPublicaciones) {
-                // Extraer datos de la fila y comprobaciones null
+        // Scroll que contiene las cards
+        scrollPublicaciones = new JScrollPane(cardsContainer);
+        scrollPublicaciones.setBounds(20, 170, 570, 380);
+        scrollPublicaciones.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        // Función para poblar las cards aplicando filtros de búsqueda, ciclo y editorial
+        poblarCards(cardsContainer, resumenPublicacionesField, "", "Ciclos", "Editorial");
+
+        // Eventos para aplicar filtros
+        btnBuscar.addActionListener(e -> {
+            String criterio = buscadorField.getText().trim();
+            String cicloSel = (String) comboCiclosField.getSelectedItem();
+            String editorialSel = (String) comboEditorialField.getSelectedItem();
+            poblarCards(cardsContainer, resumenPublicacionesField, criterio, cicloSel, editorialSel);
+            scrollPublicaciones.revalidate();
+            scrollPublicaciones.repaint();
+        });
+
+        comboCiclosField.addActionListener(e -> {
+            String criterio = buscadorField.getText().trim();
+            String cicloSel = (String) comboCiclosField.getSelectedItem();
+            String editorialSel = (String) comboEditorialField.getSelectedItem();
+            poblarCards(cardsContainer, resumenPublicacionesField, criterio, cicloSel, editorialSel);
+            scrollPublicaciones.revalidate();
+            scrollPublicaciones.repaint();
+        });
+
+        comboEditorialField.addActionListener(e -> {
+            String criterio = buscadorField.getText().trim();
+            String cicloSel = (String) comboCiclosField.getSelectedItem();
+            String editorialSel = (String) comboEditorialField.getSelectedItem();
+            poblarCards(cardsContainer, resumenPublicacionesField, criterio, cicloSel, editorialSel);
+            scrollPublicaciones.revalidate();
+            scrollPublicaciones.repaint();
+        });
+        
+        // Agregar componentes al panel principal
+        panel.add(encabezado);
+        panel.add(buscadorField);
+        panel.add(btnBuscar);
+        panel.add(filtros);
+        panel.add(comboCiclosField);
+        panel.add(comboEditorialField);
+        panel.add(scrollPublicaciones);
+
+        return panel;
+    }
+
+    /**
+     * Poblador de cards: aplica filtros y reconstruye el contenedor de cards
+     *
+     * @param cardsContainer contenedor donde se añaden las cards
+     * @param publicaciones datos sin filtrar (resumen)
+     * @param search texto de búsqueda (título/isbn/autores)
+     * @param cicloFilter filtro de ciclo ("Ciclos" indica sin filtro)
+     * @param editorialFilter filtro de editorial ("Editorial" indica sin filtro)
+     */
+    private void poblarCards(JPanel cardsContainer, String[][] publicaciones, String search, String cicloFilter, String editorialFilter) {
+        cardsContainer.removeAll();
+
+        if (publicaciones != null) {
+            for (String[] fila : publicaciones) {
                 String tituloTxt = fila[0] != null ? fila[0] : "";
                 String isbnTxt = fila[1] != null ? fila[1] : "";
                 String autoresTxt = fila[2] != null ? fila[2] : "";
@@ -147,6 +220,28 @@ public class CatalogoLibros {
                     disponiblesNum = 0;
                 }
                 String idPub = fila[6] != null ? fila[6] : "";
+
+                // Aplicar filtros
+                boolean matches = true;
+                if (search != null && !search.isEmpty()) {
+                    String s = search.toLowerCase();
+                    if (!(tituloTxt.toLowerCase().contains(s) || isbnTxt.toLowerCase().contains(s) || autoresTxt.toLowerCase().contains(s))) {
+                        matches = false;
+                    }
+                }
+                if (cicloFilter != null && !cicloFilter.equals("Ciclos") && !cicloFilter.isEmpty()) {
+                    if (!ciclosTxt.toLowerCase().contains(cicloFilter.toLowerCase())) {
+                        matches = false;
+                    }
+                }
+                if (editorialFilter != null && !editorialFilter.equals("Editorial") && !editorialFilter.isEmpty()) {
+                    if (!editorialTxt.toLowerCase().contains(editorialFilter.toLowerCase())) {
+                        matches = false;
+                    }
+                }
+
+                if (!matches)
+                    continue;
 
                 // Construir card por publicación
                 JPanel card = new JPanel();
@@ -231,20 +326,55 @@ public class CatalogoLibros {
             }
         }
 
-        JScrollPane scrollPublicaciones = new JScrollPane(cardsContainer);
-        scrollPublicaciones.setBounds(20, 170, 570, 380);
-        scrollPublicaciones.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        
-        // Agregar componentes al panel principal
-        panel.add(encabezado);
-        panel.add(buscador);
-        panel.add(btnBuscar);
-        panel.add(filtros);
-        panel.add(comboCiclos);
-        panel.add(comboEditorial);
-        panel.add(scrollPublicaciones);
+        if (cardsContainer.getComponentCount() == 0) {
+            JPanel empty = new JPanel();
+            empty.setBackground(Color.decode("#EDF3F6"));
+            empty.setLayout(null);
+            JLabel emptyLabel = new JLabel("No se encontraron resultados");
+            emptyLabel.setBounds(10, 10, 250, 20);
+            empty.add(emptyLabel);
+            cardsContainer.add(empty);
+        }
+    }
 
-        return panel;
+    /**
+     * Refresca la lista de publicaciones y filtros en la vista. Vuelve a obtener
+     * los datos desde el controlador y repuebla los combos y cards.
+     */
+    public void refrescarPublicaciones() {
+        // Guardar selecciones actuales
+        String selCiclo = comboCiclosField.getSelectedItem() == null ? null : comboCiclosField.getSelectedItem().toString();
+        String selEditorial = comboEditorialField.getSelectedItem() == null ? null : comboEditorialField.getSelectedItem().toString();
+
+        // Re-popular combos
+        comboCiclosField.removeAllItems();
+        comboCiclosField.addItem("Ciclos");
+        String[] listaCiclos = controlador.getControladorPanelControl().listaCiclos();
+        for (String ciclo : listaCiclos) {
+            comboCiclosField.addItem(ciclo);
+        }
+
+        comboEditorialField.removeAllItems();
+        comboEditorialField.addItem("Editorial");
+        String[] listaEditoriales = controlador.getControladorPanelControl().listaEditoriales();
+        for (String editorial : listaEditoriales) {
+            comboEditorialField.addItem(editorial);
+        }
+
+        // Restaurar selección si sigue disponible
+        if (selCiclo != null) comboCiclosField.setSelectedItem(selCiclo);
+        if (selEditorial != null) comboEditorialField.setSelectedItem(selEditorial);
+
+        // Actualizar datos
+        resumenPublicacionesField = controlador.getControladorPanelControl().listaPublicacionesResumen();
+
+        // Repoblar con filtros actuales
+        String criterio = buscadorField.getText().trim();
+        String cicloSel = (String) comboCiclosField.getSelectedItem();
+        String editorialSel = (String) comboEditorialField.getSelectedItem();
+        poblarCards(cardsContainer, resumenPublicacionesField, criterio, cicloSel, editorialSel);
+        scrollPublicaciones.revalidate();
+        scrollPublicaciones.repaint();
     }
 
 }

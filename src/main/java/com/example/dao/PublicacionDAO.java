@@ -39,6 +39,325 @@ public class PublicacionDAO {
     }
 
     /**
+     * Inserta una nueva publicación y devuelve su id generado.
+     *
+     * @param titulo
+     * @param editorial
+     * @param codigoIsbn
+     * @param idioma
+     * @param tipo      'L' o 'R'
+     * @return id generado o -1 en caso de error
+     */
+    public int insertarPublicacion(String titulo, String editorial, String codigoIsbn, String idioma, char tipo) {
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(
+                        "INSERT INTO publicaciones (titulo, editorial, codigo_isbn, idioma, tipo) VALUES (?, ?, ?, ?, ?)",
+                        java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, titulo);
+            ps.setString(2, editorial);
+            ps.setString(3, codigoIsbn);
+            ps.setString(4, idioma);
+            ps.setString(5, String.valueOf(Character.toUpperCase(tipo)));
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return -1;
+    }
+
+    /**
+     * Variante que utiliza una Connection existente para que pueda formar parte de
+     * una transacción
+     */
+    public int insertarPublicacion(Connection conexion, String titulo, String editorial, String codigoIsbn, String idioma, char tipo) {
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "INSERT INTO publicaciones (titulo, editorial, codigo_isbn, idioma, tipo) VALUES (?, ?, ?, ?, ?)",
+                java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, titulo);
+            ps.setString(2, editorial);
+            ps.setString(3, codigoIsbn);
+            ps.setString(4, idioma);
+            ps.setString(5, String.valueOf(Character.toUpperCase(tipo)));
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return -1;
+    }
+
+    /**
+     * Inserta los datos de libros (tabla libros)
+     *
+     * @param idPublicacion
+     * @param numEdicion
+     * @param fechaPublicacion fecha SQL (java.sql.Date)
+     * @return true si ok
+     */
+    public boolean insertarLibro(int idPublicacion, int numEdicion, java.sql.Date fechaPublicacion) {
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(
+                        "INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES (?, ?, ?)") ) {
+            ps.setInt(1, idPublicacion);
+            ps.setInt(2, numEdicion);
+            ps.setDate(3, fechaPublicacion);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Variante que utiliza una Connection existente (transacción)
+     */
+    public boolean insertarLibro(Connection conexion, int idPublicacion, int numEdicion, java.sql.Date fechaPublicacion) {
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES (?, ?, ?)") ) {
+            ps.setInt(1, idPublicacion);
+            ps.setInt(2, numEdicion);
+            ps.setDate(3, fechaPublicacion);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Inserta los datos de revistas (tabla revistas)
+     *
+     * @param idPublicacion
+     * @param periodicidad
+     * @param numRevista
+     * @return true si ok
+     */
+    public boolean insertarRevista(int idPublicacion, String periodicidad, int numRevista) {
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(
+                        "INSERT INTO revistas (id_publicacion, periodicidad, num_revista) VALUES (?, ?, ?)") ) {
+            ps.setInt(1, idPublicacion);
+            ps.setString(2, periodicidad);
+            ps.setInt(3, numRevista);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Variante que utiliza una Connection existente (transaccional)
+     */
+    public boolean insertarRevista(Connection conexion, int idPublicacion, String periodicidad, int numRevista) {
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "INSERT INTO revistas (id_publicacion, periodicidad, num_revista) VALUES (?, ?, ?)") ) {
+            ps.setInt(1, idPublicacion);
+            ps.setString(2, periodicidad);
+            ps.setInt(3, numRevista);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Inserta relación publicacion <-> modulo
+     */
+    public boolean insertarPublicacionModulo(int idPublicacion, int idModulo) {
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(
+                        "INSERT INTO publicacion_modulo (id_publicacion, id_modulo) VALUES (?, ?)") ) {
+            ps.setInt(1, idPublicacion);
+            ps.setInt(2, idModulo);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Variante transaccional que usa una Connection existente
+     */
+    public boolean insertarPublicacionModulo(Connection conexion, int idPublicacion, int idModulo) {
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "INSERT INTO publicacion_modulo (id_publicacion, id_modulo) VALUES (?, ?)") ) {
+            ps.setInt(1, idPublicacion);
+            ps.setInt(2, idModulo);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Inserta relación publicacion <-> ciclo
+     */
+    public boolean insertarPublicacionCiclo(int idPublicacion, int idCiclo) {
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(
+                        "INSERT INTO publicacion_ciclo (id_publicacion, id_ciclo) VALUES (?, ?)") ) {
+            ps.setInt(1, idPublicacion);
+            ps.setInt(2, idCiclo);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Variante transaccional que usa una Connection existente
+     */
+    public boolean insertarPublicacionCiclo(Connection conexion, int idPublicacion, int idCiclo) {
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "INSERT INTO publicacion_ciclo (id_publicacion, id_ciclo) VALUES (?, ?)") ) {
+            ps.setInt(1, idPublicacion);
+            ps.setInt(2, idCiclo);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Inserta relación publicacion <-> tema
+     */
+    public boolean insertarPublicacionTema(int idPublicacion, int idTema) {
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(
+                        "INSERT INTO publicacion_tema (id_publicacion, id_tema) VALUES (?, ?)") ) {
+            ps.setInt(1, idPublicacion);
+            ps.setInt(2, idTema);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Variante transaccional que usa una Connection existente
+     */
+    public boolean insertarPublicacionTema(Connection conexion, int idPublicacion, int idTema) {
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "INSERT INTO publicacion_tema (id_publicacion, id_tema) VALUES (?, ?)") ) {
+            ps.setInt(1, idPublicacion);
+            ps.setInt(2, idTema);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Inserta relación libro <-> autor
+     */
+    public boolean insertarLibroAutor(int idLibro, int idAutor) {
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(
+                        "INSERT INTO libros_autores (id_libro, id_autor) VALUES (?, ?)") ) {
+            ps.setInt(1, idLibro);
+            ps.setInt(2, idAutor);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Variante transaccional que usa una Connection existente
+     */
+    public boolean insertarLibroAutor(Connection conexion, int idLibro, int idAutor) {
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "INSERT INTO libros_autores (id_libro, id_autor) VALUES (?, ?)") ) {
+            ps.setInt(1, idLibro);
+            ps.setInt(2, idAutor);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Devuelve el siguiente número de revista disponible (max(num_revista)+1)
+     * @return siguiente num_revista (>=1) o 1 en caso de error
+     */
+    public int siguienteNumRevista() {
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement("SELECT COALESCE(MAX(num_revista),0) AS m FROM revistas")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("m") + 1;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return 1;
+    }
+
+    /**
+     * Variante transaccional que usa una Connection existente
+     */
+    public int siguienteNumRevista(Connection conexion) {
+        try (PreparedStatement ps = conexion.prepareStatement("SELECT COALESCE(MAX(num_revista),0) AS m FROM revistas")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("m") + 1;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return 1;
+    }
+
+    /**
      * Devuelve un resumen de las publicaciones activas con los campos solicitados:
      * Título, ISBN, Autor(es), Ciclos, Editorial, Disponibles, id
      *

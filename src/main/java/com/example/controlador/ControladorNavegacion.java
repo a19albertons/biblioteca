@@ -7,13 +7,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import com.example.vista.BarraLateral;
+import com.example.vista.CatalogoLibros;
 import com.example.vista.ConcederPrestamo;
 import com.example.vista.DevolverPrestamo;
 import com.example.vista.Ejemplares;
 import com.example.vista.GestionUsuarios;
 import com.example.vista.InicioSesion;
 import com.example.vista.PanelControl;
-import com.example.vista.CatalogoLibros;
 import com.example.vista.RecuperarCuenta;
 import com.example.vista.SancionManual;
 
@@ -161,6 +161,15 @@ public class ControladorNavegacion {
     }
 
     /**
+     * Devuelve la ventana principal (para usar como padre de diálogos/modales)
+     *
+     * @return JFrame principal
+     */
+    public JFrame getVentana() {
+        return this.ventana;
+    }
+
+    /**
      * Cambia la pantalla del panel padre
      * 
      * @param nombrePantalla
@@ -199,6 +208,15 @@ public class ControladorNavegacion {
         }
         // mostrar pantalla de ejemplares
         cambiarPantallaHijo("ejemplares");
+    }
+
+    /**
+     * Refresca la vista de publicaciones si está inicializada
+     */
+    public void refrescarPublicaciones() {
+        if (this.publicaciones != null) {
+            this.publicaciones.refrescarPublicaciones();
+        }
     }
 
 }
