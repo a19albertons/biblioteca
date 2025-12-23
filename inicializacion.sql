@@ -16,7 +16,7 @@ create table
         contrasena varchar(50) NOT NULL,
         /* E=Estudiante, P=Profesor, A=Administrativo, C=Conserje, L=Limpiador */
         tipo char(1) NOT NULL CHECK (Tipo IN ('E', 'P', 'A', 'C', 'L')),
-        estado Boolean NOT NULL DEFAULT TRUE
+        estado Boolean NOT NULL DEFAULT TRUE /* TRUE=activo, FALSE=desactivado */
     );
 
 /* Tabla de atributo multivaluado modulo */
@@ -97,7 +97,7 @@ create table
         id_ejemplar int NOT NULL,
         fecha_inicio date NOT NULL,
         fecha_fin date NOT NULL,
-        estado Boolean NOT NULL DEFAULT TRUE,
+        estado Boolean NOT NULL DEFAULT TRUE, /* TRUE=sin devolver, FALSE=devuelto */
         FOREIGN KEY (id_usuario) REFERENCES usuarios (id),
         FOREIGN KEY (id_ejemplar) REFERENCES ejemplares (id)
     );
@@ -330,6 +330,10 @@ INSERT INTO libros_autores (id_libro, id_autor) VALUES
 INSERT INTO prestamos (id, id_usuario, id_ejemplar, fecha_inicio, fecha_fin, estado) VALUES
 (5,9,5,'2024-01-10','2024-01-24',FALSE),
 (6,10,6,'2024-03-12','2024-03-26',FALSE);
+
+-- Préstamo dinámico: usa la fecha de importación (CURDATE()) para fecha_inicio y fecha_fin = fecha_inicio + 14 días
+INSERT INTO prestamos (id_usuario, id_ejemplar, fecha_inicio, fecha_fin, estado) VALUES
+(1, 10, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 14 DAY), TRUE);
 
 -- Fin de datos de prueba
 

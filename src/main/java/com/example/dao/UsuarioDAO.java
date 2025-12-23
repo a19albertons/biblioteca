@@ -104,4 +104,29 @@ public class UsuarioDAO {
         }
         return devolver;
     }
+
+    /**
+     * Obtiene el número total de socios activos
+     * 
+     * @return
+     */
+    public String totalSociosActivos() {
+        String totalSocios = "-1";
+        // Consulta SQL para contar los socios activos
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement("SELECT COUNT(*) AS TOTAL FROM usuarios where estado = TRUE")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    totalSocios = rs.getString("TOTAL");
+                }
+            }
+
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            totalSocios = "-1";
+        }
+        return totalSocios;
+    }
 }

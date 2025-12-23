@@ -21,6 +21,10 @@ public class Controlador {
      * Controlador de login
      */
     ControladorLogin controladorLogin;
+    /**
+     * Controlador de panel de control
+     */
+    ControladorPanelControl controladorPanelControl;
 
     // Getters y Setters
     /**
@@ -95,15 +99,34 @@ public class Controlador {
         this.controladorLogin = controladorLogin;
     }
 
+    /**
+     * Obtiene el controlador de panel de control
+     * 
+     * @return
+     */
+    public ControladorPanelControl getControladorPanelControl() {
+        return controladorPanelControl;
+    }
+
+    /**
+     * Establece el controlador de panel de control
+     * 
+     * @param controladorPanelControl
+     */
+    public void setControladorPanelControl(ControladorPanelControl controladorPanelControl) {
+        this.controladorPanelControl = controladorPanelControl;
+    }
+
     // Constructores
     /**
      * Constructor por defecto
      */
     public Controlador() {
-        this.controladorNavegacion = new ControladorNavegacion(this);
         this.controladorInicioSesion = new ControladorInicioSesion();
         this.controladorRecuperarCuenta = new ControladorRecuperarCuenta();
         this.controladorLogin = new ControladorLogin();
+        this.controladorPanelControl = new ControladorPanelControl();
+        this.controladorNavegacion = new ControladorNavegacion(this);
     }
 
     // Metodos del controlador

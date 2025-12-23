@@ -1,14 +1,21 @@
 package com.example.vista;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 import com.example.controlador.Controlador;
+import com.example.utilities.Fonts;
 
 /**
  * Clase para la vista Panel de control
@@ -54,7 +61,7 @@ public class PanelControl {
         titulo.setBounds(10, 10, 200, 40);
         encabezado.add(titulo);
 
-        // Card 1
+        // Card 1 - Prestamos hoy (fondo blanco, borde superior azul)
         JPanel card1 = new JPanel();
         card1.setSize(170, 100);
         card1.setLayout(null);
@@ -69,7 +76,7 @@ public class PanelControl {
         card1.add(tema1);
 
         // Valor -- provisional
-        JLabel valor1 = new JLabel("25");
+        JLabel valor1 = new JLabel(controlador.getControladorPanelControl().obtenerPrestamosHoy());
         valor1.setFont(valor1.getFont().deriveFont(36f));
         valor1.setBounds(10, 40, 150, 50);
         card1.add(valor1);
@@ -88,7 +95,7 @@ public class PanelControl {
         tema2.setFont(com.example.utilities.Fonts.openSans(12f));
         card2.add(tema2);
 
-        JLabel valor2 = new JLabel("8");
+        JLabel valor2 = new JLabel(controlador.getControladorPanelControl().obtenerPrestamosPendientes());
         valor2.setFont(valor2.getFont().deriveFont(36f));
         valor2.setBounds(10, 40, 150, 50);
         valor2.setForeground(Color.decode("#F4791B"));
@@ -110,7 +117,7 @@ public class PanelControl {
         tema3.setFont(com.example.utilities.Fonts.openSans(12f));
         card3.add(tema3);
 
-        JLabel valor3 = new JLabel("102");
+        JLabel valor3 = new JLabel(controlador.getControladorPanelControl().obtenerTotalSociosActivos());
         valor3.setFont(valor3.getFont().deriveFont(36f));
         valor3.setBounds(10, 40, 150, 50);
         // dejar valor en color por defecto (oscuro)
@@ -128,63 +135,75 @@ public class PanelControl {
         movimientosPanel.setBounds(30, 260, 540, 300);
         movimientosPanel.setBorder(BorderFactory.createLineBorder(Color.decode("#E6ECEF")));
 
-        // Encabezados de columna
-        JLabel col1 = new JLabel("ID EJEMPLAR");
-        col1.setBounds(15, 10, 100, 20);
-        col1.setFont(col1.getFont().deriveFont(Font.BOLD, 12f));
-        col1.setForeground(Color.decode("#468DAE"));
-        movimientosPanel.add(col1);
+        // Tabla de últimos movimientos
+        // Encabezado y datos
+        String[] columnNames = new String[] { "ID EJEMPLAR", "LIBRO", "ESTADO" };
+        String[][] data = controlador.getControladorPanelControl().obtenerUltimosMovimientos();
 
-        JLabel col2 = new JLabel("LIBRO");
-        col2.setBounds(120, 10, 300, 20);
-        col2.setFont(col2.getFont().deriveFont(Font.BOLD, 12f));
-        col2.setForeground(Color.decode("#468DAE"));
-        movimientosPanel.add(col2);
+        // Modificación del modelo para que no sea editable
+        DefaultTableModel model = new DefaultTableModel(data, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
-        JLabel col3 = new JLabel("ESTADO");
-        col3.setBounds(440, 10, 80, 20);
-        col3.setFont(col3.getFont().deriveFont(Font.BOLD, 12f));
-        col3.setForeground(Color.decode("#468DAE"));
-        movimientosPanel.add(col3);
+        // Establece una serie de modificadores sobre la tabla como colores, fuentes,
+        // etc
+        JTable table = new JTable(model);
+        table.setRowHeight(28);
+        table.setShowGrid(false);
+        table.setFillsViewportHeight(true);
+        table.setIntercellSpacing(new java.awt.Dimension(0, 0));
+        table.setBackground(Color.white);
+        table.setForeground(Color.decode("#666666"));
+        table.setFont(Fonts.openSans(12f));
+        // Header style
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(Color.white);
+        header.setForeground(Color.decode("#468DAE"));
+        header.setFont(header.getFont().deriveFont(Font.BOLD, 12f));
+        header.setReorderingAllowed(false);
 
-        // Filas de ejemplo (serán removidas cuando se implemente la lógica)
-        JLabel id1 = new JLabel("#9821");
-        id1.setBounds(15, 40, 100, 20);
-        id1.setForeground(Color.decode("#666666"));
-        movimientosPanel.add(id1);
+        // Ajustar anchos
+        table.getColumnModel().getColumn(0).setPreferredWidth(80);
+        table.getColumnModel().getColumn(1).setPreferredWidth(360);
+        table.getColumnModel().getColumn(2).setPreferredWidth(80);
 
-        JLabel libro1 = new JLabel("Intro a Bases de Datos");
-        libro1.setBounds(120, 40, 300, 20);
-        libro1.setForeground(Color.decode("#666666"));
-        movimientosPanel.add(libro1);
+        // Renderer para columna estado
+        // Customiza como se ven las celdas de la columna estado
+        DefaultTableCellRenderer estadoRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                String s = (value != null) ? value.toString().toUpperCase() : "";
+                setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
+                if ("DEVUELTO".equals(s)) {
+                    setBackground(Color.decode("#E6FFF0"));
+                    setForeground(Color.decode("#2BC187"));
+                } else if ("PRESTADO".equals(s)) {
+                    setBackground(Color.decode("#FFF4E6"));
+                    setForeground(Color.decode("#F4791B"));
+                } else {
+                    setBackground(Color.white);
+                    setForeground(Color.decode("#666666"));
+                }
+                setOpaque(true);
+                return this;
+            }
+        };
+        table.getColumnModel().getColumn(2).setCellRenderer(estadoRenderer);
 
-        JLabel estado1 = new JLabel("DEVUELTO", JLabel.CENTER);
-        estado1.setBounds(440, 40, 80, 20);
-        estado1.setOpaque(true);
-        estado1.setBackground(Color.decode("#E6FFF0"));
-        estado1.setForeground(Color.decode("#2BC187"));
-        estado1.setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
-        movimientosPanel.add(estado1);
+        // Hace que se pueda hacer scroll en la tabla. Esto sucede si hay 10 o más filas
+        // de la consutla a la bd actualmente limitado a 9 para evitarlo
+        JScrollPane scroll = new JScrollPane(table);
+        scroll.setBounds(10, 10, 520, 280);
+        scroll.setBorder(null);
+        movimientosPanel.add(scroll);
 
-        JLabel id2 = new JLabel("#1102");
-        id2.setBounds(15, 70, 100, 20);
-        id2.setForeground(Color.decode("#666666"));
-        movimientosPanel.add(id2);
-
-        JLabel libro2 = new JLabel("Física Vol. II");
-        libro2.setBounds(120, 70, 300, 20);
-        libro2.setForeground(Color.decode("#666666"));
-        movimientosPanel.add(libro2);
-
-        JLabel estado2 = new JLabel("PRESTADO", JLabel.CENTER);
-        estado2.setBounds(440, 70, 80, 20);
-        estado2.setOpaque(true);
-        estado2.setBackground(Color.decode("#FFF4E6"));
-        estado2.setForeground(Color.decode("#F4791B"));
-        estado2.setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
-        movimientosPanel.add(estado2);
-
-        
+        // Añade todo al panel principal
         panel.add(encabezado);
         panel.add(card1);
         panel.add(card2);
