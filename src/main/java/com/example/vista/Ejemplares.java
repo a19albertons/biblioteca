@@ -396,7 +396,7 @@ public class Ejemplares {
             id = -1;
         }
         if (id > 0) {
-            String[][] ejemplaresData = controlador.getControladorPanelControl().obtenerEjemplaresPorPublicacion(id);
+            String[][] ejemplaresData = controlador.getControladorEjemplares().obtenerEjemplaresPorPublicacion(id);
             // Limpiar modelo
             for (int i = ejemplaresModel.getRowCount() - 1; i >= 0; i--) {
                 ejemplaresModel.removeRow(i);

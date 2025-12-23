@@ -86,15 +86,6 @@ public class ControladorPanelControl {
         return resumen;
     }
 
-    /**
-     * Obtiene los ejemplares de una publicación
-     *
-     * @param idPublicacion
-     * @return String[][] con columnas: id, num_ejemplar, fecha, estado
-     */
-    public String[][] obtenerEjemplaresPorPublicacion(int idPublicacion) {
-        EjemplarDAO ejemplarDAO = new EjemplarDAO();
-        return ejemplarDAO.listaEjemplaresPorPublicacion(idPublicacion);
-    }
+
 
 }

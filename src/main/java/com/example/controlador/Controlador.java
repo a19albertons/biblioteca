@@ -25,6 +25,10 @@ public class Controlador {
      * Controlador de panel de control
      */
     ControladorPanelControl controladorPanelControl;
+    /**
+     * Controlador de ejemplares
+     */
+    ControladorEjemplares controladorEjemplares;
 
     // Getters y Setters
     /**
@@ -116,6 +120,22 @@ public class Controlador {
     public void setControladorPanelControl(ControladorPanelControl controladorPanelControl) {
         this.controladorPanelControl = controladorPanelControl;
     }
+    /**
+     * Obtiene el controlador de ejemplares
+     * 
+     * @return
+     */ 
+    public ControladorEjemplares getControladorEjemplares() {
+        return controladorEjemplares;
+    }
+    /**
+     * Establece el controlador de ejemplares
+     * 
+     * @param controladorEjemplares
+     */
+    public void setControladorEjemplares(ControladorEjemplares controladorEjemplares) {
+        this.controladorEjemplares = controladorEjemplares;
+    }
 
     // Constructores
     /**
@@ -126,7 +146,9 @@ public class Controlador {
         this.controladorRecuperarCuenta = new ControladorRecuperarCuenta();
         this.controladorLogin = new ControladorLogin();
         this.controladorPanelControl = new ControladorPanelControl();
+        this.controladorEjemplares = new ControladorEjemplares();
         this.controladorNavegacion = new ControladorNavegacion(this);
+        
     }
 
     // Metodos del controlador
