@@ -146,19 +146,19 @@ public class RecuperarCuenta {
                 // Invocamos al usuario desde el controlador
                 Usuario usuario = controlador.getControladorRecuperarCuenta().recuperarCuenta(campo.getText().trim());
                 // Comprobar si el usuario es null (credenciales incorrectas)
-                if (controlador.getControladorRecuperarCuenta().usuarioNoValido(usuario)) {
+                if (controlador.getControladorLogin().usuarioNoValido(usuario)) {
                     JOptionPane.showMessageDialog(version, "Ingrese un usuario o correo electrónico válido.",
                             "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 // Si da true, la cuenta está desactivada. Mantener signo de exclamación
-                if (controlador.getControladorRecuperarCuenta().cuentaDesactivada(usuario)) {
+                if (controlador.getControladorLogin().cuentaDesactivada(usuario)) {
                     JOptionPane.showMessageDialog(version, "La cuenta está desactivada. Contacte con el administrador.",
                             "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 // Solo los conserjes pueden recuperar la contraseña
-                if (controlador.getControladorRecuperarCuenta().usuarioNoConserje(usuario)) {
+                if (controlador.getControladorLogin().usuarioNoConserje(usuario)) {
                     JOptionPane.showMessageDialog(version, "Actualmente esto no le afecta.",
                             "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
                     return;

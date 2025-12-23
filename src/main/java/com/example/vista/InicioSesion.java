@@ -144,17 +144,17 @@ public class InicioSesion {
                 // Invocamos al usuario desde el controlador
                 Usuario usuario = controlador.getControladorInicioSesion().iniciarSesion(usuarioField.getText().trim(), contrasenaField.getText().trim());
                 // Comprobar si el usuario es null (credenciales incorrectas)
-                if (controlador.getControladorInicioSesion().usuarioNoValido(usuario)) {
+                if (controlador.getControladorLogin().usuarioNoValido(usuario)) {
                     JOptionPane.showMessageDialog(version, "Usuario o contraseña incorrectos.", "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 // Si da true, la cuenta está desactivada. Mantener signo de exclamación
-                if (controlador.getControladorInicioSesion().cuentaDesactivada(usuario)) {
+                if (controlador.getControladorLogin().cuentaDesactivada(usuario)) {
                     JOptionPane.showMessageDialog(version, "La cuenta está desactivada. Contacte con el administrador.", "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 // Solo los conserjes pueden acceder al sistema
-                if (controlador.getControladorInicioSesion().usuarioNoConserje(usuario)) {
+                if (controlador.getControladorLogin().usuarioNoConserje(usuario)) {
                     JOptionPane.showMessageDialog(version, "Solo los conserjes tienen acceso al sistema.", "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
                     return;
                 }

@@ -17,6 +17,10 @@ public class Controlador {
      * Controlador de recuperación de cuenta
      */
     ControladorRecuperarCuenta controladorRecuperarCuenta;
+    /**
+     * Controlador de login
+     */
+    ControladorLogin controladorLogin;
 
     // Getters y Setters
     /**
@@ -73,6 +77,24 @@ public class Controlador {
         this.controladorRecuperarCuenta = controladorRecuperarCuenta;
     }
 
+    /**
+     * Obtiene el controlador de login
+     * 
+     * @return
+     */
+    public ControladorLogin getControladorLogin() {
+        return controladorLogin;
+    }
+
+    /**
+     * Establece el controlador de login
+     * 
+     * @param controladorLogin
+     */
+    public void setControladorLogin(ControladorLogin controladorLogin) {
+        this.controladorLogin = controladorLogin;
+    }
+
     // Constructores
     /**
      * Constructor por defecto
@@ -81,6 +103,7 @@ public class Controlador {
         this.controladorNavegacion = new ControladorNavegacion(this);
         this.controladorInicioSesion = new ControladorInicioSesion();
         this.controladorRecuperarCuenta = new ControladorRecuperarCuenta();
+        this.controladorLogin = new ControladorLogin();
     }
 
     // Metodos del controlador
