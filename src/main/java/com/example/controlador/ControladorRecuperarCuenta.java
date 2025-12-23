@@ -1,7 +1,6 @@
 package com.example.controlador;
 
 import com.example.dao.UsuarioDAO;
-import com.example.modelo.TipoUsuario;
 import com.example.modelo.Usuario;
 
 /**

@@ -2,13 +2,13 @@ package com.example.vista;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import java.net.URL;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -19,7 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.example.controlador.Controlador;
-import com.example.modelo.TipoUsuario;
 import com.example.modelo.Usuario;
 
 /**
