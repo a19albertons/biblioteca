@@ -639,4 +639,52 @@ public class PublicacionDAO {
         }
     }
 
+    /**
+     * Comprueba si existen préstamos activos para alguna copia de la publicación
+     * indicada.
+     *
+     * @param idPublicacion id de la publicación
+     * @return true si existe al menos un préstamo activo, false en caso
+     *         contrario
+     */
+    public boolean tienePrestamosActivos(int idPublicacion) {
+        String sql = "SELECT COUNT(*) AS cnt FROM prestamos p JOIN ejemplares e ON p.id_ejemplar = e.id WHERE e.id_publicacion = ? AND p.estado = TRUE";
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, idPublicacion);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cnt") > 0;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return false;
+    }
+
+    /**
+     * En el contexto de una transacción, marca la publicación y sus ejemplares
+     * como "baja" (estado = FALSE).
+     *
+     * @param conexion      connection transaccional
+     * @param idPublicacion id publicación
+     * @return true si OK
+     */
+    public boolean bajaPublicacion(Connection conexion, int idPublicacion) {
+        try (PreparedStatement ps1 = conexion.prepareStatement("UPDATE ejemplares SET estado = FALSE WHERE id_publicacion = ?");
+                PreparedStatement ps2 = conexion.prepareStatement("UPDATE publicaciones SET estado = FALSE WHERE id = ?")) {
+            ps1.setInt(1, idPublicacion);
+            ps1.executeUpdate();
+            ps2.setInt(1, idPublicacion);
+            ps2.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
 }

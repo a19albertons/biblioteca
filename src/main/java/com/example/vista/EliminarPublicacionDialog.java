@@ -1,0 +1,186 @@
+package com.example.vista;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+import com.example.controlador.Controlador;
+
+/**
+ * Diálogo de confirmación para eliminar (dar de baja) una publicación.
+ * Comprueba que no haya préstamos activos antes de borrar y muestra mensajes
+ * al usuario.
+ */
+public class EliminarPublicacionDialog extends JDialog {
+    /**
+     * Controlador de la aplicación
+     */
+    private Controlador controlador;
+    /**
+     * Frame padre (para overlay)
+     */
+    private javax.swing.JFrame parentFrame;
+    /**
+     * ID de la publicación a eliminar
+     */
+    private int idPublicacion;
+    /**
+     * Componente previo del glass pane (para restaurar al cerrar el diálogo)
+     */
+    private java.awt.Component previousGlassPane;
+
+    /**
+     * Constructor del diálogo
+     * @param parent
+     * @param controlador
+     * @param idPublicacion
+     */
+    public EliminarPublicacionDialog(JFrame parent, Controlador controlador, int idPublicacion) {
+        super(parent, "Eliminar Publicación", true);
+        this.controlador = controlador;
+        this.parentFrame = parent;
+        this.idPublicacion = idPublicacion;
+        initUI();
+        setSize(new Dimension(360, 160));
+        setLocationRelativeTo(parent);
+
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                removeOverlay();
+            }
+
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                removeOverlay();
+            }
+        });
+    }
+
+    /**
+     * Inicializa la interfaz de usuario del diálogo
+     */
+    private void initUI() {
+        // Configuración del diálogo
+        getContentPane().setLayout(new BorderLayout());
+        JPanel contenido = new JPanel(new BorderLayout());
+        contenido.setBackground(Color.white);
+        contenido.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
+
+        // Título y mensaje
+        JLabel titulo = new JLabel("Eliminar Publicación");
+        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 16f));
+        contenido.add(titulo, BorderLayout.NORTH);
+
+        // Mensaje de confirmación
+        JLabel texto = new JLabel("Seguro que quieres eliminar la publicación?");
+        texto.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 6, 12, 6));
+        contenido.add(texto, BorderLayout.CENTER);
+
+        // Botones
+        JPanel botones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        botones.setBackground(Color.white);
+
+        // Cancelar y Eliminar
+        JButton cancelar = new JButton("Cancelar");
+        cancelar.setBackground(Color.white);
+        cancelar.setForeground(Color.decode("#000000"));
+        cancelar.setBorder(null);
+        cancelar.addActionListener(e -> dispose());
+
+        JButton eliminar = new JButton("Eliminar");
+        eliminar.setBackground(Color.decode("#E53935"));
+        eliminar.setForeground(Color.white);
+        eliminar.setBorder(null);
+        eliminar.addActionListener(e -> {
+            // Pedir al controlador que elimine la publicación
+            boolean ok = controlador.getControladorEliminarPublicacion().eliminarPublicacion(idPublicacion);
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "Publicación eliminada (marcada como baja)", "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+                // Refresh views
+                controlador.getControladorNavegacion().refrescarPublicaciones();
+                controlador.getControladorNavegacion().refrescarPanelControl();
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "No es posible eliminar la publicación: existen préstamos activos o ocurrió un error",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        botones.add(cancelar);
+        botones.add(eliminar);
+
+        getContentPane().add(contenido, BorderLayout.CENTER);
+        getContentPane().add(botones, BorderLayout.SOUTH);
+    }
+
+    @Override
+    public void setVisible(boolean b) {
+        if (b) {
+            installOverlay();
+        }
+        super.setVisible(b);
+        if (!b) {
+            removeOverlay();
+        }
+    }
+
+    /**
+     * Instala un overlay semitransparente en el frame padre
+     */
+    private void installOverlay() {
+        if (parentFrame == null)
+            return;
+        try {
+            // Guardar el componente previo del glass pane para restaurarlo después
+            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
+            java.awt.Component current = rpc.getRootPane().getGlassPane();
+            previousGlassPane = current;
+
+            // Crear overlay semitransparente
+            javax.swing.JPanel overlay = new javax.swing.JPanel();
+            overlay.setOpaque(true);
+            overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
+            overlay.addMouseListener(new java.awt.event.MouseAdapter() {
+            });
+
+            // Asignar overlay como glass pane
+            rpc.getRootPane().setGlassPane(overlay);
+            overlay.setVisible(true);
+        } catch (Exception e) {
+            System.out.println("No se pudo instalar overlay: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Quita el overlay del frame padre
+     */
+    private void removeOverlay() {
+        if (parentFrame == null)
+            return;
+        try {
+            // Restaurar el componente previo del glass pane
+            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
+            if (previousGlassPane != null) {
+                rpc.getRootPane().setGlassPane(previousGlassPane);
+                previousGlassPane.setVisible(false);
+                previousGlassPane = null;
+            } else {
+                rpc.getRootPane().getGlassPane().setVisible(false);
+            }
+        } catch (Exception e) {
+            System.out.println("No se pudo quitar overlay: " + e.getMessage());
+        }
+    }
+
+}

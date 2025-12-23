@@ -222,6 +222,17 @@ public class Ejemplares {
         btnEliminarEjemplar.setMargin(new Insets(0, 0, 0, 0));
         publicacionPanel.add(btnEliminarEjemplar);
 
+        btnEliminarEjemplar.addActionListener(evt -> {
+            if (currentPublicacionId > 0) {
+                EliminarPublicacionDialog d = new EliminarPublicacionDialog(controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
+                d.setVisible(true);
+                // refrescar para mostrar posibles cambios
+                controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(publicacionPanel, "No hay publicación seleccionada para eliminar", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
         // Panel de ejemplares
         JPanel ejemplares = new JPanel();
         ejemplares.setSize(new Dimension(560, 380));

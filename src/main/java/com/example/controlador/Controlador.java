@@ -36,8 +36,10 @@ public class Controlador {
     /**
      * Controlador para editar publicaciones (diálogo de edición)
      */
-    ControladorEditarPublicacionDialog controladorEditarPublicacionDialog;
-    /**
+    ControladorEditarPublicacionDialog controladorEditarPublicacionDialog;    /**
+     * Controlador para eliminar publicaciones (diálogo de eliminación)
+     */
+    ControladorEliminarPublicacion controladorEliminarPublicacion;    /**
      * Controlador de gestión de usuarios
      */
     ControladorGestionUsuarios controladorGestionUsuarios = new ControladorGestionUsuarios();
@@ -201,6 +203,24 @@ public class Controlador {
         this.controladorEditarPublicacionDialog = controladorEditarPublicacionDialog;
     }
 
+    /**
+     * Obtiene el controlador encargado de eliminar publicaciones.
+     *
+     * @return controlador de eliminación de publicaciones
+     */
+    public ControladorEliminarPublicacion getControladorEliminarPublicacion() {
+        return controladorEliminarPublicacion;
+    }
+
+    /**
+     * Establece el controlador encargado de eliminar publicaciones.
+     *
+     * @param controladorEliminarPublicacion controlador de eliminación
+     */
+    public void setControladorEliminarPublicacion(ControladorEliminarPublicacion controladorEliminarPublicacion) {
+        this.controladorEliminarPublicacion = controladorEliminarPublicacion;
+    }
+
     // Constructores
     /**
      * Constructor por defecto
@@ -214,6 +234,7 @@ public class Controlador {
         this.controladorGestionUsuarios = new ControladorGestionUsuarios();
         this.controladorNuevaPublicacionDialog = new ControladorNuevaPublicacionDialog(this);
         this.controladorEditarPublicacionDialog = new ControladorEditarPublicacionDialog(this);
+        this.controladorEliminarPublicacion = new ControladorEliminarPublicacion(this);
         this.controladorNavegacion = new ControladorNavegacion(this);
         
     }
