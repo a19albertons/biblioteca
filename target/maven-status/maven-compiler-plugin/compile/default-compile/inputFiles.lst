@@ -4,6 +4,7 @@
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/DevolverPrestamo.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/Controlador.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/dao/CicloDAO.java
+/home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorEjemplares.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/PanelControl.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/modelo/Ejemplar.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/modelo/Publicacion.java
@@ -19,6 +20,7 @@
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/modelo/Tema.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/utilities/Fonts.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/modelo/Autor.java
+/home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorGestionUsuarios.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/conexiones/MySQLConnection.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/utilities/ConfigLoader.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/dao/PublicacionDAO.java

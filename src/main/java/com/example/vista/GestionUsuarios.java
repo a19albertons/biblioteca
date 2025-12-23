@@ -1,9 +1,12 @@
 package com.example.vista;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
 
@@ -14,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
@@ -103,6 +107,7 @@ public class GestionUsuarios {
             data[i][4] = "";           // ACCIONES (placeholder, renderizado con botones en ActionsRenderer)
         }
 
+        // Modelo de tabla no editable
         DefaultTableModel model = new DefaultTableModel(data, cols) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -110,17 +115,20 @@ public class GestionUsuarios {
             }
         };
 
+        // Crear tabla
         JTable table = new JTable(model);
         table.setRowHeight(48);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
 
+        // Renderers personalizados
         class StatusRenderer extends JLabel implements TableCellRenderer {
             public StatusRenderer() {
                 setOpaque(true);
-                setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                setHorizontalAlignment(SwingConstants.CENTER);
             }
 
+            // Define los colores del campo estado
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                     boolean hasFocus, int row, int column) {
@@ -144,6 +152,7 @@ public class GestionUsuarios {
             }
         }
 
+        // Renderer para los botones de acciones
         class ActionsRenderer implements TableCellRenderer {
             private final JPanel panelCell = new JPanel();
 
@@ -155,9 +164,9 @@ public class GestionUsuarios {
                 java.net.URL editarIconUrl = getClass().getResource("/editar.png");
                 final JButton editBtn = new JButton() {
                     @Override
-                    protected void paintComponent(java.awt.Graphics g) {
-                        java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
-                        g2.setComposite(java.awt.AlphaComposite.SrcOver);
+                    protected void paintComponent(Graphics g) {
+                        Graphics2D g2 = (Graphics2D) g.create();
+                        g2.setComposite(AlphaComposite.SrcOver);
                         g2.setColor(new Color(70, 141, 174, 102));
                         g2.fillRect(0, 0, getWidth(), getHeight());
                         g2.dispose();
@@ -181,9 +190,9 @@ public class GestionUsuarios {
                 java.net.URL borrarIconUrl = getClass().getResource("/borrar.png");
                 final JButton delBtn = new JButton() {
                     @Override
-                    protected void paintComponent(java.awt.Graphics g) {
-                        java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
-                        g2.setComposite(java.awt.AlphaComposite.SrcOver);
+                    protected void paintComponent(Graphics g) {
+                        Graphics2D g2 = (Graphics2D) g.create();
+                        g2.setComposite(AlphaComposite.SrcOver);
                         g2.setColor(new Color(192, 57, 43, 102));
                         g2.fillRect(0, 0, getWidth(), getHeight());
                         g2.dispose();
@@ -207,6 +216,7 @@ public class GestionUsuarios {
                 panelCell.add(delBtn);
             }
 
+            // Devuelve el panel con los botones
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                     boolean hasFocus, int row, int column) {
@@ -214,6 +224,7 @@ public class GestionUsuarios {
             }
         }
 
+        // Asignar renderers a las columnas correspondientes
         table.getColumnModel().getColumn(3).setCellRenderer(new StatusRenderer());
         table.getColumnModel().getColumn(4).setCellRenderer(new ActionsRenderer());
 
