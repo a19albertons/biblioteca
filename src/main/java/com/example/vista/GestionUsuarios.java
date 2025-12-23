@@ -82,11 +82,26 @@ public class GestionUsuarios {
 
         // Tabla con columnas y datos de ejemplo
         String[] cols = new String[] {"DNI", "NOMBRE Y APELLIDO", "TIPO", "ESTADO", "ACCIONES"};
-        Object[][] data = new Object[][] {
-                {"87654321Z", "García, María", "Profesor", "ACTIVO", null},
-                {"12345678X", "Pérez, Juan", "Estudiante", "ACTIVO", null},
-                {"44556677L", "López, Carlos", "Estudiante", "SANCIONADO", null}
-        };
+        // La DAO devuelve filas en formato: [id, dni, nombre_completo, sancion_activa, tipo]
+        // Reservamos el campo `id` para los botones de acciones (columna invisible para ahora)
+        String[][] rawData = controlador.getControladorGestionUsuarios().obtenerUsuariosYEstadoSancionActiva();
+        if (rawData == null) {
+            rawData = new String[0][0];
+        }
+        // Construir la matriz visible (omitimos el id y colocamos un placeholder para ACCIONES)
+        String[][] data = new String[rawData.length][5];
+        for (int i = 0; i < rawData.length; i++) {
+            String[] r = rawData[i];
+            String dni = (r.length > 1 && r[1] != null) ? r[1] : "";
+            String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
+            String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
+            String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
+            data[i][0] = dni;            // DNI
+            data[i][1] = nombre;         // NOMBRE Y APELLIDO
+            data[i][2] = tipo;           // TIPO (mostrar en columna 3)
+            data[i][3] = sancion;        // ESTADO
+            data[i][4] = "";           // ACCIONES (placeholder, renderizado con botones en ActionsRenderer)
+        }
 
         DefaultTableModel model = new DefaultTableModel(data, cols) {
             @Override

@@ -1,7 +1,6 @@
 package com.example.controlador;
 
 import com.example.dao.CicloDAO;
-import com.example.dao.EjemplarDAO;
 import com.example.dao.PrestamoDAO;
 import com.example.dao.PublicacionDAO;
 import com.example.dao.UsuarioDAO;

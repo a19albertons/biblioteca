@@ -114,7 +114,8 @@ public class UsuarioDAO {
         String totalSocios = "-1";
         // Consulta SQL para contar los socios activos
         try (Connection conexion = new MySQLConnection().getConnection();
-                PreparedStatement ps = conexion.prepareStatement("SELECT COUNT(*) AS TOTAL FROM usuarios where estado = TRUE")) {
+                PreparedStatement ps = conexion
+                        .prepareStatement("SELECT COUNT(*) AS TOTAL FROM usuarios where estado = TRUE")) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     totalSocios = rs.getString("TOTAL");
@@ -128,5 +129,58 @@ public class UsuarioDAO {
             totalSocios = "-1";
         }
         return totalSocios;
+    }
+
+    /**
+     * Obtiene el id, dni, nombre + apellidos, tipo (version larga) y estado
+     * (activo/sancionado)
+     * 
+     * @return String[][] con columnas: id, dni, nombre_completo, sancion_activa, tipo
+     */
+    public String[][] listaUsuariosYEstadoSancionActiva() {
+        // Listado de usuarios
+        String[][] devolver = new String[0][0];
+        try (Connection conexion = new MySQLConnection().getConnection();
+                // Consulta SQL
+                PreparedStatement ps = conexion.prepareStatement(
+                        "SELECT u.id, u.dni, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS nombre_completo, "
+                                + "CASE WHEN EXISTS (SELECT 1 FROM sanciones s WHERE s.id_usuario = u.id AND s.estado = TRUE) "
+                                + "THEN 'SANCIONADO' ELSE 'ACTIVO' END AS sancion_activa, "
+                                + "u.tipo "
+                                + "FROM usuarios u ORDER BY u.nombre ASC, u.apellido1 ASC, u.apellido2 ASC");) {
+            // Ejecutar consulta
+            try (ResultSet rs = ps.executeQuery();) {
+                // Collect rows into a list (works with forward-only ResultSet)
+                java.util.List<String[]> rows = new java.util.ArrayList<>();
+                while (rs.next()) {
+                    String[] fila = new String[5];
+                    fila[0] = rs.getString("id");
+                    fila[1] = rs.getString("dni");
+                    fila[2] = rs.getString("nombre_completo");
+                    fila[3] = rs.getString("sancion_activa");
+                    // Map single-letter code to descriptive name using TipoUsuario enum
+                    String tipoCode = rs.getString("tipo");
+                    String tipoDesc = "";
+                    // Comprueba si el tipo esta declarado y despues llama a la descripcion
+                    if (tipoCode != null) {
+                        try {
+                            tipoDesc = TipoUsuario.valueOf(tipoCode).getDescripcion();
+                        } catch (IllegalArgumentException e) {
+                            tipoDesc = tipoCode; // fallback to raw code if unknown
+                        }
+                    }
+                    fila[4] = tipoDesc;
+                    rows.add(fila);
+                }
+                // Convert list to array for return
+                devolver = rows.toArray(new String[0][0]);
+            }
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            devolver = new String[0][0];
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return devolver;
     }
 }

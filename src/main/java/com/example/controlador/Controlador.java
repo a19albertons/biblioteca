@@ -29,6 +29,10 @@ public class Controlador {
      * Controlador de ejemplares
      */
     ControladorEjemplares controladorEjemplares;
+    /**
+     * Controlador de gestión de usuarios
+     */
+    ControladorGestionUsuarios controladorGestionUsuarios = new ControladorGestionUsuarios();
 
     // Getters y Setters
     /**
@@ -136,6 +140,22 @@ public class Controlador {
     public void setControladorEjemplares(ControladorEjemplares controladorEjemplares) {
         this.controladorEjemplares = controladorEjemplares;
     }
+    /**
+     * Obtiene el controlador de gestión de usuarios
+     * 
+     * @return
+     */
+    public ControladorGestionUsuarios getControladorGestionUsuarios() {
+        return controladorGestionUsuarios;
+    }
+    /**
+     * Establece el controlador de gestión de usuarios
+     * 
+     * @param controladorGestionUsuarios
+     */
+    public void setControladorGestionUsuarios(ControladorGestionUsuarios controladorGestionUsuarios) {
+        this.controladorGestionUsuarios = controladorGestionUsuarios;
+    }
 
     // Constructores
     /**
@@ -147,6 +167,7 @@ public class Controlador {
         this.controladorLogin = new ControladorLogin();
         this.controladorPanelControl = new ControladorPanelControl();
         this.controladorEjemplares = new ControladorEjemplares();
+        this.controladorGestionUsuarios = new ControladorGestionUsuarios();
         this.controladorNavegacion = new ControladorNavegacion(this);
         
     }
