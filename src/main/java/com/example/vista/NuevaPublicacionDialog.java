@@ -425,8 +425,9 @@ public class NuevaPublicacionDialog extends JDialog {
                 if (ok) {
                     JOptionPane.showMessageDialog(this, "Publicación tipo Libro añadida", "Éxito",
                             JOptionPane.INFORMATION_MESSAGE);
-                    // Refrescar vista de publicaciones
+                    // Refrescar vista de publicaciones y panel de control
                     controlador.getControladorNavegacion().refrescarPublicaciones();
+                    controlador.getControladorNavegacion().refrescarPanelControl();
                     dispose();
                 } else {
                     JOptionPane.showMessageDialog(this, "Error añadiendo la publicación en la base de datos", "Error",
@@ -508,8 +509,9 @@ public class NuevaPublicacionDialog extends JDialog {
                 if (ok) {
                     JOptionPane.showMessageDialog(this, "Publicación tipo Revista añadida", "Éxito",
                             JOptionPane.INFORMATION_MESSAGE);
-                    // Refrescar vista de publicaciones
+                    // Refrescar vista de publicaciones y panel de control
                     controlador.getControladorNavegacion().refrescarPublicaciones();
+                    controlador.getControladorNavegacion().refrescarPanelControl();
                     dispose();
                 } else {
                     JOptionPane.showMessageDialog(this, "Error añadiendo la publicación en la base de datos", "Error",

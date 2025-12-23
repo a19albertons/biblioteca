@@ -219,4 +219,13 @@ public class ControladorNavegacion {
         }
     }
 
+    /**
+     * Refresca los datos del panel de control si está inicializado
+     */
+    public void refrescarPanelControl() {
+        if (this.panelControl != null) {
+            this.panelControl.refrescarPanel();
+        }
+    }
+
 }

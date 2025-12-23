@@ -41,6 +41,28 @@ public class PanelControl {
      *
      * @return JPanel con el panel de control
      */
+    // Componentes que deben mantenerse para refresco
+    /**
+     * Etiqueta valor 1 (préstamos hoy)
+     */
+    private JLabel valor1;
+    /**
+     * Etiqueta valor 2 (préstamos pendientes)
+     */
+    private JLabel valor2;
+    /**
+     * Etiqueta valor 3 (socios activos)
+     */
+    private JLabel valor3;
+    /**
+     * Tabla de últimos movimientos
+     */
+    private JTable table;
+    /**
+     * Modelo de la tabla de últimos movimientos
+     */
+    private DefaultTableModel model;
+
     public JPanel pantalla() {
         // Panel principal
         JPanel panel = new JPanel();
@@ -76,7 +98,7 @@ public class PanelControl {
         card1.add(tema1);
 
         // Valor -- provisional
-        JLabel valor1 = new JLabel(controlador.getControladorPanelControl().obtenerPrestamosHoy());
+        valor1 = new JLabel(controlador.getControladorPanelControl().obtenerPrestamosHoy());
         valor1.setFont(valor1.getFont().deriveFont(36f));
         valor1.setBounds(10, 40, 150, 50);
         card1.add(valor1);
@@ -95,7 +117,7 @@ public class PanelControl {
         tema2.setFont(com.example.utilities.Fonts.openSans(12f));
         card2.add(tema2);
 
-        JLabel valor2 = new JLabel(controlador.getControladorPanelControl().obtenerPrestamosPendientes());
+        valor2 = new JLabel(controlador.getControladorPanelControl().obtenerPrestamosPendientes());
         valor2.setFont(valor2.getFont().deriveFont(36f));
         valor2.setBounds(10, 40, 150, 50);
         valor2.setForeground(Color.decode("#F4791B"));
@@ -117,7 +139,7 @@ public class PanelControl {
         tema3.setFont(com.example.utilities.Fonts.openSans(12f));
         card3.add(tema3);
 
-        JLabel valor3 = new JLabel(controlador.getControladorPanelControl().obtenerTotalSociosActivos());
+        valor3 = new JLabel(controlador.getControladorPanelControl().obtenerTotalSociosActivos());
         valor3.setFont(valor3.getFont().deriveFont(36f));
         valor3.setBounds(10, 40, 150, 50);
         // dejar valor en color por defecto (oscuro)
@@ -141,16 +163,15 @@ public class PanelControl {
         String[][] data = controlador.getControladorPanelControl().obtenerUltimosMovimientos();
 
         // Modificación del modelo para que no sea editable
-        DefaultTableModel model = new DefaultTableModel(data, columnNames) {
+        model = new DefaultTableModel(data, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-
         // Establece una serie de modificadores sobre la tabla como colores, fuentes,
         // etc
-        JTable table = new JTable(model);
+        table = new JTable(model);
         table.setRowHeight(28);
         table.setShowGrid(false);
         table.setFillsViewportHeight(true);
@@ -210,6 +231,49 @@ public class PanelControl {
         panel.add(card3);
         panel.add(movimientosPanel);
         return panel;
+    }
+
+    /**
+     * Refresca los datos mostrados en el panel de control (tarjetas y tabla de
+     * movimientos).
+     */
+    public void refrescarPanel() {
+        // Actualizar tarjetas
+        valor1.setText(controlador.getControladorPanelControl().obtenerPrestamosHoy());
+        valor2.setText(controlador.getControladorPanelControl().obtenerPrestamosPendientes());
+        valor3.setText(controlador.getControladorPanelControl().obtenerTotalSociosActivos());
+
+        // Actualizar tabla
+        String[][] data = controlador.getControladorPanelControl().obtenerUltimosMovimientos();
+        // Reemplazar todos los datos del modelo
+        model.setDataVector(data, new String[] { "ID EJEMPLAR", "LIBRO", "ESTADO" });
+
+        // Reaplicar el renderer a la columna estado (porque cambiar model puede resetearla en algunas LAF)
+        DefaultTableCellRenderer estadoRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                String s = (value != null) ? value.toString().toUpperCase() : "";
+                setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
+                if ("DEVUELTO".equals(s)) {
+                    setBackground(Color.decode("#E6FFF0"));
+                    setForeground(Color.decode("#2BC187"));
+                } else if ("PRESTADO".equals(s)) {
+                    setBackground(Color.decode("#FFF4E6"));
+                    setForeground(Color.decode("#F4791B"));
+                } else {
+                    setBackground(Color.white);
+                    setForeground(Color.decode("#666666"));
+                }
+                setOpaque(true);
+                return this;
+            }
+        };
+        if (table.getColumnModel().getColumnCount() > 2) {
+            table.getColumnModel().getColumn(2).setCellRenderer(estadoRenderer);
+        }
     }
 
 }
