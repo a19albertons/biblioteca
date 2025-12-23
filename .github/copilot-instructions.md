@@ -1,59 +1,68 @@
 # GitHub Copilot / AI Agent Instructions for this repo ✅
 
-Concise, actionable guidance to help an AI agent be productive quickly in this Java Swing project.
+Concise, actionable guidance to help an AI agent be productive quickly in this Java Swing project (JDK 21).
 
 ## Big picture
-- Desktop Java Swing app (JDK 21) for library management. MVC-ish layout: **com.example.controlador** (controllers), **com.example.vista** (views that expose `pantalla()` -> `JPanel`), and **com.example.modelo** (domain models).
-- App bootstrap: `com.example.App` → creates `Controlador` and `ControladorNavegacion` which wires views into a `CardLayout`.
+- Desktop Java Swing app (JDK 21) for library management. The code follows an MVC-ish layout:
+  - **com.example.controlador** — controllers and navigation wiring (`Controlador`, `ControladorNavegacion`).
+  - **com.example.vista** — views, each exposes `public JPanel pantalla()` and receives a `Controlador` instance for callbacks.
+  - **com.example.modelo** — domain models (Usuario, Publicacion, Ejemplar, etc.).
+- Startup: `com.example.App` applies default fonts and constructs `Controlador` which creates `ControladorNavegacion` and shows the main window.
 
-## Key files & patterns
-- Entry: `src/main/java/com/example/App.java` (startup, fonts, and main window).
-- Navigation: `ControladorNavegacion.java` (uses `CardLayout`, primary keys: parent/child panels; methods `cambiarPantallaPadre(String)` / `cambiarPantallaHijo(String)`).
-- Views: `src/main/java/com/example/vista/*.java` — each view exposes `public JPanel pantalla()`; register in `ControladorNavegacion` and navigate with the controller.
-- DB adapter: `com.example.conexiones.DBConnection` + `MySQLConnection` (reads `mysql.*` from `application.properties`).
-- DAO example: `src/main/java/com/example/dao/UsuarioDAO.java` — follow explicit JDBC usage (no ORM), use `PreparedStatement` and close resources.
+## Navigation & UI patterns (important)
+- `ControladorNavegacion` builds two CardLayouts: a parent (`panelPadre`) for top-level screens and a child (`panelPrincipal` inside `panelHijo`) for authenticated area.
+  - Parent keys: `"inicioSesion"`, `"recuperarCuenta"`, `"entrarSistema"`.
+  - Child keys (examples): `"panelControl"`, `"concederPrestamo"`, `"devolverPrestamo"`, `"ejemplares"`, `"gestionUsuarios"`, `"sancionManual"`, `"publicaciones"`.
+- Important: When switching child screens use `ControladorNavegacion.cambiarPantallaHijo("name")` which calls `cardHijo.show(panelPrincipal, name)` to avoid the common "wrong parent for CardLayout" exception. Use the controller, not direct CardLayout on the visible panel.
+- Fonts: `Fonts.applyDefaultOpenSans()` attempts to load `resources/fonts/OpenSans-Regular.ttf` and sets default UI fonts. The code falls back to a family named "Open Sans" if resource not present.
 
-## How to run locally (exact commands) 🔧
-- Start DB + phpMyAdmin (initial SQL seeded automatically):
-  - docker compose up -d
-  - phpMyAdmin: http://localhost:8080 (connect to host `mysql` / container `mysql_db`)
-- Build & run:
-  - mvn -DskipTests package
-  - java -cp target/classes com.example.App
-- Run tests:
-  - mvn test
+## Data access & DB patterns
+- No ORM — direct JDBC only. DAOs use `MySQLConnection` (implements `DBConnection`) + `PreparedStatement` and try-with-resources. Example: `UsuarioDAO.consultaInicioSesion(...)`.
+- `ConfigLoader` loads `src/main/resources/application.properties` at class-load time; missing file throws a `RuntimeException` (fail fast).
+- `MySQLConnection` reads `mysql.url`, `mysql.user`, `mysql.password` from properties and returns a `java.sql.Connection` (returns `null` on failure — callers generally check for null implicitly).
+- Error handling pattern: DAOs catch exceptions and print messages/causes to stdout (no centralized logging framework). Expect console output for errors during local runs.
+- SQL seeds and triggers: `inicializacion.sql` seeds data and includes triggers that generate the `usuario` field for `usuarios` on INSERT/UPDATE — the DB can override values set in code.
 
-## Database specifics & gotchas ⚠️
-- `inicializacion.sql` (in repo root) seeds schema and sample data and is mounted into the MySQL container at `/docker-entrypoint-initdb.d/`.
-- Triggers in the SQL auto-generate the `usuario` field for `usuarios`. Note: `Usuario.setUsuario()` exists in code but the DB trigger may override values—be careful when writing insert/update tests.
-- Default docker-compose service names: `mysql` (container `mysql_db`, port 3306) and `phpmyadmin` (port 8080).
+## Docker / local environment
+- Docker Compose file (root `docker-compose.yml`) provides services:
+  - `mysql` → container name `mysql_db`, port 3306, initialized with `inicializacion.sql`.
+  - `phpmyadmin` → container name `phpmyadmin`, port 8080.
+- Exact commands to reproduce environment:
+  - Start DB: `docker compose up -d` (wait until `mysql_db` is healthy)
+  - phpMyAdmin UI: http://localhost:8080 (PMA host: `mysql`, port `3306`)
 
-## Conventions & style
-- Language: source code and comments are primarily **Spanish** — prefer Spanish for variable names, UI strings, and test texts.
-- UI/Fonts: bundled Open Sans TTFs live in `src/main/resources/fonts/`. `Fonts.applyDefaultOpenSans()` is called in `App.main` — use `Fonts.openSans(size)` when specific sizes are needed.
-- Resources: load images/assets via `getResource("/filename")` and put them in `src/main/resources` so they are present in `target/classes`.
-- No ORM: use direct JDBC with `PreparedStatement` and explicit resource closing (see `UsuarioDAO` as a pattern).
+## Build, run, test (exact commands) 🔧
+- Build (skip tests locally): `mvn -DskipTests package`
+- Run the app from classes (recommended for development): `java -cp target/classes com.example.App`
+- Run tests: `mvn test` (JUnit 4.11)
+
+## Common tasks (quick recipes) 💡
+- Add a new screen (pattern):
+  1. Create `src/main/java/com/example/vista/MiVista.java`, inject `Controlador` via constructor, expose `public JPanel pantalla()`.
+  2. Instantiate in `ControladorNavegacion` and add to `panelPrincipal` or `panelPadre`, giving it a unique string key (see keys above).
+  3. Navigate using `controlador.getControladorNavegacion().cambiarPantallaHijo("miVista")` or `cambiarPantallaPadre(...)`.
+- Add DAO method: follow existing patterns in `PublicacionDAO` / `UsuarioDAO` — use `PreparedStatement`, `try-with-resources`, return arrays/objects (methods often return `null`/empty results on error).
 
 ## Tests & CI notes
 - Unit tests use JUnit 4.11; current coverage is minimal (`AppTest`).
-- No CI workflow exists yet; for CI, recommended steps are: bring up MySQL with `docker compose up -d`, run an integration test that asserts `DBConnection.getConnection()` and then `mvn test`.
+- Integration test suggestion (useful for CI): add a test that starts with `docker compose up -d` and asserts `new MySQLConnection().getConnection()` is non-null and basic queries succeed.
+- No GitHub Actions workflow yet — recommended CI steps: bring up DB, run the DB-aware integration test, then `mvn test`.
 
-## Common tasks (quick recipes) 💡
-- Add a new screen:
-  1. Create `src/main/java/com/example/vista/MiVista.java` implementing `pantalla()` returning a `JPanel`.
-  2. Instantiate and add to `ControladorNavegacion` (`panelPrincipal.add(miVista.pantalla(), "miVista");`).
-  3. Navigate using `controlador.getControladorNavegacion().cambiarPantallaHijo("miVista");`.
+## Project conventions & gotchas
+- Language: **Spanish** for identifiers, comments, and UI strings — keep tests and messages in Spanish where appropriate.
+- Resources must sit under `src/main/resources` to be available at runtime via classpath.
+- Watch out for DB triggers that auto-generate `usuario` — when writing insert/update tests, assert DB-generated value when necessary.
+- Logging: most DAOs print to console; Fonts uses `java.util.logging`. Expect simple console output for debugging.
 
-- Fix DB connection failures:
-  - Ensure `docker compose up -d` is running, verify `mysql_db` container is healthy, confirm credentials in `src/main/resources/application.properties` match the docker-compose env vars.
-
-## Where to look
-- Start reading: `App.java` → `controlador/Controlador.java` → `controlador/ControladorNavegacion.java` → `vista/*` classes.
-- DB schema & test data: `inicializacion.sql`.
+## Files to inspect when debugging
+- Startup/UI: `App.java`, `controlador/Controlador.java`, `controlador/ControladorNavegacion.java` 🔧
+- DB access: `conexiones/MySQLConnection.java`, `utilities/ConfigLoader.java`, DAOs in `dao/` 🔍
+- UI utils: `utilities/Fonts.java` (font loading fallback behaviour) 🎨
+- DB schema and test data: `inicializacion.sql` (trigger behaviour & sample data) 🗂️
 
 ---
-If you'd like, I can:
-- add a small integration test that brings up the DB and asserts `DBConnection.getConnection()` (useful for CI), or
-- add a minimal GitHub Actions workflow that runs `docker compose up -d` and the integration test so PRs validate DB connectivity.
+If you want, I can (pick one):
+- add a focused integration test that asserts DB connectivity and a simple query, or
+- add a minimal GitHub Actions workflow that boots the DB and runs that integration test.
 
-Feedback welcome — tell me if you want more examples or translations into Spanish.
+Tell me which you'd prefer and I’ll implement it. Feedback welcome — specify any missing areas you'd like the instructions to expand on (e.g., CI details or additional code examples).
