@@ -206,8 +206,14 @@ public class CatalogoLibros {
                 card.addMouseListener(new java.awt.event.MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        // por ahora solo navegamos a la pantalla de ejemplares; el id está disponible en idPub si se necesita usar
-                        controlador.getControladorNavegacion().cambiarPantallaHijo("ejemplares");
+                        // Navegar a la pantalla de ejemplares y cargar la publicación seleccionada
+                        try {
+                            int id = Integer.parseInt(idPub);
+                            controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(id);
+                        } catch (NumberFormatException ex) {
+                            // fallback: mostrar la pantalla sin contexto
+                            controlador.getControladorNavegacion().cambiarPantallaHijo("ejemplares");
+                        }
                     }
 
                     @Override

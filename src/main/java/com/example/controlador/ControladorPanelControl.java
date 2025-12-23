@@ -1,6 +1,7 @@
 package com.example.controlador;
 
 import com.example.dao.CicloDAO;
+import com.example.dao.EjemplarDAO;
 import com.example.dao.PrestamoDAO;
 import com.example.dao.PublicacionDAO;
 import com.example.dao.UsuarioDAO;
@@ -72,14 +73,28 @@ public class ControladorPanelControl {
         String[] listaEditoriales = publicacionDAO.listaEditoriales();
         return listaEditoriales;
     }
-    
+
     /**
      * Obtiene el resumen de publicaciones
+     * 
+     * @return String[][] con columnas: titulo, isbn, autores, ciclos, editorial,
+     *         disponibles, id
      */
     public String[][] listaPublicacionesResumen() {
         PublicacionDAO publicacionDAO = new PublicacionDAO();
         String[][] resumen = publicacionDAO.listaPublicacionesResumen();
         return resumen;
+    }
+
+    /**
+     * Obtiene los ejemplares de una publicación
+     *
+     * @param idPublicacion
+     * @return String[][] con columnas: id, num_ejemplar, fecha, estado
+     */
+    public String[][] obtenerEjemplaresPorPublicacion(int idPublicacion) {
+        EjemplarDAO ejemplarDAO = new EjemplarDAO();
+        return ejemplarDAO.listaEjemplaresPorPublicacion(idPublicacion);
     }
 
 }

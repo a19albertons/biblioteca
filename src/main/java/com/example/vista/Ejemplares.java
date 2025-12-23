@@ -1,9 +1,12 @@
 package com.example.vista;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
 import java.net.URL;
@@ -15,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
@@ -30,6 +34,33 @@ public class Ejemplares {
      */
     Controlador controlador;
 
+    // Componentes que se actualizan cuando se selecciona una publicación
+    /**
+     * Panel de la publicación seleccionada
+     */
+    private JPanel publicacionPanel;
+    /**
+     * Etiqueta del título de la publicación seleccionada
+     */
+    private JLabel tituloPublicacion;
+    /**
+     * Etiqueta del ISBN de la publicación seleccionada
+     */
+    private JLabel isbnPublicacion;
+    /**
+     * Etiqueta de los autores de la publicación seleccionada
+     */
+    private JLabel autoresPublicacion;
+
+    // Tabla de ejemplares (modelo y tabla como campos para actualizar dinámicamente)
+    /**
+     * Modelo de la tabla de ejemplares
+     */
+    private DefaultTableModel ejemplaresModel;
+    /**
+     * Tabla de ejemplares
+     */
+    private JTable ejemplaresTable;
     /**
      * Constructor de la vista Ejemplares
      *
@@ -74,32 +105,32 @@ public class Ejemplares {
         encabezado.add(btnFormularioRegistrar);
 
         // Panel de publicacion
-        JPanel publicacion = new JPanel();
-        publicacion.setSize(new Dimension(560, 100));
-        publicacion.setBackground(Color.white);
-        publicacion.setLayout(null);
-        publicacion.setBounds(20, 70, 560, 100);
+        publicacionPanel = new JPanel();
+        publicacionPanel.setSize(new Dimension(560, 100));
+        publicacionPanel.setBackground(Color.white);
+        publicacionPanel.setLayout(null);
+        publicacionPanel.setBounds(20, 70, 560, 100);
 
         // Placeholder lo que va aqui aún no ha sido definido
         JPanel placeholder = new JPanel();
         placeholder.setBackground(Color.decode("#EEEEEE"));
         placeholder.setSize(50,70);
         placeholder.setBounds(10,15,50,70);
-        publicacion.add(placeholder);
+        publicacionPanel.add(placeholder);
 
         // Datos publicacion
-        JLabel tituloPublicacion = new JLabel("Ingeniería de Software (7ª Ed.)");
+        tituloPublicacion = new JLabel("Ingeniería de Software (7ª Ed.)");
         tituloPublicacion.setBounds(80, 15, 300, 25);
-        publicacion.add(tituloPublicacion);
+        publicacionPanel.add(tituloPublicacion);
 
-        JLabel isbnPublicacion = new JLabel("ISBN: 978-0073375977");
+        isbnPublicacion = new JLabel("ISBN: 978-0073375977");
         isbnPublicacion.setBounds(80, 45, 200, 20);
-        publicacion.add(isbnPublicacion);
+        publicacionPanel.add(isbnPublicacion);
 
         // Autores solo aplica a libros si es revista dejar en blanco
-        JLabel autoresPublicacion = new JLabel("Autor: Roger Pressman");
+        autoresPublicacion = new JLabel("Autor: Roger Pressman");
         autoresPublicacion.setBounds(80, 70, 300, 20);
-        publicacion.add(autoresPublicacion);
+        publicacionPanel.add(autoresPublicacion);
 
         // Botones
         JButton btnEditarEjemplar = new JButton() {
@@ -107,7 +138,7 @@ public class Ejemplares {
             @Override
             protected void paintComponent(java.awt.Graphics g) {
                 // paint custom background with alpha and keep icon/text on top
-                java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
+                Graphics2D g2 = (Graphics2D) g.create();
                 g2.setComposite(java.awt.AlphaComposite.SrcOver);
                 // fill with background color (includes alpha)
                 g2.setColor(getBackground());
@@ -120,7 +151,7 @@ public class Ejemplares {
         // Sitúan a la altura del título (y=15) y tamaño 24x24
         btnEditarEjemplar.setBounds(440, 15, 24, 24);
         // Icono escalado a 16x16
-        java.net.URL editarIconUrl = getClass().getResource("/editar.png");
+        URL editarIconUrl = getClass().getResource("/editar.png");
         if (editarIconUrl != null) {
             Image img = new ImageIcon(editarIconUrl).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
             btnEditarEjemplar.setIcon(new ImageIcon(img));
@@ -134,14 +165,14 @@ public class Ejemplares {
         btnEditarEjemplar.setBorder(null);
         btnEditarEjemplar.setToolTipText("Editar ejemplar");
         btnEditarEjemplar.setMargin(new Insets(0, 0, 0, 0));
-        publicacion.add(btnEditarEjemplar);
+        publicacionPanel.add(btnEditarEjemplar);
 
         JButton btnEliminarEjemplar = new JButton() {
             // Asegura que el color de la opacidad sea el debido
             @Override
-            protected void paintComponent(java.awt.Graphics g) {
-                java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
-                g2.setComposite(java.awt.AlphaComposite.SrcOver);
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setComposite(AlphaComposite.SrcOver);
                 g2.setColor(getBackground());
                 g2.fillRect(0, 0, getWidth(), getHeight());
                 g2.dispose();
@@ -151,7 +182,7 @@ public class Ejemplares {
         // Ubicado a la derecha del botón editar (24px + 4px gap)
         btnEliminarEjemplar.setBounds(480, 15, 24, 24);
         // Icono escalado a 16x16
-        java.net.URL borrarIconUrl = getClass().getResource("/borrar.png");
+        URL borrarIconUrl = getClass().getResource("/borrar.png");
         if (borrarIconUrl != null) {
             Image img = new ImageIcon(borrarIconUrl).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
             btnEliminarEjemplar.setIcon(new ImageIcon(img));
@@ -165,7 +196,7 @@ public class Ejemplares {
         btnEliminarEjemplar.setBorder(null);
         btnEliminarEjemplar.setToolTipText("Eliminar ejemplar");
         btnEliminarEjemplar.setMargin(new Insets(0, 0, 0, 0));
-        publicacion.add(btnEliminarEjemplar);
+        publicacionPanel.add(btnEliminarEjemplar);
 
 
         // Panel de ejemplares
@@ -189,31 +220,26 @@ public class Ejemplares {
         btnNuevoEjemplar.setBorder(null);
         ejemplares.add(btnNuevoEjemplar);
 
-        // Tabla con datos de ejemplo (sin backend)
+        // Tabla de ejemplares (modelo dinámico, se actualizará cuando se cargue una publicación)
         String[] cols = new String[] {"ID", "num_ejemplar", "FECHA", "ESTADO", "ACCIONES"};
-        Object[][] data = new Object[][] {
-                {"#9821", "1", "12/09/23", "DISPONIBLE", null},
-                {"#1102", "2", "01/02/24", "PRESTADO", null},
-                {"#4401", "3", "15/05/22", "BAJA", null}
-        };
 
-        DefaultTableModel model = new DefaultTableModel(data, cols) {
+        ejemplaresModel = new DefaultTableModel(new Object[0][0], cols) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
 
-        JTable table = new javax.swing.JTable(model);
-        table.setRowHeight(36);
-        table.setShowGrid(false);
-        table.setIntercellSpacing(new java.awt.Dimension(0, 0));
+        ejemplaresTable = new JTable(ejemplaresModel);
+        ejemplaresTable.setRowHeight(36);
+        ejemplaresTable.setShowGrid(false);
+        ejemplaresTable.setIntercellSpacing(new Dimension(0, 0));
 
         // Render para estado (badges)
         class StatusRenderer extends JLabel implements TableCellRenderer {
             public StatusRenderer() {
                 setOpaque(true);
-                setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                setHorizontalAlignment(SwingConstants.CENTER);
             }
 
             @Override
@@ -257,9 +283,9 @@ public class Ejemplares {
                 java.net.URL editarIconUrl = getClass().getResource("/editar.png");
                 final JButton editBtn = new JButton() {
                     @Override
-                    protected void paintComponent(java.awt.Graphics g) {
-                        java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
-                        g2.setComposite(java.awt.AlphaComposite.SrcOver);
+                    protected void paintComponent(Graphics g) {
+                        Graphics2D g2 = (Graphics2D) g.create();
+                        g2.setComposite(AlphaComposite.SrcOver);
                         g2.setColor(new Color(70, 141, 174, 102));
                         g2.fillRect(0, 0, getWidth(), getHeight());
                         g2.dispose();
@@ -282,9 +308,9 @@ public class Ejemplares {
                 URL borrarIconUrl = getClass().getResource("/borrar.png");
                 final JButton delBtn = new JButton() {
                     @Override
-                    protected void paintComponent(java.awt.Graphics g) {
-                        java.awt.Graphics2D g2 = (java.awt.Graphics2D) g.create();
-                        g2.setComposite(java.awt.AlphaComposite.SrcOver);
+                    protected void paintComponent(Graphics g) {
+                        Graphics2D g2 = (Graphics2D) g.create();
+                        g2.setComposite(AlphaComposite.SrcOver);
                         g2.setColor(new Color(192, 57, 43, 102));
                         g2.fillRect(0, 0, getWidth(), getHeight());
                         g2.dispose();
@@ -314,10 +340,10 @@ public class Ejemplares {
             }
         }
 
-        table.getColumnModel().getColumn(3).setCellRenderer(new StatusRenderer());
-        table.getColumnModel().getColumn(4).setCellRenderer(new ActionsRenderer());
+        ejemplaresTable.getColumnModel().getColumn(3).setCellRenderer(new StatusRenderer());
+        ejemplaresTable.getColumnModel().getColumn(4).setCellRenderer(new ActionsRenderer());
 
-        JScrollPane scroll = new JScrollPane(table);
+        JScrollPane scroll = new JScrollPane(ejemplaresTable);
         scroll.setBounds(10, 50, 540, 320);
         scroll.setBorder(null);
         ejemplares.add(scroll);
@@ -325,12 +351,62 @@ public class Ejemplares {
 
         // Añadir paneles principales al panel principal
         panel.add(encabezado);
-        panel.add(publicacion);
+        panel.add(publicacionPanel);
         panel.add(ejemplares);
 
 
         
         return panel;
+    }
+
+    /**
+     * Carga los datos del resumen de la publicación en la vista
+     *
+     * @param resumen arreglo: titulo,isbn,autores,ciclos,editorial,disponibles,id
+     */
+    public void cargarPublicacionResumen(String[] resumen) {
+        if (resumen == null) {
+            return;
+        }
+        String titulo = resumen.length > 0 ? resumen[0] : "";
+        String isbn = resumen.length > 1 ? resumen[1] : "";
+        String autores = resumen.length > 2 ? resumen[2] : "";
+        String editorial = resumen.length > 4 ? resumen[4] : "";
+        String disponibles = resumen.length > 5 ? resumen[5] : "";
+        String idStr = resumen.length > 6 ? resumen[6] : "";
+
+        if (tituloPublicacion != null) {
+            tituloPublicacion.setText(titulo);
+        }
+        if (isbnPublicacion != null) {
+            isbnPublicacion.setText("ISBN: " + isbn);
+        }
+        if (autoresPublicacion != null) {
+            autoresPublicacion.setText(autores == null || autores.isEmpty() ? "" : "Autor: " + autores);
+        }
+
+        // Cargar ejemplares reales para la publicación
+        int id = -1;
+        try {
+            id = Integer.parseInt(idStr);
+        } catch (Exception e) {
+            id = -1;
+        }
+        if (id > 0) {
+            String[][] ejemplaresData = controlador.getControladorPanelControl().obtenerEjemplaresPorPublicacion(id);
+            // Limpiar modelo
+            for (int i = ejemplaresModel.getRowCount() - 1; i >= 0; i--) {
+                ejemplaresModel.removeRow(i);
+            }
+            if (ejemplaresData != null) {
+                for (String[] row : ejemplaresData) {
+                    // row: id, num_ejemplar, fecha, estado
+                    Object[] fila = new Object[] { "#" + row[0], row[1], row[2], row[3], null };
+                    ejemplaresModel.addRow(fila);
+                }
+            }
+        }
+
     }
 
 }  

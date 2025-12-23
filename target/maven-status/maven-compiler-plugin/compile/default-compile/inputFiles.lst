@@ -28,6 +28,7 @@
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorLogin.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/ConcederPrestamo.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorPanelControl.java
+/home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/dao/EjemplarDAO.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/App.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/dao/UsuarioDAO.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/InicioSesion.java

@@ -182,4 +182,23 @@ public class ControladorNavegacion {
         }
     }
 
+    /**
+     * Muestra la pantalla de ejemplares cargando la publicación indicada por id
+     *
+     * @param idPublicacion id de la publicación a mostrar
+     */
+    public void mostrarEjemplaresParaPublicacion(int idPublicacion) {
+        // obtener resumen de la publicación y pedir a la vista que lo cargue
+        com.example.dao.PublicacionDAO publicacionDAO = new com.example.dao.PublicacionDAO();
+        String[] resumen = publicacionDAO.obtenerResumenPublicacionPorId(idPublicacion);
+        if (resumen != null) {
+            // cargar datos en la vista ejemplares
+            if (this.ejemplares != null) {
+                this.ejemplares.cargarPublicacionResumen(resumen);
+            }
+        }
+        // mostrar pantalla de ejemplares
+        cambiarPantallaHijo("ejemplares");
+    }
+
 }
