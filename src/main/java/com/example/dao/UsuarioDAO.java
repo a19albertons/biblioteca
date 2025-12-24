@@ -145,7 +145,8 @@ public class UsuarioDAO {
                 // Consulta SQL
                 PreparedStatement ps = conexion.prepareStatement(
                         "SELECT u.id, u.dni, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS nombre_completo, "
-                                + "CASE WHEN EXISTS (SELECT 1 FROM sanciones s WHERE s.id_usuario = u.id AND s.estado = TRUE) "
+                                + "CASE WHEN u.estado = FALSE THEN 'BAJA' "
+                                + "WHEN EXISTS (SELECT 1 FROM sanciones s WHERE s.id_usuario = u.id AND s.estado = TRUE) "
                                 + "THEN 'SANCIONADO' ELSE 'ACTIVO' END AS sancion_activa, "
                                 + "u.tipo "
                                 + "FROM usuarios u ORDER BY u.nombre ASC, u.apellido1 ASC, u.apellido2 ASC");) {

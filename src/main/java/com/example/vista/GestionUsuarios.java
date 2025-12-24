@@ -171,6 +171,11 @@ public class GestionUsuarios {
                         setBackground(Color.decode("#FFF4E6"));
                         setForeground(Color.decode("#F4791B"));
                         break;
+                    case "BAJA":
+                        // Azul translúcido (mismo tono translúcido del botón editar)
+                        setBackground(new Color(70, 141, 174, 102));
+                        setForeground(new Color(70, 141, 174));
+                        break;
                     default:
                         setBackground(Color.white);
                         setForeground(Color.black);
