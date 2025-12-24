@@ -176,4 +176,52 @@ public class EjemplarDAO {
             return false;
         }
     }
+
+    /**
+     * Comprueba si un ejemplar tiene préstamos activos (estado TRUE).
+     *
+     * @param idEjemplar
+     * @return true si existen préstamos activos
+     */
+    public boolean tienePrestamosActivosEjemplar(int idEjemplar) {
+        // Consulta SQL
+        String sql = "SELECT COUNT(*) AS cnt FROM prestamos WHERE id_ejemplar = ? AND estado = TRUE";
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetro
+            ps.setInt(1, idEjemplar);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cnt") > 0;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error comprobando préstamos activos: " + e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return false;
+    }
+
+    /**
+     * Marca un ejemplar como baja (estado = FALSE) dentro de la transacción.
+     *
+     * @param conexion
+     * @param idEjemplar
+     * @return true si la actualización afectó exactamente una fila
+     */
+    public boolean bajaEjemplar(Connection conexion, int idEjemplar) {
+        // Consulta SQL
+        String sql = "UPDATE ejemplares SET estado = FALSE WHERE id = ?";
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetro
+            ps.setInt(1, idEjemplar);
+            // Ejecutar actualización
+            int rows = ps.executeUpdate();
+            return rows == 1;
+        } catch (Exception e) {
+            System.out.println("Error marcando ejemplar como baja: " + e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
 }

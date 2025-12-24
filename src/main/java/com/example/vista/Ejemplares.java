@@ -65,7 +65,8 @@ public class Ejemplares {
     private JTable ejemplaresTable;
 
     /**
-     * Id de la publicación actualmente cargada en la vista (para acciones como editar)
+     * Id de la publicación actualmente cargada en la vista (para acciones como
+     * editar)
      */
     private int currentPublicacionId = -1;
 
@@ -110,9 +111,11 @@ public class Ejemplares {
         btnFormularioRegistrar.setForeground(Color.decode("#468DAE"));
         btnFormularioRegistrar.setFocusPainted(false);
         btnFormularioRegistrar.setBorder(null);
-        // Navegar de vuelta al catálogo de publicaciones
-        btnFormularioRegistrar
-                .addActionListener(evt -> controlador.getControladorNavegacion().cambiarPantallaHijo("publicaciones"));
+        // Navegar de vuelta al catálogo de publicaciones previo refresco
+        btnFormularioRegistrar.addActionListener(evt -> {
+            controlador.getControladorNavegacion().refrescarPublicaciones();
+            controlador.getControladorNavegacion().cambiarPantallaHijo("publicaciones");
+        });
         btnFormularioRegistrar.setToolTipText("Volver al catálogo");
         encabezado.add(btnFormularioRegistrar);
 
@@ -182,12 +185,15 @@ public class Ejemplares {
         // Abrir diálogo de edición al pulsar editar (si hay una publicación cargada)
         btnEditarEjemplar.addActionListener(evt -> {
             if (currentPublicacionId > 0) {
-                EditarPublicacionDialog dialog = new EditarPublicacionDialog(controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
+                EditarPublicacionDialog dialog = new EditarPublicacionDialog(
+                        controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
                 dialog.setVisible(true);
                 // refrescar la vista de ejemplares para mostrar cambios
                 controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
             } else {
-                javax.swing.JOptionPane.showMessageDialog(publicacionPanel, "No hay publicación seleccionada para editar", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(publicacionPanel,
+                        "No hay publicación seleccionada para editar", "Aviso",
+                        javax.swing.JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -224,12 +230,15 @@ public class Ejemplares {
 
         btnEliminarEjemplar.addActionListener(evt -> {
             if (currentPublicacionId > 0) {
-                EliminarPublicacionDialog d = new EliminarPublicacionDialog(controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
+                EliminarPublicacionDialog d = new EliminarPublicacionDialog(
+                        controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
                 d.setVisible(true);
                 // refrescar para mostrar posibles cambios
                 controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
             } else {
-                javax.swing.JOptionPane.showMessageDialog(publicacionPanel, "No hay publicación seleccionada para eliminar", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(publicacionPanel,
+                        "No hay publicación seleccionada para eliminar", "Aviso",
+                        javax.swing.JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -257,12 +266,15 @@ public class Ejemplares {
         // Abrir diálogo de nuevo ejemplar
         btnNuevoEjemplar.addActionListener(evt -> {
             if (currentPublicacionId > 0) {
-                NuevoEjemplarDialog d = new NuevoEjemplarDialog(controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
+                NuevoEjemplarDialog d = new NuevoEjemplarDialog(controlador.getControladorNavegacion().getVentana(),
+                        controlador, currentPublicacionId);
                 d.setVisible(true);
                 // refrescar la vista tras cerrar
                 controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
             } else {
-                javax.swing.JOptionPane.showMessageDialog(ejemplares, "No hay publicación seleccionada para añadir ejemplares", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(ejemplares,
+                        "No hay publicación seleccionada para añadir ejemplares", "Aviso",
+                        javax.swing.JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -351,15 +363,18 @@ public class Ejemplares {
                 editBtn.setOpaque(false);
                 editBtn.setMargin(new Insets(0, 0, 0, 0));
 
-                // Abrir diálogo de edición de la publicación actual (usa `currentPublicacionId`)
+                // Abrir diálogo de edición de la publicación actual (usa
+                // `currentPublicacionId`)
                 editBtn.addActionListener(evt -> {
                     if (currentPublicacionId > 0) {
-                        EditarPublicacionDialog d = new EditarPublicacionDialog(controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
+                        EditarPublicacionDialog d = new EditarPublicacionDialog(
+                                controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
                         d.setVisible(true);
                         // refrescar para mostrar posibles cambios
                         controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
                     } else {
-                        JOptionPane.showMessageDialog(panelCell, "No hay publicación seleccionada para editar", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(panelCell, "No hay publicación seleccionada para editar", "Aviso",
+                                javax.swing.JOptionPane.WARNING_MESSAGE);
                     }
                 });
 
@@ -402,7 +417,8 @@ public class Ejemplares {
         ejemplaresTable.getColumnModel().getColumn(3).setCellRenderer(new StatusRenderer());
         ejemplaresTable.getColumnModel().getColumn(4).setCellRenderer(new ActionsRenderer());
 
-        // Hacer que al hacer click en la columna ACCIONES se abra el diálogo de editar ejemplar
+        // Hacer que al hacer click en la columna ACCIONES se abra el diálogo de editar
+        // ejemplar
         ejemplaresTable.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -411,16 +427,31 @@ public class Ejemplares {
                 // Si se hizo click en la columna ACCIONES (4)
                 if (row >= 0 && col == 4) {
                     Object idObj = ejemplaresModel.getValueAt(row, 0);
-                    // Abrir diálogo de edición del ejemplar seleccionado
+                    // Abrir diálogo de edición o eliminar según la posición del click dentro de la
+                    // celda
                     if (idObj != null) {
                         String idStr = idObj.toString().replace("#", "");
                         try {
-                            // Parsear el ID del ejemplar
                             int idEjemplar = Integer.parseInt(idStr.trim());
-                            EditarEjemplarDialog d = new EditarEjemplarDialog(controlador.getControladorNavegacion().getVentana(), controlador, idEjemplar);
-                            d.setVisible(true);
-                            // refrescar la vista tras cerrar
-                            controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
+                            // Determinar la X relativa dentro de la celda para distinguir botones
+                            java.awt.Rectangle cellRect = ejemplaresTable.getCellRect(row, col, true);
+                            int clickX = e.getX() - cellRect.x;
+                            // Definir la zona de 'eliminar' como los ~32 píxeles finales (botón + margen)
+                            int deleteThreshold = cellRect.width - 32; // 24px botón + padding
+                            if (clickX >= deleteThreshold) {
+                                // Parte derecha -> eliminar (diálogo de confirmación)
+                                EliminarEjemplarDialog del = new EliminarEjemplarDialog(
+                                        controlador.getControladorNavegacion().getVentana(), controlador, idEjemplar);
+                                del.setVisible(true);
+                            } else {
+                                // Resto -> editar
+                                EditarEjemplarDialog d = new EditarEjemplarDialog(
+                                        controlador.getControladorNavegacion().getVentana(), controlador, idEjemplar);
+                                d.setVisible(true);
+                            }
+                            // refrescar la vista tras cerrar cualquiera de los diálogos
+                            controlador.getControladorNavegacion()
+                                    .mostrarEjemplaresParaPublicacion(currentPublicacionId);
                         } catch (NumberFormatException ex) {
                             System.out.println("ID de ejemplar inválido: " + idStr);
                         }

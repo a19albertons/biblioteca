@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.example.EditarEjemplarTest" time="0.726" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.example.EliminarEjemplarTest" time="8.039" tests="2" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.jnu.encoding" value="ANSI_X3.4-1968"/>
@@ -54,5 +54,6 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="editarFechaEjemplarYRestaurar" classname="com.example.EditarEjemplarTest" time="0.726"/>
+  <testcase name="eliminarEjemplarConPrestamoActivoFalla" classname="com.example.EliminarEjemplarTest" time="6.828"/>
+  <testcase name="eliminarEjemplarSinPrestamosDaBaja" classname="com.example.EliminarEjemplarTest" time="0.962"/>
 </testsuite>
