@@ -69,7 +69,8 @@ public class PrestamoDAO {
         return totalPendientes;
     }
 
-    // Ultimos movimientos de prestamos (Estado prestamos, id ejemplar, titulo publicacion)
+    // Ultimos movimientos de prestamos (Estado prestamos, id ejemplar, titulo
+    // publicacion)
     public String[][] ultimosMovimientos() {
         String[][] movimientos = new String[9][3];
         // Consulta SQL para obtener los últimos 9 movimientos de préstamos
@@ -88,7 +89,7 @@ public class PrestamoDAO {
                     movimientos[index][0] = String.valueOf(rs.getInt("id_ejemplar"));
                     movimientos[index][1] = rs.getString("titulo");
                     movimientos[index][2] = rs.getBoolean("estado") ? "Devuelto" : "Prestado";
-                    
+
                     index++;
                 }
             }
@@ -101,6 +102,68 @@ public class PrestamoDAO {
         return movimientos;
     }
 
+    /**
+     * Inserta un nuevo préstamo y devuelve true si fue insertado correctamente.
+     *
+     * @param idUsuario
+     * @param idEjemplar
+     * @param fechaInicio (java.sql.Date)
+     * @param fechaFin    (java.sql.Date)
+     * @return true si se insertó correctamente
+     */
+    public boolean insertarPrestamo(int idUsuario, int idEjemplar, Date fechaInicio, Date fechaFin) {
+        // Consulta SQL para insertar el préstamo
+        String sql = "INSERT INTO prestamos (id_usuario, id_ejemplar, fecha_inicio, fecha_fin, estado) VALUES (?, ?, ?, ?, TRUE)";
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetros
+            ps.setInt(1, idUsuario);
+            ps.setInt(2, idEjemplar);
+            ps.setDate(3, fechaInicio);
+            ps.setDate(4, fechaFin);
 
+            // Ejecutar inserción
+            int rows = ps.executeUpdate();
+            return rows == 1;
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Error insertando préstamo: " + e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Comprueba si el usuario tiene un préstamo activo de un tipo de publicación
+     * (L = libro, R = revista)
+     *
+     * @param idUsuario
+     * @param tipoPublicacion (char 'L' o 'R')
+     * @return true si existe al menos un préstamo activo de ese tipo
+     */
+    public boolean tienePrestamoActivoTipo(int idUsuario, char tipoPublicacion) {
+        // Consulta SQL para comprobar préstamos activos por tipo
+        String sql = "SELECT COUNT(*) AS cnt FROM prestamos p "
+                + "JOIN ejemplares e ON p.id_ejemplar = e.id "
+                + "JOIN publicaciones pub ON e.id_publicacion = pub.id "
+                + "WHERE p.id_usuario = ? AND p.estado = TRUE AND pub.tipo = ?";
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetros
+            ps.setInt(1, idUsuario);
+            ps.setString(2, String.valueOf(Character.toUpperCase(tipoPublicacion)));
+            try (ResultSet rs = ps.executeQuery()) {
+                // Ejecutar consulta
+                if (rs.next()) {
+                    return rs.getInt("cnt") > 0;
+                }
+            }
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Error comprobando préstamo activo por tipo: " + e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return false;
+    }
 
 }

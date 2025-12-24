@@ -265,6 +265,56 @@ public class UsuarioDAO {
     }
 
     /**
+     * Obtiene los datos de un usuario por DNI o por ID (cadena). Devuelve
+     * arreglo: id, dni, nombre_completo, sancion_activa (SANCIONADO/ACTIVO/BAJA), tipo_desc
+     *
+     * @param dniOrId cadena que contiene DNI o ID
+     * @return String[] con los datos o null si no existe
+     */
+    public String[] obtenerUsuarioYEstadoPorDniOId(String dniOrId) {
+        // Listado de usuarios
+        String[] devolver = null;
+        try (Connection conexion = new MySQLConnection().getConnection()) {
+            // Consulta SQL dependiendo si es número (id) o texto (dni)
+            boolean esNumero = dniOrId != null && dniOrId.matches("^\\d+$");
+            String sql = "SELECT u.id, u.dni, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS nombre_completo, "
+                    + "CASE WHEN u.estado = FALSE THEN 'BAJA' "
+                    + "WHEN EXISTS (SELECT 1 FROM sanciones s WHERE s.id_usuario = u.id AND s.estado = TRUE) "
+                    + "THEN 'SANCIONADO' ELSE 'ACTIVO' END AS sancion_activa, "
+                    + "u.tipo "
+                    + "FROM usuarios u WHERE " + (esNumero ? "u.id = ?" : "u.dni = ?");
+            try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+                // Asignar parámetro
+                if (esNumero) {
+                    ps.setInt(1, Integer.parseInt(dniOrId));
+                } else {
+                    ps.setString(1, dniOrId);
+                }
+                try (ResultSet rs = ps.executeQuery()) {
+                    // Ejecutar consulta
+                    if (rs.next()) {
+                        devolver = new String[5];
+                        devolver[0] = rs.getString("id");
+                        devolver[1] = rs.getString("dni");
+                        devolver[2] = rs.getString("nombre_completo");
+                        devolver[3] = rs.getString("sancion_activa");
+                        // convertir tipo a descripcion si es posible
+                        String tipoCode = rs.getString("tipo");
+                        String tipoDesc = tipoCode != null ? com.example.modelo.TipoUsuario.valueOf(tipoCode).getDescripcion() : "";
+                        devolver[4] = tipoDesc;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Error buscando usuario por DNI/ID: " + e.getMessage());
+            System.out.println(e.getCause());
+            devolver = null;
+        }
+        return devolver;
+    }
+
+    /**
      * Actualiza los datos de un usuario (dni, nombre, apellidos, email, tipo)
      * 
      * @param idUsuario id del usuario a actualizar

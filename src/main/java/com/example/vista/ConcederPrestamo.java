@@ -105,6 +105,9 @@ public class ConcederPrestamo {
         resultadoSocio.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
         contenido.add(resultadoSocio);
 
+        // mutable holder para el id de usuario seleccionado (para usar desde lambdas)
+        final int[] usuarioSeleccionado = new int[] { -1 };
+
         // Paso 2: Seleccionar libro
         JLabel paso2 = new JLabel("2. Seleccionar Libro");
         paso2.setBounds(20, 200, 300, 30);
@@ -127,7 +130,7 @@ public class ConcederPrestamo {
         contenido.add(publicacion);
 
         JLabel txtPublicacion = new JLabel();
-        txtPublicacion.setBounds(230, 280, 200, 35);
+        txtPublicacion.setBounds(230, 280, 260, 35);
         txtPublicacion.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 0, Color.white));
         contenido.add(txtPublicacion);
 
@@ -150,6 +153,102 @@ public class ConcederPrestamo {
         txtFechaFin.setBounds(230, 360, 200, 35);
         txtFechaFin.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 0, Color.white));
         contenido.add(txtFechaFin);
+
+        // Detectar automáticamente al escribir ID de ejemplar
+        txtIdEjemplar.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            private void doDetect() {
+                // si está vacío, limpiar campos
+                String idEjStr = txtIdEjemplar.getText().trim();
+                if (idEjStr.isEmpty()) {
+                    txtPublicacion.setText("");
+                    txtFechaInicio.setText("");
+                    txtFechaFin.setText("");
+                    return;
+                }
+                int idEj;
+                try {
+                    // convertir a entero
+                    idEj = Integer.parseInt(idEjStr);
+                } catch (NumberFormatException ex) {
+                    // si hay texto no numérico, limpiar campos
+                    txtPublicacion.setText("");
+                    txtFechaInicio.setText("");
+                    txtFechaFin.setText("");
+                    return;
+                }
+                // detectar ejemplar
+                String[] detectado = controlador.getControladorConcederPrestamo().detectarEjemplar(idEj);
+                if (detectado == null) {
+                    txtPublicacion.setText("");
+                    txtFechaInicio.setText("");
+                    txtFechaFin.setText("");
+                    return;
+                }
+                // detectado: idEjemplar, idPublicacion, numEjemplar, estadoEjemplar, titulo,
+                // numEdicion, tipo
+                String pubTitulo = detectado[4];
+                String numEd = detectado[5];
+                String tipoPub = detectado[6];
+                // mostrar info publicación
+                if ("L".equalsIgnoreCase(tipoPub)) {
+                    String texto = "Detectado: " + pubTitulo
+                            + (numEd != null && !numEd.isEmpty() ? " (Ed. " + numEd + ")" : "");
+                    txtPublicacion.setText(texto);
+                } else if ("R".equalsIgnoreCase(tipoPub)) {
+                    String texto = "Detectado: " + pubTitulo + " (Revista)";
+                    txtPublicacion.setText(texto);
+                } else {
+                    txtPublicacion.setText("Detectado: " + pubTitulo);
+                }
+
+                // establecer fecha inicio como hoy
+                java.time.LocalDate hoy = java.time.LocalDate.now();
+                txtFechaInicio.setText(hoy.toString());
+                // calcular fecha fin segun reglas y tipo de usuario
+                int idUsuarioSel = usuarioSeleccionado[0];
+                java.time.LocalDate fechaFinLocal;
+                // para revistas, mismo día; para libros, +7 días (o +7 días si es profesor)
+                if ("R".equalsIgnoreCase(tipoPub)) {
+                    // revista
+                    if (idUsuarioSel != -1) {
+                        // obtener tipo de usuario
+                        String[] detUsuario = controlador.getControladorEditarUsuarioDialog()
+                                .obtenerDetallesUsuario(idUsuarioSel);
+                        String tipoCode = detUsuario != null ? detUsuario[5] : null;
+                        // ajustar fecha fin
+                        if ("P".equalsIgnoreCase(tipoCode)) {
+                            fechaFinLocal = hoy.plusDays(7);
+                        } else {
+                            fechaFinLocal = hoy; // mismo dia
+                        }
+                    } else {
+                        // usuario no seleccionado -> asumir mismo dia para revistas
+                        fechaFinLocal = hoy;
+                    }
+                } else {
+                    fechaFinLocal = hoy.plusDays(7);
+                }
+                txtFechaFin.setText(fechaFinLocal.toString());
+            }
+
+            // Detectar cambios en el campo de texto
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                doDetect();
+            }
+
+            // Detectar cambios en el campo de texto
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                doDetect();
+            }
+
+            // Detectar cambios en el campo de texto
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                doDetect();
+            }
+        });
 
         // Boton cancelar
         JButton btnCancelar = new JButton("Cancelar");
@@ -175,9 +274,35 @@ public class ConcederPrestamo {
         });
 
         btnBuscarSocio.addActionListener(e -> {
-            // placeholder: en el futuro buscar en BD por ID/DNI
-            resultadoSocio.setText(
-                    "<html>Usuario: (Estudiante) - <span style='color:#2BC187; font-weight:bold'>Sin Sanciones</span></html>");
+            String input = txtDniID.getText().trim();
+            // si está vacío, mensaje de error
+            if (input.isEmpty()) {
+                resultadoSocio.setText("<html><span style='color:#F4791B'>Ingrese DNI o ID</span></html>");
+                usuarioSeleccionado[0] = -1;
+                return;
+            }
+            // buscar usuario y comprobar resultado
+            String[] datos = controlador.getControladorConcederPrestamo().buscarUsuarioPorDniOId(input);
+            if (datos == null) {
+                resultadoSocio.setText("<html><span style='color:#F4791B'>Usuario no encontrado</span></html>");
+                usuarioSeleccionado[0] = -1;
+                return;
+            }
+            // datos: id, dni, nombre_completo, sancion_activa, tipo_desc
+            usuarioSeleccionado[0] = Integer.parseInt(datos[0]);
+            String estado = datos[3];
+            String tipoDesc = datos[4];
+            // mostrar resultado de estado usuario
+            if ("SANCIONADO".equalsIgnoreCase(estado)) {
+                resultadoSocio.setText("<html>Usuario: " + datos[2] + " (" + tipoDesc
+                        + ") - <span style='color:#F4791B; font-weight:bold'>Tiene sanciones</span></html>");
+            } else if ("BAJA".equalsIgnoreCase(estado)) {
+                resultadoSocio.setText("<html>Usuario: " + datos[2]
+                        + " - <span style='color:#F4791B; font-weight:bold'>Dado de baja</span></html>");
+            } else {
+                resultadoSocio.setText("<html>Usuario: " + datos[2] + " (" + tipoDesc
+                        + ") - <span style='color:#2BC187; font-weight:bold'>Sin sanciones</span></html>");
+            }
         });
 
         btnCancelar.addActionListener(e -> {
@@ -185,8 +310,43 @@ public class ConcederPrestamo {
         });
 
         btnRegistrarPrestamo.addActionListener(e -> {
-            // placeholder: ejecutar devolución y volver al panel de control
-            controlador.getControladorNavegacion().cambiarPantallaHijo("panelControl");
+            // Validar datos
+            if (usuarioSeleccionado[0] == -1) {
+                javax.swing.JOptionPane.showMessageDialog(null, "Seleccione primero un usuario válido", "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            // validar id ejemplar
+            String idEjStr = txtIdEjemplar.getText().trim();
+            if (idEjStr.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int idEj;
+            try {
+                // convertir a entero
+                idEj = Integer.parseInt(idEjStr);
+            } catch (NumberFormatException ex) {
+                // mostrar error
+                javax.swing.JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            // registrar préstamo
+            String err = controlador.getControladorConcederPrestamo().registrarPrestamo(usuarioSeleccionado[0], idEj);
+            // mostrar resultado
+            if (err == null) {
+                javax.swing.JOptionPane.showMessageDialog(null, "Préstamo registrado correctamente", "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                // Refrescar vistas dependientes y marcar inicio como activo
+                controlador.getControladorNavegacion().refrescarPublicaciones();
+                controlador.getControladorNavegacion().refrescarPanelControl();
+                controlador.getControladorNavegacion().marcarPantallaActiva("panelControl");
+                controlador.getControladorNavegacion().cambiarPantallaHijo("panelControl");
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(null, err, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         // Añadir los dos subpaneles al principal

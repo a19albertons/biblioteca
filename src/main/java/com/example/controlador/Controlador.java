@@ -25,6 +25,11 @@ public class Controlador {
      * Controlador de panel de control
      */
     ControladorPanelControl controladorPanelControl;
+
+    /**
+     * Controlador de concesión de préstamos
+     */
+    ControladorConcederPrestamo controladorConcederPrestamo;
     /**
      * Controlador de ejemplares
      */
@@ -152,6 +157,15 @@ public class Controlador {
      */
     public ControladorPanelControl getControladorPanelControl() {
         return controladorPanelControl;
+    }
+
+    /**
+     * Obtiene el controlador de concesión de préstamos
+     *
+     * @return controlador de conceder préstamo
+     */
+    public ControladorConcederPrestamo getControladorConcederPrestamo() {
+        return controladorConcederPrestamo;
     }
 
     /**
@@ -349,6 +363,7 @@ public class Controlador {
         this.controladorEditarUsuarioDialog = new ControladorEditarUsuarioDialog(this);
         this.controladorEliminarUsuario = new ControladorEliminarUsuario(this);
         this.controladorNavegacion = new ControladorNavegacion(this);
+        this.controladorConcederPrestamo = new ControladorConcederPrestamo(this);
         
     }
 

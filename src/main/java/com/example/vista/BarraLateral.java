@@ -22,6 +22,29 @@ public class BarraLateral {
      */
     Controlador controlador;
 
+    // Botones de la barra lateral expuestos para poder marcar estado activo desde
+    // fuera
+    /**
+     * Botón de inicio
+     */
+    private javax.swing.JButton btnInicio;
+    /**
+     * Botón de catálogo de libros
+     */
+    private javax.swing.JButton btnCatalogoLibros;
+    /**
+     * Botón de préstamos
+     */
+    private javax.swing.JButton btnPrestamos;
+    /**
+     * Botón de socios / usuarios
+     */
+    private javax.swing.JButton btnSocios;
+    /**
+     * Botón de sanciones
+     */
+    private javax.swing.JButton btnSanciones;
+
     /**
      * Constructor de la vista BarraLateral
      * 
@@ -63,7 +86,7 @@ public class BarraLateral {
         opciones.setBackground(Color.decode("#468DAE"));
 
         // Boton de inicio
-        JButton btnInicio = new JButton("Inicio");
+        btnInicio = new JButton("Inicio");
         btnInicio.setPreferredSize(new Dimension(200, 40));
         btnInicio.setBackground(Color.decode("#444444"));
         btnInicio.setForeground(Color.WHITE);
@@ -73,7 +96,7 @@ public class BarraLateral {
         opciones.add(btnInicio);
 
         // Boton de catalogo de libros
-        JButton btnCatalogoLibros = new JButton("Catálogo de libros");
+        btnCatalogoLibros = new JButton("Catálogo de libros");
         btnCatalogoLibros.setPreferredSize(new Dimension(200, 40));
         btnCatalogoLibros.setForeground(Color.decode("#EDF3F6"));
         btnCatalogoLibros.setBackground(Color.decode("#468DAE"));
@@ -82,7 +105,7 @@ public class BarraLateral {
         opciones.add(btnCatalogoLibros);
 
         // Boton de prestamos
-        JButton btnPrestamos = new JButton("Préstamos");
+        btnPrestamos = new JButton("Préstamos");
         btnPrestamos.setPreferredSize(new Dimension(200, 40));
         btnPrestamos.setForeground(Color.decode("#EDF3F6"));
         btnPrestamos.setBackground(Color.decode("#468DAE"));
@@ -91,7 +114,7 @@ public class BarraLateral {
         opciones.add(btnPrestamos);
 
         // Botons de socios / usuarios
-        JButton btnSocios = new JButton("Socios / Usuarios");
+        btnSocios = new JButton("Socios / Usuarios");
         btnSocios.setPreferredSize(new Dimension(200, 40));
         btnSocios.setForeground(Color.decode("#EDF3F6"));
         btnSocios.setBackground(Color.decode("#468DAE"));
@@ -100,7 +123,7 @@ public class BarraLateral {
         opciones.add(btnSocios);
 
         // Boton de sanciones
-        JButton btnSanciones = new JButton("Sanciones");
+        btnSanciones = new JButton("Sanciones");
         btnSanciones.setPreferredSize(new Dimension(200, 40));
         btnSanciones.setForeground(Color.decode("#EDF3F6"));
         btnSanciones.setBackground(Color.decode("#468DAE"));
@@ -137,6 +160,40 @@ public class BarraLateral {
         });
 
         return panel;
+    }
+
+    /**
+     * Marca programáticamente una pantalla como activa en la barra lateral
+     *
+     * @param nombrePantalla nombre del key usado en ControladorNavegacion (ej:
+     *                       "panelControl", "publicaciones")
+     */
+    public void marcarPantallaActiva(String nombrePantalla) {
+        // si es null, marcar inicio
+        if (nombrePantalla == null) {
+            setActiveButton(btnInicio, btnInicio, btnCatalogoLibros, btnPrestamos, btnSocios, btnSanciones);
+            return;
+        }
+        // evaluar nombrePantalla
+        switch (nombrePantalla) {
+            case "panelControl":
+                setActiveButton(btnInicio, btnInicio, btnCatalogoLibros, btnPrestamos, btnSocios, btnSanciones);
+                break;
+            case "publicaciones":
+                setActiveButton(btnCatalogoLibros, btnInicio, btnCatalogoLibros, btnPrestamos, btnSocios, btnSanciones);
+                break;
+            case "concederPrestamo":
+                setActiveButton(btnPrestamos, btnInicio, btnCatalogoLibros, btnPrestamos, btnSocios, btnSanciones);
+                break;
+            case "gestionUsuarios":
+                setActiveButton(btnSocios, btnInicio, btnCatalogoLibros, btnPrestamos, btnSocios, btnSanciones);
+                break;
+            case "sancionManual":
+                setActiveButton(btnSanciones, btnInicio, btnCatalogoLibros, btnPrestamos, btnSocios, btnSanciones);
+                break;
+            default:
+                setActiveButton(btnInicio, btnInicio, btnCatalogoLibros, btnPrestamos, btnSocios, btnSanciones);
+        }
     }
 
     /**

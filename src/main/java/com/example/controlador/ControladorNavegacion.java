@@ -220,6 +220,17 @@ public class ControladorNavegacion {
     }
 
     /**
+     * Marca programáticamente en la barra lateral qué sección está activa
+     *
+     * @param nombrePantalla key de la pantalla hija (ej: "panelControl")
+     */
+    public void marcarPantallaActiva(String nombrePantalla) {
+        if (this.barraLateral != null) {
+            this.barraLateral.marcarPantallaActiva(nombrePantalla);
+        }
+    }
+
+    /**
      * Refresca la lista de usuarios si la vista está inicializada
      */
     public void refrescarUsuarios() {

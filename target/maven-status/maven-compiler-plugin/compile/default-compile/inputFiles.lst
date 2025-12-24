@@ -31,6 +31,7 @@
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/App.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/dao/PrestamoDAO.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/modelo/Sancion.java
+/home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorConcederPrestamo.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorNuevoEjemplarDialog.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorNuevoUsuarioDialog.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorRecuperarCuenta.java
