@@ -46,6 +46,7 @@
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/RecuperarCuenta.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/GestionUsuarios.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/modelo/Modulo.java
+/home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/dao/SancionDAO.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/modelo/Tema.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorGestionUsuarios.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/NuevoUsuarioDialog.java
@@ -54,6 +55,7 @@
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorNavegacion.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/modelo/TipoUsuario.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/CatalogoLibros.java
+/home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorDevolverPrestamo.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/ConcederPrestamo.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/EditarUsuarioDialog.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/dao/UsuarioDAO.java

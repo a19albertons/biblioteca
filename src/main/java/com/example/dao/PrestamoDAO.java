@@ -166,4 +166,92 @@ public class PrestamoDAO {
         return false;
     }
 
+    /**
+     * Comprueba si existe un préstamo activo entre un usuario y un ejemplar
+     *
+     * @param idUsuario
+     * @param idEjemplar
+     * @return true si existe un préstamo activo
+     */
+    public boolean existePrestamoActivoUsuarioEjemplar(int idUsuario, int idEjemplar) {
+        // Consulta SQL para comprobar préstamo activo entre usuario y ejemplar
+        String sql = "SELECT COUNT(*) AS cnt FROM prestamos WHERE id_usuario = ? AND id_ejemplar = ? AND estado = TRUE";
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetros
+            ps.setInt(1, idUsuario);
+            ps.setInt(2, idEjemplar);
+            // Ejecutar consulta
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cnt") > 0;
+                }
+            }
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Error comprobando préstamo activo usuario-ejemplar: " + e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return false;
+    }
+
+    /**
+     * Marca un préstamo activo como devuelto (estado = FALSE) para el usuario y
+     * ejemplar
+     *
+     * @param idUsuario
+     * @param idEjemplar
+     * @return true si se actualizó exactamente una fila
+     */
+    public boolean devolverPrestamoUsuarioEjemplar(int idUsuario, int idEjemplar) {
+        // Consulta SQL para actualizar el estado del préstamo
+        String sql = "UPDATE prestamos SET estado = FALSE WHERE id_usuario = ? AND id_ejemplar = ? AND estado = TRUE";
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetros
+            ps.setInt(1, idUsuario);
+            ps.setInt(2, idEjemplar);
+            // Ejecutar actualización
+            int rows = ps.executeUpdate();
+            return rows == 1;
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Error marcando devolución de préstamo: " + e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Obtiene el préstamo activo (estado = TRUE) entre un usuario y un ejemplar
+     * Devuelve arreglo {idPrestamo, fecha_inicio, fecha_fin} o null
+     */
+    public String[] obtenerPrestamoActivoPorUsuarioEjemplar(int idUsuario, int idEjemplar) {
+        // Consulta SQL para obtener el préstamo activo
+        String sql = "SELECT id, fecha_inicio, fecha_fin FROM prestamos WHERE id_usuario = ? AND id_ejemplar = ? AND estado = TRUE";
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetros
+            ps.setInt(1, idUsuario);
+            ps.setInt(2, idEjemplar);
+            try (ResultSet rs = ps.executeQuery()) {
+                // Ejecutar consulta
+                if (rs.next()) {
+                    // Construir y devolver el arreglo con los datos del préstamo
+                    String idPrestamo = String.valueOf(rs.getInt("id"));
+                    java.sql.Date fechaInicio = rs.getDate("fecha_inicio");
+                    java.sql.Date fechaFin = rs.getDate("fecha_fin");
+                    String fechaInicioStr = fechaInicio != null ? fechaInicio.toString() : "";
+                    String fechaFinStr = fechaFin != null ? fechaFin.toString() : "";
+                    return new String[] { idPrestamo, fechaInicioStr, fechaFinStr };
+                }
+            }
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Error obteniendo préstamo activo: " + e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return null;
+    }
+
 }

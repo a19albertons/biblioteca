@@ -31,6 +31,10 @@ public class Controlador {
      */
     ControladorConcederPrestamo controladorConcederPrestamo;
     /**
+     * Controlador de devolución de préstamos
+     */
+    ControladorDevolverPrestamo controladorDevolverPrestamo;
+    /**
      * Controlador de ejemplares
      */
     ControladorEjemplares controladorEjemplares;
@@ -166,6 +170,15 @@ public class Controlador {
      */
     public ControladorConcederPrestamo getControladorConcederPrestamo() {
         return controladorConcederPrestamo;
+    }
+
+    /**
+     * Obtiene el controlador de devolución de préstamos
+     *
+     * @return controlador de devolución
+     */
+    public ControladorDevolverPrestamo getControladorDevolverPrestamo() {
+        return controladorDevolverPrestamo;
     }
 
     /**
@@ -364,6 +377,7 @@ public class Controlador {
         this.controladorEliminarUsuario = new ControladorEliminarUsuario(this);
         this.controladorNavegacion = new ControladorNavegacion(this);
         this.controladorConcederPrestamo = new ControladorConcederPrestamo(this);
+        this.controladorDevolverPrestamo = new ControladorDevolverPrestamo(this);
         
     }
 

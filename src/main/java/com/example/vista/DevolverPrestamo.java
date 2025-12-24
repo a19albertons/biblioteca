@@ -103,6 +103,9 @@ public class DevolverPrestamo {
         resultadoSocio.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
         contenido.add(resultadoSocio);
 
+        // mutable holder para el id de usuario seleccionado (para usar desde lambdas)
+        final int[] usuarioSeleccionado = new int[] { -1 };
+
         // Paso 2: Identificar Ejemplar
         JLabel paso2 = new JLabel("2. Identificar Ejemplar");
         paso2.setBounds(20, 200, 300, 30);
@@ -129,6 +132,64 @@ public class DevolverPrestamo {
         txtPublicacion.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 0, Color.white));
         contenido.add(txtPublicacion);
 
+        // Detectar automáticamente al escribir ID de ejemplar
+        txtIdEjemplar.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            private void doDetect() {
+                String idEjStr = txtIdEjemplar.getText().trim();
+                // Si está vacío, limpiar y salir
+                if (idEjStr.isEmpty()) {
+                    txtPublicacion.setText("");
+                    return;
+                }
+                // intentar parsear id ejemplar
+                int idEj;
+                try {
+                    idEj = Integer.parseInt(idEjStr);
+                } catch (NumberFormatException ex) {
+                    txtPublicacion.setText("");
+                    return;
+                }
+                // detectar ejemplar
+                String[] detectado = controlador.getControladorDevolverPrestamo().detectarEjemplar(idEj);
+                if (detectado == null) {
+                    txtPublicacion.setText("");
+                    return;
+                }
+                // Aplica datos en el formato adecuado
+                String pubTitulo = detectado[4];
+                String numEd = detectado[5];
+                String tipoPub = detectado[6];
+                if ("L".equalsIgnoreCase(tipoPub)) {
+                    String texto = "Detectado: " + pubTitulo
+                            + (numEd != null && !numEd.isEmpty() ? " (Ed. " + numEd + ")" : "");
+                    txtPublicacion.setText(texto);
+                } else if ("R".equalsIgnoreCase(tipoPub)) {
+                    String texto = "Detectado: " + pubTitulo + " (Revista)";
+                    txtPublicacion.setText(texto);
+                } else {
+                    txtPublicacion.setText("Detectado: " + pubTitulo);
+                }
+            }
+
+            // modifcacion del texto de ejemplar
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                doDetect();
+            }
+
+            // modifcacion del texto de ejemplar
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                doDetect();
+            }
+
+            // modifcacion del texto de ejemplar
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                doDetect();
+            }
+        });
+
         // Boton cancelar
         JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setBounds(250, 420, 100, 35);
@@ -154,8 +215,35 @@ public class DevolverPrestamo {
         });
 
         btnBuscarSocio.addActionListener(e -> {
-            // placeholder: en el futuro buscar en BD por ID/DNI
-            resultadoSocio.setText("<html>Usuario: (Estudiante) - <span style='color:#2BC187; font-weight:bold'>Sin Sanciones</span></html>");
+            String input = txtDniID.getText().trim();
+            // si está vacío, mensaje de error
+            if (input.isEmpty()) {
+                resultadoSocio.setText("<html><span style='color:#F4791B'>Ingrese DNI o ID</span></html>");
+                usuarioSeleccionado[0] = -1;
+                return;
+            }
+            // buscar usuario y comprobar resultado
+            String[] datos = controlador.getControladorDevolverPrestamo().buscarUsuarioPorDniOId(input);
+            if (datos == null) {
+                resultadoSocio.setText("<html><span style='color:#F4791B'>Usuario no encontrado</span></html>");
+                usuarioSeleccionado[0] = -1;
+                return;
+            }
+            // datos: id, dni, nombre_completo, sancion_activa, tipo_desc
+            usuarioSeleccionado[0] = Integer.parseInt(datos[0]);
+            String estado = datos[3];
+            String tipoDesc = datos[4];
+            // mostrar resultado de estado usuario
+            if ("SANCIONADO".equalsIgnoreCase(estado)) {
+                resultadoSocio.setText("<html>Usuario: " + datos[2] + " (" + tipoDesc
+                        + ") - <span style='color:#F4791B; font-weight:bold'>Tiene sanciones</span></html>");
+            } else if ("BAJA".equalsIgnoreCase(estado)) {
+                resultadoSocio.setText("<html>Usuario: " + datos[2]
+                        + " - <span style='color:#F4791B; font-weight:bold'>Dado de baja</span></html>");
+            } else {
+                resultadoSocio.setText("<html>Usuario: " + datos[2] + " (" + tipoDesc
+                        + ") - <span style='color:#2BC187; font-weight:bold'>Sin sanciones</span></html>");
+            }
         });
 
         btnCancelar.addActionListener(e -> {
@@ -163,8 +251,50 @@ public class DevolverPrestamo {
         });
 
         btnDevolverPrestamo.addActionListener(e -> {
-            // placeholder: ejecutar devolución y volver al panel de control
-            controlador.getControladorNavegacion().cambiarPantallaHijo("panelControl");
+            // Validar que se haya seleccionado usuario
+            if (usuarioSeleccionado[0] == -1) {
+                javax.swing.JOptionPane.showMessageDialog(null, "Seleccione primero un usuario válido", "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            // validar id ejemplar
+            String idEjStr = txtIdEjemplar.getText().trim();
+            if (idEjStr.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int idEj;
+            try {
+                idEj = Integer.parseInt(idEjStr);
+            } catch (NumberFormatException ex) {
+                javax.swing.JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            // comprobar que exista préstamo activo entre usuario y ejemplar
+            boolean existe = controlador.getControladorDevolverPrestamo()
+                    .existePrestamoActivoUsuarioEjemplar(usuarioSeleccionado[0], idEj);
+            if (!existe) {
+                javax.swing.JOptionPane.showMessageDialog(null,
+                        "No existe un préstamo activo entre este usuario y el ejemplar", "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            // ejecutar devolución
+            String err = controlador.getControladorDevolverPrestamo().registrarDevolucion(usuarioSeleccionado[0],
+                    idEj);
+            if (err == null) {
+                javax.swing.JOptionPane.showMessageDialog(null, "Devolución registrada correctamente", "Éxito",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                // refrescar vistas dependientes y volver al panelControl
+                controlador.getControladorNavegacion().refrescarPublicaciones();
+                controlador.getControladorNavegacion().refrescarPanelControl();
+                controlador.getControladorNavegacion().marcarPantallaActiva("panelControl");
+                controlador.getControladorNavegacion().cambiarPantallaHijo("panelControl");
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(null, err, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         // Añadir los dos subpaneles al principal

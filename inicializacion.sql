@@ -261,17 +261,17 @@ INSERT INTO ejemplares (id, id_publicacion, num_ejemplar, fecha_adquisicion, est
 (9,5,2,'2023-07-10',TRUE),
 (10,1,3,'2024-09-12',TRUE);
 
--- Usuarios (alumnos A, profesores P, empleados E, conserje C, limpiador L)
+-- Usuarios (estudiante E, profesores P, administrativo A, conserje C, limpiador L)
 INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, Tipo, estado) VALUES
-(1,'11111111A','Juan','Pérez','García','juan.perez@example.com','passJuan1','A',TRUE),
-(2,'22222222B','Lucía','Martínez','Sánchez','lucia.martinez@example.com','passLucia2','A',TRUE),
+(1,'11111111A','Juan','Pérez','García','juan.perez@example.com','passJuan1','E',TRUE),
+(2,'22222222B','Lucía','Martínez','Sánchez','lucia.martinez@example.com','passLucia2','E',TRUE),
 (3,'33333333C','Miguel','López','Pena','miguel.lopez@example.com','passMiguel3','P',TRUE),
 (4,'44444444D','Ana','García','Ramírez','ana.garcia@example.com','passAna4','P',TRUE),
-(5,'55555555E','Carlos','Ruiz','Fernández','carlos.ruiz@example.com','passCarlos5','E',TRUE),
+(5,'55555555E','Carlos','Ruiz','Fernández','carlos.ruiz@example.com','passCarlos5','A',TRUE),
 (6,'66666666F','Laura','Díaz','Torres','laura.conserje@example.com','passLaura6','C',TRUE),
 (7,'77777777G','Sergio','Navarro','Gómez','sergio.navarro@example.com','passSergio7','L',TRUE),
-(8,'88888888H','Marta','Ortega','Sanz','marta.ortega@example.com','passMarta8','A',TRUE),
-(9,'99999999I','Isabel','Soto','Molina','isabel.soto@example.com','passIsabel9','A',TRUE),
+(8,'88888888H','Marta','Ortega','Sanz','marta.ortega@example.com','passMarta8','E',TRUE),
+(9,'99999999I','Isabel','Soto','Molina','isabel.soto@example.com','passIsabel9','E',TRUE),
 (10,'00000000J','David','Giménez','Ruano','david.gimenez@example.com','passDavid10','P',TRUE);
 
 -- Usuarios de prueba adicionales para tests de inicio de sesión
@@ -279,8 +279,8 @@ INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, 
 -- id 12: contraseña vacía (para probar validaciones de formulario)
 -- id 13: conserje de prueba (para probar la restricción de acceso de conserjes)
 INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, Tipo, estado) VALUES
-(11,'12121212K','Bloqueado','Usuario','Test','bloqueado.usuario@example.com','passBloq11','A',FALSE),
-(12,'13131313L','NoPass','Usuario','Test','nopass.usuario@example.com','','A',TRUE),
+(11,'12121212K','Bloqueado','Usuario','Test','bloqueado.usuario@example.com','passBloq11','E',FALSE),
+(12,'13131313L','NoPass','Usuario','Test','nopass.usuario@example.com','','E',TRUE),
 (13,'14141414M','ConserjePrueba','Soler','Márquez','conserje@example.com','conserje123','C',TRUE);
 
 -- Préstamos (algunos abiertos, algunos cerrados)
