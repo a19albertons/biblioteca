@@ -62,6 +62,16 @@ public class Controlador {
      */
     ControladorNuevoUsuarioDialog controladorNuevoUsuarioDialog;
 
+    /**
+     * Controlador para editar usuarios
+     */
+    ControladorEditarUsuarioDialog controladorEditarUsuarioDialog;
+
+    /**
+     * Controlador para eliminar (desactivar) usuarios
+     */
+    ControladorEliminarUsuario controladorEliminarUsuario;
+
     // Getters y Setters
     /**
      * Obtiene el controlador de navegación
@@ -258,6 +268,22 @@ public class Controlador {
     }
 
     /**
+     * Obtiene el controlador de edición de usuarios
+     * @return controlador de edición de usuarios
+     */
+    public ControladorEditarUsuarioDialog getControladorEditarUsuarioDialog() {
+        return controladorEditarUsuarioDialog;
+    }
+
+    /**
+     * Obtiene el controlador de eliminación (desactivar) de usuarios
+     * @return controlador de eliminación de usuarios
+     */
+    public ControladorEliminarUsuario getControladorEliminarUsuario() {
+        return controladorEliminarUsuario;
+    }
+
+    /**
      * Establece el controlador encargado de crear nuevos ejemplares.
      *
      * @param controladorNuevoEjemplarDialog
@@ -320,6 +346,8 @@ public class Controlador {
         this.controladorEditarEjemplarDialog = new ControladorEditarEjemplarDialog(this);
         this.controladorEliminarEjemplarDialog = new ControladorEliminarEjemplarDialog(this);
         this.controladorNuevoUsuarioDialog = new ControladorNuevoUsuarioDialog(this);
+        this.controladorEditarUsuarioDialog = new ControladorEditarUsuarioDialog(this);
+        this.controladorEliminarUsuario = new ControladorEliminarUsuario(this);
         this.controladorNavegacion = new ControladorNavegacion(this);
         
     }

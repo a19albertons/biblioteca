@@ -102,27 +102,28 @@ public class GestionUsuarios {
 
 
 
-        // Tabla con columnas y datos de ejemplo
-        String[] cols = new String[] {"DNI", "NOMBRE Y APELLIDO", "TIPO", "ESTADO", "ACCIONES"};
+        // Tabla con columnas y datos de ejemplo (incluye columna oculta ID en la posición 0)
+        String[] cols = new String[] {"ID", "DNI", "NOMBRE Y APELLIDO", "TIPO", "ESTADO", "ACCIONES"};
         // La DAO devuelve filas en formato: [id, dni, nombre_completo, sancion_activa, tipo]
-        // Reservamos el campo `id` para los botones de acciones (columna invisible para ahora)
         String[][] rawData = controlador.getControladorGestionUsuarios().obtenerUsuariosYEstadoSancionActiva();
         if (rawData == null) {
             rawData = new String[0][0];
         }
-        // Construir la matriz visible (omitimos el id y colocamos un placeholder para ACCIONES)
-        String[][] data = new String[rawData.length][5];
+        // Construir la matriz (incluye id en la primera columna)
+        String[][] data = new String[rawData.length][6];
         for (int i = 0; i < rawData.length; i++) {
             String[] r = rawData[i];
+            String id = (r.length > 0 && r[0] != null) ? r[0] : "";
             String dni = (r.length > 1 && r[1] != null) ? r[1] : "";
             String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
             String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
             String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
-            data[i][0] = dni;            // DNI
-            data[i][1] = nombre;         // NOMBRE Y APELLIDO
-            data[i][2] = tipo;           // TIPO (mostrar en columna 3)
-            data[i][3] = sancion;        // ESTADO
-            data[i][4] = "";           // ACCIONES (placeholder, renderizado con botones en ActionsRenderer)
+            data[i][0] = id;             // ID (oculto)
+            data[i][1] = dni;            // DNI
+            data[i][2] = nombre;         // NOMBRE Y APELLIDO
+            data[i][3] = tipo;           // TIPO
+            data[i][4] = sancion;        // ESTADO
+            data[i][5] = "";           // ACCIONES
         }
 
         // Guardar modelo y tabla como campos para permitir refrescar desde fuera
@@ -140,6 +141,13 @@ public class GestionUsuarios {
         table.setRowHeight(48);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
+
+        // Ocultar columna ID (columna 0)
+        if (table.getColumnModel().getColumnCount() > 0) {
+            table.getColumnModel().getColumn(0).setMinWidth(0);
+            table.getColumnModel().getColumn(0).setMaxWidth(0);
+            table.getColumnModel().getColumn(0).setPreferredWidth(0);
+        }
 
         // Renderers personalizados
         class StatusRenderer extends JLabel implements TableCellRenderer {
@@ -245,8 +253,9 @@ public class GestionUsuarios {
         }
 
         // Asignar renderers a las columnas correspondientes
-        table.getColumnModel().getColumn(3).setCellRenderer(new StatusRenderer());
-        table.getColumnModel().getColumn(4).setCellRenderer(new ActionsRenderer());
+        // Columna ESTADO ahora es la 4 y ACCIONES es la 5
+        table.getColumnModel().getColumn(4).setCellRenderer(new StatusRenderer());
+        table.getColumnModel().getColumn(5).setCellRenderer(new ActionsRenderer());
 
         // Implementar click en ACCIONES para editar/eliminar (similar a Ejemplares)
         table.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -254,9 +263,35 @@ public class GestionUsuarios {
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = table.rowAtPoint(e.getPoint());
                 int col = table.columnAtPoint(e.getPoint());
-                if (row >= 0 && col == 4) {
-                    // Para ahora solo mostrar mensaje
-                    javax.swing.JOptionPane.showMessageDialog(table, "Acción sobre usuario seleccionada (pendiente implementación)", "Info", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                // Asegurarse de que es la columna ACCIONES
+                if (row >= 0 && col == 5) {
+                    Object idObj = usuariosModel.getValueAt(row, 0);
+                    // Obtener ID usuario de la fila
+                    if (idObj != null) {
+                        String idStr = idObj.toString();
+                        try {
+                            int idUsuario = Integer.parseInt(idStr.trim());
+
+                            // Determinar si se hizo click en editar o eliminar
+                            java.awt.Rectangle cellRect = table.getCellRect(row, col, true);
+                            int clickX = e.getX() - cellRect.x;
+                            int deleteThreshold = cellRect.width - 32; // 24px botón + padding
+                            // Determinar si se hizo click en editar o eliminar
+                            if (clickX >= deleteThreshold) {
+                                // Parte derecha -> eliminar (desactivar)
+                                EliminarUsuarioDialog del = new EliminarUsuarioDialog(controlador.getControladorNavegacion().getVentana(), controlador, idUsuario);
+                                del.setVisible(true);
+                            } else {
+                                // Parte izquierda -> editar
+                                EditarUsuarioDialog d = new EditarUsuarioDialog(controlador.getControladorNavegacion().getVentana(), controlador, idUsuario);
+                                d.setVisible(true);
+                            }
+                            // Refrescar listado tras cerrar diálogo
+                            controlador.getControladorNavegacion().refrescarUsuarios();
+                        } catch (NumberFormatException ex) {
+                            System.out.println("ID de usuario inválido: " + idStr);
+                        }
+                    }
                 }
             }
         });
@@ -296,7 +331,7 @@ public class GestionUsuarios {
             String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
             String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
             String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
-            usuariosModel.addRow(new Object[] { dni, nombre, tipo, sancion, "" });
+            usuariosModel.addRow(new Object[] { (r.length>0? r[0] : ""), dni, nombre, tipo, sancion, "" });
         }
     }
 

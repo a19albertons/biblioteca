@@ -135,7 +135,8 @@ public class UsuarioDAO {
      * Obtiene el id, dni, nombre + apellidos, tipo (version larga) y estado
      * (activo/sancionado)
      * 
-     * @return String[][] con columnas: id, dni, nombre_completo, sancion_activa, tipo
+     * @return String[][] con columnas: id, dni, nombre_completo, sancion_activa,
+     *         tipo
      */
     public String[][] listaUsuariosYEstadoSancionActiva() {
         // Listado de usuarios
@@ -201,7 +202,7 @@ public class UsuarioDAO {
      */
     public boolean insertarUsuario(Connection conexion, String dni, String nombre, String apellido1, String apellido2,
             String email, String contrasena, String tipo, boolean estado) {
-                // Consulta SQL
+        // Consulta SQL
         String sql = "INSERT INTO usuarios (dni, nombre, apellido1, apellido2, email, contrasena, tipo, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
@@ -222,5 +223,131 @@ public class UsuarioDAO {
             System.out.println(e.getCause());
             return false;
         }
+    }
+
+    /**
+     * Obtiene los detalles de un usuario por su id. Devuelve array: dni, nombre,
+     * apellido1, apellido2, email, tipo, id
+     * 
+     * @param idUsuario id del usuario
+     * @return String[] con los detalles o null si error
+     */
+    public String[] obtenerDetallesUsuario(int idUsuario) {
+        String[] devolver = null;
+        try (Connection conexion = new MySQLConnection().getConnection();
+                // Consulta SQL
+                PreparedStatement ps = conexion.prepareStatement(
+                        "SELECT id, dni, nombre, apellido1, apellido2, email, tipo, estado FROM usuarios WHERE id = ?")) {
+            // Asignar parámetro
+            ps.setInt(1, idUsuario);
+            // Ejecutar consulta
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // Rellenar array de devolución
+                    devolver = new String[7];
+                    devolver[0] = rs.getString("dni");
+                    devolver[1] = rs.getString("nombre");
+                    devolver[2] = rs.getString("apellido1");
+                    devolver[3] = rs.getString("apellido2");
+                    devolver[4] = rs.getString("email");
+                    devolver[5] = rs.getString("tipo");
+                    devolver[6] = rs.getString("id");
+                }
+            }
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Error obteniendo detalles de usuario: " + e.getMessage());
+            System.out.println(e.getCause());
+            devolver = null;
+        }
+        return devolver;
+    }
+
+    /**
+     * Actualiza los datos de un usuario (dni, nombre, apellidos, email, tipo)
+     * 
+     * @param idUsuario id del usuario a actualizar
+     * @param dni
+     * @param nombre
+     * @param apellido1
+     * @param apellido2
+     * @param email
+     * @param tipo
+     * @return true si la actualización fue exitosa
+     */
+    public boolean actualizarUsuario(int idUsuario, String dni, String nombre, String apellido1, String apellido2,
+            String email, String tipo) {
+        // Consulta SQL
+        String sql = "UPDATE usuarios SET dni = ?, nombre = ?, apellido1 = ?, apellido2 = ?, email = ?, tipo = ? WHERE id = ?";
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetros
+            ps.setString(1, dni);
+            ps.setString(2, nombre);
+            ps.setString(3, apellido1);
+            ps.setString(4, apellido2);
+            ps.setString(5, email);
+            ps.setString(6, tipo);
+            ps.setInt(7, idUsuario);
+            int rows = ps.executeUpdate();
+            return rows == 1;
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Error actualizando usuario: " + e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Da de baja (marca estado = false) a un usuario por su id
+     * 
+     * @param idUsuario id del usuario
+     * @return true si la operación fue exitosa
+     */
+    public boolean bajaUsuario(int idUsuario) {
+        // Consulta SQL
+        String sql = "UPDATE usuarios SET estado = FALSE WHERE id = ?";
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetro
+            ps.setInt(1, idUsuario);
+            // Ejecutar actualización
+            int rows = ps.executeUpdate();
+            return rows == 1;
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Error dando de baja usuario: " + e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Comprueba si el usuario tiene préstamos activos (estado = TRUE)
+     * 
+     * @param idUsuario id del usuario
+     * @return true si tiene préstamos activos
+     */
+    public boolean tienePrestamosActivosUsuario(int idUsuario) {
+        // Consulta SQL
+        String sql = "SELECT COUNT(*) AS total FROM prestamos WHERE id_usuario = ? AND estado = TRUE";
+
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetro
+            ps.setInt(1, idUsuario);
+            try (ResultSet rs = ps.executeQuery()) {
+                // Ejecutar consulta
+                if (rs.next()) {
+                    return rs.getInt("total") > 0;
+                }
+            }
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Error comprobando prestamos activos usuario: " + e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return false;
     }
 }

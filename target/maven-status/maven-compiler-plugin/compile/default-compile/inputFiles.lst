@@ -1,6 +1,7 @@
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/dao/AutorDAO.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/BarraLateral.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorEliminarPublicacion.java
+/home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorEditarUsuarioDialog.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/dao/CicloDAO.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorEliminarEjemplarDialog.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorEjemplares.java
@@ -8,9 +9,11 @@
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/modelo/Publicacion.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/EditarPublicacionDialog.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorEditarPublicacionDialog.java
+/home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorEliminarUsuario.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/EditarEjemplarDialog.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/modelo/Libro.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/Ejemplares.java
+/home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/EliminarUsuarioDialog.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/dao/PublicacionHijoDAO.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/controlador/ControladorInicioSesion.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/utilities/Fonts.java
@@ -51,6 +54,7 @@
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/modelo/TipoUsuario.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/CatalogoLibros.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/ConcederPrestamo.java
+/home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/EditarUsuarioDialog.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/dao/UsuarioDAO.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/dao/TemaDAO.java
 /home/alberto/2025-2026/bibliotecav1.2.1/demo/src/main/java/com/example/vista/InicioSesion.java
