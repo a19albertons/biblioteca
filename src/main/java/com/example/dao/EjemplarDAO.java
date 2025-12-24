@@ -58,4 +58,57 @@ public class EjemplarDAO {
         }
         return lista.toArray(new String[0][0]);
     }
+
+    /**
+     * Devuelve el siguiente número de ejemplar para una publicación dada (1..n).
+     *
+     * @param conexion
+     * @param idPublicacion
+     * @return siguiente num_ejemplar o -1 en caso de error
+     */
+    public int siguienteNumEjemplar(Connection conexion, int idPublicacion) {
+        // Consulta SQL
+        String sql = "SELECT COALESCE(MAX(num_ejemplar),0) + 1 AS siguiente FROM ejemplares WHERE id_publicacion = ?";
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setInt(1, idPublicacion);
+            // Ejecutar consulta
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("siguiente");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error al obtener siguiente num_ejemplar: " + e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return -1;
+    }
+
+    /**
+     * Inserta un nuevo ejemplar para una publicación (usa la Connection proporcionada).
+     *
+     * @param conexion
+     * @param idPublicacion
+     * @param numEjemplar
+     * @param fechaAdquisicion (java.sql.Date)
+     * @return true si la inserción fue exitosa
+     */
+    public boolean insertarEjemplar(Connection conexion, int idPublicacion, int numEjemplar, Date fechaAdquisicion) {
+        // Consulta SQL
+        String sql = "INSERT INTO ejemplares (id_publicacion, num_ejemplar, fecha_adquisicion, estado) VALUES (?, ?, ?, TRUE)";
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetros
+            ps.setInt(1, idPublicacion);
+            ps.setInt(2, numEjemplar);
+            ps.setDate(3, fechaAdquisicion);
+            // Ejecutar inserción
+            int rows = ps.executeUpdate();
+            return rows == 1;
+        } catch (Exception e) {
+            // Error
+            System.out.println("Error insertando ejemplar: " + e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
 }

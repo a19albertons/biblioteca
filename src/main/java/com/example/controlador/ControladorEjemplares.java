@@ -17,4 +17,6 @@ public class ControladorEjemplares {
         EjemplarDAO ejemplarDAO = new EjemplarDAO();
         return ejemplarDAO.listaEjemplaresPorPublicacion(idPublicacion);
     }
+
+
 }

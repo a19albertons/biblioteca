@@ -254,6 +254,18 @@ public class Ejemplares {
         btnNuevoEjemplar.setBorder(null);
         ejemplares.add(btnNuevoEjemplar);
 
+        // Abrir diálogo de nuevo ejemplar
+        btnNuevoEjemplar.addActionListener(evt -> {
+            if (currentPublicacionId > 0) {
+                NuevoEjemplarDialog d = new NuevoEjemplarDialog(controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
+                d.setVisible(true);
+                // refrescar la vista tras cerrar
+                controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(ejemplares, "No hay publicación seleccionada para añadir ejemplares", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
         // Tabla de ejemplares (modelo dinámico, se actualizará cuando se cargue una
         // publicación)
         String[] cols = new String[] { "ID", "num_ejemplar", "FECHA", "ESTADO", "ACCIONES" };
