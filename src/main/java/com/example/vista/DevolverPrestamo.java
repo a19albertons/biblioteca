@@ -287,6 +287,11 @@ public class DevolverPrestamo {
             if (err == null) {
                 javax.swing.JOptionPane.showMessageDialog(null, "Devolución registrada correctamente", "Éxito",
                         javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                // Mostrar notificación sobre sanción si existe
+                String notif = controlador.getControladorDevolverPrestamo().obtenerYLimpiarUltimaNotificacionSancion();
+                if (notif != null) {
+                    javax.swing.JOptionPane.showMessageDialog(null, notif, "Información", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                }
                 // refrescar vistas dependientes y volver al panelControl
                 controlador.getControladorNavegacion().refrescarPublicaciones();
                 controlador.getControladorNavegacion().refrescarPanelControl();

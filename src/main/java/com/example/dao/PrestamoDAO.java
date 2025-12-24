@@ -254,4 +254,36 @@ public class PrestamoDAO {
         return null;
     }
 
+    /**
+     * Obtiene el ultimo préstamo asociado a un ejemplar (independientemente de
+     * estado)
+     * Devuelve: idPrestamo, idUsuario, fecha_inicio, fecha_fin, estado
+     */
+    public String[] obtenerUltimoPrestamoPorEjemplar(int idEjemplar) {
+        // Consulta SQL para obtener el último préstamo por ejemplar
+        String sql = "SELECT id, id_usuario, fecha_inicio, fecha_fin, estado FROM prestamos WHERE id_ejemplar = ? ORDER BY fecha_inicio DESC, id DESC LIMIT 1";
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetro
+            ps.setInt(1, idEjemplar);
+            try (ResultSet rs = ps.executeQuery()) {
+                // Ejecutar consulta
+                if (rs.next()) {
+                    String id = String.valueOf(rs.getInt("id"));
+                    String idUsuario = String.valueOf(rs.getInt("id_usuario"));
+                    java.sql.Date fi = rs.getDate("fecha_inicio");
+                    java.sql.Date ff = rs.getDate("fecha_fin");
+                    String estado = String.valueOf(rs.getBoolean("estado"));
+                    return new String[] { id, idUsuario, fi != null ? fi.toString() : "",
+                            ff != null ? ff.toString() : "", estado };
+                }
+            }
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Error obteniendo ultimo prestamo por ejemplar: " + e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return null;
+    }
+
 }

@@ -266,7 +266,8 @@ public class UsuarioDAO {
 
     /**
      * Obtiene los datos de un usuario por DNI o por ID (cadena). Devuelve
-     * arreglo: id, dni, nombre_completo, sancion_activa (SANCIONADO/ACTIVO/BAJA), tipo_desc
+     * arreglo: id, dni, nombre_completo, sancion_activa (SANCIONADO/ACTIVO/BAJA),
+     * tipo_desc
      *
      * @param dniOrId cadena que contiene DNI o ID
      * @return String[] con los datos o null si no existe
@@ -300,7 +301,9 @@ public class UsuarioDAO {
                         devolver[3] = rs.getString("sancion_activa");
                         // convertir tipo a descripcion si es posible
                         String tipoCode = rs.getString("tipo");
-                        String tipoDesc = tipoCode != null ? com.example.modelo.TipoUsuario.valueOf(tipoCode).getDescripcion() : "";
+                        String tipoDesc = tipoCode != null
+                                ? com.example.modelo.TipoUsuario.valueOf(tipoCode).getDescripcion()
+                                : "";
                         devolver[4] = tipoDesc;
                     }
                 }
@@ -400,5 +403,34 @@ public class UsuarioDAO {
             System.out.println(e.getCause());
         }
         return false;
+    }
+
+    /**
+     * Obtiene los usuarios sancionables (estudiantes activos)
+     * Devuelve filas: id, dni, nombre_completo, tipo
+     */
+    public String[][] obtenerUsuariosSancionables() {
+        // Consulta SQL
+        String sql = "SELECT u.id, u.dni, CONCAT(u.apellido1, ', ', u.nombre) AS nombre_completo, u.tipo "
+                + "FROM usuarios u WHERE u.tipo = 'E' AND u.estado = TRUE ORDER BY u.apellido1, u.nombre";
+        java.util.List<String[]> rows = new java.util.ArrayList<>();
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql);
+                // Ejecutar consulta
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                // Rellenar fila
+                String[] fila = new String[4];
+                fila[0] = rs.getString("id");
+                fila[1] = rs.getString("dni");
+                fila[2] = rs.getString("nombre_completo");
+                fila[3] = rs.getString("tipo");
+                rows.add(fila);
+            }
+        } catch (Exception e) {
+            System.out.println("Error obteniendo usuarios sancionables: " + e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return rows.toArray(new String[0][0]);
     }
 }

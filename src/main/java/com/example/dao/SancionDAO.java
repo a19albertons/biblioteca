@@ -67,10 +67,35 @@ public class SancionDAO {
                 }
             }
         } catch (Throwable t) {
-            // Evitar que errores de compilación/Classpath propaguen una excepción no controlada
+            // Evitar que errores de compilación/Classpath propaguen una excepción no
+            // controlada
             System.out.println("Error obteniendo sanción activa: " + t.getMessage());
             t.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Desactiva una sanción por su id (estado = FALSE)
+     *
+     * @param idSancion
+     * @return true si afectó exactamente una fila
+     */
+    public boolean desactivarSancionPorId(int idSancion) {
+        // consulta SQL para desactivar sanción
+        String sql = "UPDATE sanciones SET estado = FALSE WHERE id = ?";
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // establecer parámetro
+            ps.setInt(1, idSancion);
+            // ejecutar
+            int rows = ps.executeUpdate();
+            return rows == 1;
+        } catch (Throwable t) {
+            // registrar el error
+            System.out.println("Error desactivando sanción: " + t.getMessage());
+            t.printStackTrace();
+            return false;
+        }
     }
 }

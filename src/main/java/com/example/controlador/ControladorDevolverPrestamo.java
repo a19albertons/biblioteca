@@ -16,12 +16,28 @@ public class ControladorDevolverPrestamo {
     private Controlador controlador;
 
     /**
+     * Mensaje informativo sobre sanción (si se creó/actualizó una sanción durante la operación)
+     */
+    private String ultimaNotificacionSancion = null;
+
+    /**
      * Constructor
      * 
      * @param controlador
      */
     public ControladorDevolverPrestamo(Controlador controlador) {
         this.controlador = controlador;
+    }
+
+    /**
+     * Obtiene y limpia la última notificación de sanción
+     *
+     * @return mensaje o null
+     */
+    public String obtenerYLimpiarUltimaNotificacionSancion() {
+        String tmp = ultimaNotificacionSancion;
+        ultimaNotificacionSancion = null;
+        return tmp;
     }
 
     /**
@@ -142,7 +158,8 @@ public class ControladorDevolverPrestamo {
                     java.time.LocalDate finSancion;
                     String descripcionBase = "Retraso en devolución " + diasRetraso + " días";
                     String descripcion = descripcionBase;
-                    // Si ya hay sanción activa, acumular días
+                    boolean previaDesactivada = false;
+                    // Si ya hay sanción activa, acumular días y desactivar la previa
                     if (sancionActiva != null && sancionActiva[1] != null && !sancionActiva[1].isEmpty()) {
                         try {
                             java.time.LocalDate finAct = java.time.LocalDate.parse(sancionActiva[1]);
@@ -150,8 +167,19 @@ public class ControladorDevolverPrestamo {
                             finSancion = finAct.plusDays(diasSancion);
                             descripcion = descripcionBase + " (Acumulativa: sanción activa hasta " + finAct
                                     + "; se añaden " + diasSancion + " días)";
+                            // intentar desactivar la sanción previa
+                            try {
+                                int idPrev = Integer.parseInt(sancionActiva[0]);
+                                previaDesactivada = sancionDAO.desactivarSancionPorId(idPrev);
+                            } catch (Exception ex2) {
+                                // registrar el error al intentar desactivar la sanción previa
+                                System.out.println("Error desactivando sanción previa (id=" + sancionActiva[0] + "): " + ex2.getMessage());
+                                ex2.printStackTrace();
+                            }
                         } catch (Exception ex) {
                             // si no se puede parsear la fecha anterior, fallback a hoy + dias
+                            System.out.println("Error parsing previous sanction end date: " + ex.getMessage());
+                            ex.printStackTrace();
                             finSancion = hoy.plusDays(diasSancion);
                             descripcion = descripcionBase + " (Acumulativa: fallo leyendo sanción previa; se añaden "
                                     + diasSancion + " días)";
@@ -166,7 +194,30 @@ public class ControladorDevolverPrestamo {
                     if (!ins) {
                         return "Devolución registrada, pero error aplicando sanción automática";
                     }
-                }
+                    // Preparar notificación para la UI
+                    try {
+                        // analizar sanción activa previa para el mensaje
+                        String finActStr = sancionActiva != null ? (sancionActiva[1] == null ? "" : sancionActiva[1]) : null;
+                        // construir mensaje adecuado
+                        if (finActStr != null && !finActStr.isEmpty()) {
+                            java.time.LocalDate finAct = java.time.LocalDate.parse(finActStr);
+                            java.time.LocalDate finNuevo = finSancion;
+                            // comparar fechas
+                            if (finNuevo.isAfter(finAct)) {
+                                ultimaNotificacionSancion = "Se ha aplicado una sanción acumulativa: anterior fin " + finAct + 
+                                        ", nuevo fin " + finNuevo + "." + (previaDesactivada ? " La sanción previa ha sido desactivada." : "");
+                            } else {
+                                ultimaNotificacionSancion = "Se ha aplicado una sanción (acumulativa): anterior fin " + finAct + 
+                                        ", no se añadió plazo adicional." + (previaDesactivada ? " La sanción previa ha sido desactivada." : "");
+                            }
+                        } else {
+                            ultimaNotificacionSancion = "Se ha aplicado una sanción: fin " + finSancion + "." + (previaDesactivada ? " La sanción previa ha sido desactivada." : "");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Error preparando notificación de sanción automática: " + e.getMessage());
+                        e.printStackTrace();
+                        ultimaNotificacionSancion = "Se ha aplicado una sanción." + (previaDesactivada ? " La sanción previa ha sido desactivada." : "");
+                    }                }
             }
         }
         return null;
