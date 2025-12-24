@@ -85,7 +85,8 @@ public class EjemplarDAO {
     }
 
     /**
-     * Inserta un nuevo ejemplar para una publicación (usa la Connection proporcionada).
+     * Inserta un nuevo ejemplar para una publicación (usa la Connection
+     * proporcionada).
      *
      * @param conexion
      * @param idPublicacion
@@ -107,6 +108,70 @@ public class EjemplarDAO {
         } catch (Exception e) {
             // Error
             System.out.println("Error insertando ejemplar: " + e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
+
+    /**
+     * Obtiene los detalles de un ejemplar por su id.
+     *
+     * @param idEjemplar
+     * @return arreglo con {id, id_publicacion, num_ejemplar, fecha_adquisicion,
+     *         estado} o null
+     */
+    public String[] obtenerEjemplarPorId(int idEjemplar) {
+        // Consulta SQL
+        String sql = "SELECT id, id_publicacion, num_ejemplar, fecha_adquisicion, estado FROM ejemplares WHERE id = ?";
+        try (Connection conexion = new MySQLConnection().getConnection();
+                PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetro
+            ps.setInt(1, idEjemplar);
+            // Ejecutar consulta
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String id = String.valueOf(rs.getInt("id"));
+                    String idPub = String.valueOf(rs.getInt("id_publicacion"));
+                    String num = String.valueOf(rs.getInt("num_ejemplar"));
+                    Date fecha = rs.getDate("fecha_adquisicion");
+                    String fechaStr = (fecha != null) ? fecha.toString() : "";
+                    boolean enServicio = rs.getBoolean("estado");
+                    String estadoStr = enServicio ? "DISPONIBLE" : "BAJA";
+                    return new String[] { id, idPub, num, fechaStr, estadoStr };
+                }
+            }
+        } catch (Exception e) {
+            // Error
+            System.out.println("Error obteniendo ejemplar: " + e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return null;
+    }
+
+    /**
+     * Actualiza los campos editables de un ejemplar (fecha_adquisicion y estado)
+     * usando la Connection proporcionada.
+     *
+     * @param conexion
+     * @param idEjemplar
+     * @param fechaAdquisicion (java.sql.Date)
+     * @param estado           estado (true = activo/en servicio, false = baja)
+     * @return true si la actualización afectó exactamente una fila
+     */
+    public boolean actualizarEjemplar(Connection conexion, int idEjemplar, Date fechaAdquisicion, boolean estado) {
+        // Consulta SQL
+        String sql = "UPDATE ejemplares SET fecha_adquisicion = ?, estado = ? WHERE id = ?";
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetros
+            ps.setDate(1, fechaAdquisicion);
+            ps.setBoolean(2, estado);
+            ps.setInt(3, idEjemplar);
+            // Ejecutar actualización
+            int rows = ps.executeUpdate();
+            return rows == 1;
+        } catch (Exception e) {
+            // Error
+            System.out.println("Error actualizando ejemplar: " + e.getMessage());
             System.out.println(e.getCause());
             return false;
         }

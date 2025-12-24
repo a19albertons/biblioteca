@@ -45,6 +45,10 @@ public class Controlador {
      */
     ControladorNuevoEjemplarDialog controladorNuevoEjemplarDialog;
     /**
+     * Controlador de edición de ejemplares (diálogo)
+     */
+    ControladorEditarEjemplarDialog controladorEditarEjemplarDialog;
+    /**
      * Controlador de gestión de usuarios
      */
     ControladorGestionUsuarios controladorGestionUsuarios = new ControladorGestionUsuarios();
@@ -244,6 +248,24 @@ public class Controlador {
         this.controladorNuevoEjemplarDialog = controladorNuevoEjemplarDialog;
     }
 
+    /**
+     * Obtiene el controlador encargado de editar ejemplares desde el diálogo.
+     *
+     * @return controlador de edición de ejemplares
+     */
+    public ControladorEditarEjemplarDialog getControladorEditarEjemplarDialog() {
+        return controladorEditarEjemplarDialog;
+    }
+
+    /**
+     * Establece el controlador encargado de editar ejemplares.
+     *
+     * @param controladorEditarEjemplarDialog
+     */
+    public void setControladorEditarEjemplarDialog(ControladorEditarEjemplarDialog controladorEditarEjemplarDialog) {
+        this.controladorEditarEjemplarDialog = controladorEditarEjemplarDialog;
+    }
+
     // Constructores
     /**
      * Constructor por defecto
@@ -259,6 +281,7 @@ public class Controlador {
         this.controladorEditarPublicacionDialog = new ControladorEditarPublicacionDialog(this);
         this.controladorEliminarPublicacion = new ControladorEliminarPublicacion(this);
         this.controladorNuevoEjemplarDialog = new ControladorNuevoEjemplarDialog(this);
+        this.controladorEditarEjemplarDialog = new ControladorEditarEjemplarDialog(this);
         this.controladorNavegacion = new ControladorNavegacion(this);
         
     }

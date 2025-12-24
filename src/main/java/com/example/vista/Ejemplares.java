@@ -402,6 +402,33 @@ public class Ejemplares {
         ejemplaresTable.getColumnModel().getColumn(3).setCellRenderer(new StatusRenderer());
         ejemplaresTable.getColumnModel().getColumn(4).setCellRenderer(new ActionsRenderer());
 
+        // Hacer que al hacer click en la columna ACCIONES se abra el diálogo de editar ejemplar
+        ejemplaresTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int row = ejemplaresTable.rowAtPoint(e.getPoint());
+                int col = ejemplaresTable.columnAtPoint(e.getPoint());
+                // Si se hizo click en la columna ACCIONES (4)
+                if (row >= 0 && col == 4) {
+                    Object idObj = ejemplaresModel.getValueAt(row, 0);
+                    // Abrir diálogo de edición del ejemplar seleccionado
+                    if (idObj != null) {
+                        String idStr = idObj.toString().replace("#", "");
+                        try {
+                            // Parsear el ID del ejemplar
+                            int idEjemplar = Integer.parseInt(idStr.trim());
+                            EditarEjemplarDialog d = new EditarEjemplarDialog(controlador.getControladorNavegacion().getVentana(), controlador, idEjemplar);
+                            d.setVisible(true);
+                            // refrescar la vista tras cerrar
+                            controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
+                        } catch (NumberFormatException ex) {
+                            System.out.println("ID de ejemplar inválido: " + idStr);
+                        }
+                    }
+                }
+            }
+        });
+
         JScrollPane scroll = new JScrollPane(ejemplaresTable);
         scroll.setBounds(10, 50, 540, 320);
         scroll.setBorder(null);
