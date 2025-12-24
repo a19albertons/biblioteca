@@ -3,54 +3,62 @@
 Concise, actionable guidance to get productive in this Java Swing (JDK 21) library app.
 
 ## Big picture
-- Desktop Java Swing, MVC-like layout:
+- Desktop Java Swing, MVC-like structure:
   - **controllers:** `com.example.controlador` (e.g., `Controlador`, `ControladorNavegacion`)
   - **views:** `com.example.vista` (each exposes `public JPanel pantalla()` and accepts a `Controlador`)
-  - **models:** `com.example.modelo`
-- Entry point: `com.example.App` — it registers fonts and builds the `Controlador` → `ControladorNavegacion` UI.
+  - **models / dao:** `com.example.modelo`, `com.example.dao`
+- Entry point: `com.example.App` — calls `Fonts.applyDefaultOpenSans()` then creates `Controlador` and starts the UI.
 
 ## Navigation & UI patterns 🔧
-- `ControladorNavegacion` manages two CardLayouts with parent keys (`"inicioSesion"`, `"recuperarCuenta"`, `"entrarSistema"`) and child keys for the authenticated area (`"panelControl"`, `"concederPrestamo"`, `"devolverPrestamo"`, `"ejemplares"`, `"gestionUsuarios"`).
-- **Always** change screens with `ControladorNavegacion.cambiarPantallaHijo("key")` — avoids "wrong parent for CardLayout" errors.
-- Views are lightweight UI classes that expose `pantalla()` and receive a `Controlador`; prefer adding navigation keys rather than manipulating CardLayout directly.
-- Fonts: `utilities/Fonts.applyDefaultOpenSans()` loads `resources/fonts/OpenSans-*.ttf` (fallback: system Open Sans family).
+- `ControladorNavegacion` manages two CardLayouts:
+  - parent keys: `"inicioSesion"`, `"recuperarCuenta"`, `"entrarSistema"` (top-level screens)
+  - child keys inside the authenticated area: `"panelControl"`, `"concederPrestamo"`, `"devolverPrestamo"`, `"ejemplares"`, `"gestionUsuarios"`, `"sancionManual"`, `"publicaciones"`
+- **Always** change screens using `ControladorNavegacion.cambiarPantallaPadre(...)` or `cambiarPantallaHijo(...)` — do not call `CardLayout.show` directly on views; use the controller to avoid "wrong parent for CardLayout" errors.
+- New view pattern: create class in `com.example.vista` with constructor `(Controlador controlador)` and a `public JPanel pantalla()` method; register it in `ControladorNavegacion`.
+- Fonts: `utilities/Fonts.applyDefaultOpenSans()` expects `src/main/resources/fonts/OpenSans-*.ttf` (fallback: system Open Sans).
 
 ## Data & DB patterns 🗄️
-- No ORM — DAOs use direct JDBC (`MySQLConnection` + `PreparedStatement` + try-with-resources). Typical return types: `String[]`, `String[][]`, model objects, `boolean` (success), or `int` (id / -1 on error).
-- Many DAO methods have two variants: one that opens a new `Connection`, and a second that accepts a `Connection` parameter (useful for transactions). Follow `PublicacionDAO` as the reference.
-- `ConfigLoader` loads `application.properties` at class-load time and will throw a RuntimeException if the file is missing — don't run without it.
-- `MySQLConnection.getConnection()` logs to stderr and **returns null** on failure — caller code sometimes assumes non-null, so ensure DB is available when running UI or tests.
-- DB initialization: `inicializacion.sql` seeds tables and triggers; the docker compose mounts this file into MySQL container during first startup.
+- No ORM — DAOs use plain JDBC (see `com.example.dao`): `MySQLConnection`, `PreparedStatement`, try-with-resources.
+- Many DAO methods provide two overloads: one that opens its own `Connection`, and one that accepts a `Connection` parameter for transactional composition (see `PublicacionDAO` as the reference).
+- Error conventions: return `-1` for id errors, `false` for failure booleans, `null` for missing objects — follow existing DAO patterns.
+- `ConfigLoader` loads `application.properties` at class-load time and throws a RuntimeException if the file is missing — ensure `src/main/resources/application.properties` exists when running.
+- `MySQLConnection.getConnection()` logs to stderr and **returns null** on failure — calling code sometimes assumes a non-null `Connection`, so verify the DB is reachable before running UI or tests.
+- DB seeding: `inicializacion.sql` seeds schema & triggers; `docker-compose.yml` mounts it into the MySQL container on first startup.
 
 ## Build / Run / Debug / Docker 🧰
-- JDK: **21** (project compiled/tested on OpenJDK 21).
-- Build: `mvn -DskipTests package` (produces `target/classes` for running locally).
-- Run (dev): `java -cp target/classes com.example.App` (or run from IDE main class `com.example.App`).
-- Debug: attach JDWP (example): `java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005 -cp target/classes com.example.App`.
-- Tests: `mvn test` (JUnit 4). Current test coverage is minimal; DB integration tests are not present yet.
-- Docker: `docker compose up -d` brings up `mysql` (container `mysql_db`, port 3306) and `phpmyadmin` (container `phpmyadmin`, port 8080). The compose file mounts `inicializacion.sql` to seed the DB.
-- Config: `src/main/resources/application.properties` contains `mysql.url`, `mysql.user`, `mysql.password` — adjust when needed (note: defaults expect DB on localhost:3306, which works with `docker compose` port mapping).
+- JDK: **21** (compile & run with OpenJDK 21).
+- Build for dev: `mvn -DskipTests package` (produces `target/classes`).
+- Run locally: `java -cp target/classes com.example.App` or run `com.example.App` from your IDE.
+- Debug (JDWP):
+  - Example: `java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005 -cp target/classes com.example.App`.
+- Tests: `mvn test` (JUnit 4). Some tests may require a running MySQL instance seeded by `inicializacion.sql` — start it via `docker compose up -d` or mock the DAOs.
+- Docker: `docker compose up -d` starts services including `mysql` (container `mysql_db`, default port 3306) and `phpmyadmin` (`phpmyadmin`, port 8080).
 
 ## Conventions & gotchas ⚠️
-- UI strings and comments are **Spanish** — keep tests and messages consistent.
-- Resources (images, fonts) must be under `src/main/resources` to be available at runtime.
-- Logging is ad-hoc: DAOs print to stdout/stderr; there is no centralized logger. Handle errors explicitly in new code.
-- Use the DAO transactional overloads when several DB operations must be atomic (open a `Connection`, set auto-commit=false, call DAO methods that accept the `Connection`, commit/rollback).
+- Project language: UI strings and comments are **Spanish** — keep messages and tests consistent.
+- Resources (images, fonts) must be placed under `src/main/resources` to be on the classpath.
+- Logging is ad-hoc: DAOs print to stdout/stderr (no centralized logger) — surface errors explicitly in new code.
+- Use DAO transactional overloads for multi-step operations (open `Connection`, set `autoCommit=false`, call DAO methods that accept the connection, commit/rollback).
+- Watch for `null` `Connection` from `MySQLConnection.getConnection()`; defensive checks are common.
 
 ## Quick recipes (examples) 💡
 - Add a new screen:
   1. Create `src/main/java/com/example/vista/MiVista.java` with constructor `(Controlador controlador)` and `public JPanel pantalla()`.
-  2. Register view in `ControladorNavegacion` (add to `panelPrincipal` or `panelPadre`) using a unique key.
-  3. Navigate with `controlador.getControladorNavegacion().cambiarPantallaHijo("miVista")`.
+  2. Register the view in `ControladorNavegacion` (add to `panelPrincipal` or `panelPadre`) and pick a unique navigation key.
+  3. Navigate using `controlador.getControladorNavegacion().cambiarPantallaHijo("miVista")`.
 - Add a DAO method:
-  - Follow `PublicacionDAO` pattern: provide an overload `method(Connection conexion, ...)` when the operation may be part of a larger transaction; return `-1`/`false`/`null` on error per existing conventions.
+  - Follow `PublicacionDAO` pattern: add an overload `method(Connection conexion, ...)` when the operation may be part of a transaction; use `-1`/`false`/`null` to signal errors.
 - Adding tests:
-  - For DB tests, run `docker compose up -d` before `mvn test`, or write tests that mock DAOs.
+  - For DB integration tests, run `docker compose up -d` to start MySQL before `mvn test`. For unit tests, prefer mocking DAO classes.
 
 ## Files to inspect when debugging
-- `App.java`, `controlador/Controlador.java`, `controlador/ControladorNavegacion.java`
-- `conexiones/MySQLConnection.java`, `conexiones/DBConnection.java`, `utilities/ConfigLoader.java`
-- `dao/*` (look for transactional overloads), `inicializacion.sql`, `src/main/resources/fonts/*`
+- `src/main/java/com/example/App.java`
+- `src/main/java/com/example/controlador/ControladorNavegacion.java`
+- `src/main/java/com/example/controlador/Controlador.java`
+- `src/main/java/com/example/conexiones/MySQLConnection.java`
+- `src/main/java/com/example/utilities/ConfigLoader.java`
+- `src/main/java/com/example/dao/` (see `PublicacionDAO` for patterns)
+- `inicializacion.sql`, `docker-compose.yml`, `src/main/resources/application.properties`, `src/main/resources/fonts/`
 
 ---
-If you'd like, I can add a DB integration test (starts docker-compose in CI) or a minimal GitHub Actions workflow that boots the DB and runs `mvn test`. Please tell me which you'd prefer or any missing details to include.
+If you'd like, I can add a DB integration test and a small GitHub Actions workflow that boots the DB and runs `mvn test` (or a focused job that runs only unit tests). Any preferences or missing details to add?
