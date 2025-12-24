@@ -220,6 +220,15 @@ public class ControladorNavegacion {
     }
 
     /**
+     * Refresca la lista de usuarios si la vista está inicializada
+     */
+    public void refrescarUsuarios() {
+        if (this.gestionUsuarios != null) {
+            this.gestionUsuarios.refrescarUsuarios();
+        }
+    }
+
+    /**
      * Refresca los datos del panel de control si está inicializado
      */
     public void refrescarPanelControl() {

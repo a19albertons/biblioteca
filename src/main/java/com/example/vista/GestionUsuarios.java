@@ -34,6 +34,16 @@ public class GestionUsuarios {
     Controlador controlador;
 
     /**
+     * Modelo de tabla que contiene los usuarios (se guarda para permitir refrescar)
+     */
+    private javax.swing.table.DefaultTableModel usuariosModel;
+
+    /**
+     * Tabla que muestra los usuarios (se guarda para permitir refrescar)
+     */
+    private javax.swing.JTable usuariosTable;
+
+    /**
      * Constructor de la vista GestionUsuarios
      *
      * @param controlador controlador principal
@@ -75,6 +85,14 @@ public class GestionUsuarios {
         btnNuevoPub.setBorder(null);
         encabezado.add(btnNuevoPub);
 
+        // Abrir diálogo de nuevo usuario
+        btnNuevoPub.addActionListener(evt -> {
+            NuevoUsuarioDialog d = new NuevoUsuarioDialog(controlador.getControladorNavegacion().getVentana(), controlador);
+            d.setVisible(true);
+            // Refrescar listado tras cerrar diálogo
+            controlador.getControladorNavegacion().refrescarUsuarios();
+        });
+
         // Listado usuarios
         JPanel listaUsuarios = new JPanel();
         listaUsuarios.setSize(540, 480);
@@ -107,16 +125,18 @@ public class GestionUsuarios {
             data[i][4] = "";           // ACCIONES (placeholder, renderizado con botones en ActionsRenderer)
         }
 
-        // Modelo de tabla no editable
-        DefaultTableModel model = new DefaultTableModel(data, cols) {
+        // Guardar modelo y tabla como campos para permitir refrescar desde fuera
+        final DefaultTableModel modelRef = new DefaultTableModel(data, cols) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
+        final JTable table = new JTable(modelRef);
+        // Exponerlos mediante setters locales para usar en refrescarUsuarios
+        this.usuariosModel = modelRef;
+        this.usuariosTable = table;
 
-        // Crear tabla
-        JTable table = new JTable(model);
         table.setRowHeight(48);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
@@ -228,17 +248,56 @@ public class GestionUsuarios {
         table.getColumnModel().getColumn(3).setCellRenderer(new StatusRenderer());
         table.getColumnModel().getColumn(4).setCellRenderer(new ActionsRenderer());
 
+        // Implementar click en ACCIONES para editar/eliminar (similar a Ejemplares)
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int col = table.columnAtPoint(e.getPoint());
+                if (row >= 0 && col == 4) {
+                    // Para ahora solo mostrar mensaje
+                    javax.swing.JOptionPane.showMessageDialog(table, "Acción sobre usuario seleccionada (pendiente implementación)", "Info", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        });
+
         // Scroll que contiene la tabla (ocupa la parte superior del panel ahora que no hay detalle)
         JScrollPane scroll = new JScrollPane(table);
         scroll.setBounds(10, 10, 520, 460);
         scroll.setBorder(null);
         listaUsuarios.add(scroll);
 
+        // Guardar referencias para refrescar posteriormente (ya guardadas arriba)
         // Agregar paneles al panel principal
         panel.add(encabezado);
         panel.add(listaUsuarios);
 
         return panel;
+    }
+
+    /**
+     * Refresca los datos de la tabla de usuarios recargando la consulta.
+     */
+    public void refrescarUsuarios() {
+        // Verificar que el modelo existe
+        if (this.usuariosModel == null)
+            return;
+        String[][] rawData = controlador.getControladorGestionUsuarios().obtenerUsuariosYEstadoSancionActiva();
+        // Comprobar null
+        if (rawData == null)
+            rawData = new String[0][0];
+        // Limpiar modelo
+        for (int i = usuariosModel.getRowCount() - 1; i >= 0; i--) {
+            usuariosModel.removeRow(i);
+        }
+        // Rellenar con datos nuevos
+        for (String[] r : rawData) {
+            String dni = (r.length > 1 && r[1] != null) ? r[1] : "";
+            String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
+            String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
+            String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
+            usuariosModel.addRow(new Object[] { dni, nombre, tipo, sancion, "" });
+        }
     }
 
 }

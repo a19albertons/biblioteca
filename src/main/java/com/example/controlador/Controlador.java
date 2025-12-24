@@ -36,7 +36,8 @@ public class Controlador {
     /**
      * Controlador para editar publicaciones (diálogo de edición)
      */
-    ControladorEditarPublicacionDialog controladorEditarPublicacionDialog;    /**
+    ControladorEditarPublicacionDialog controladorEditarPublicacionDialog;    
+    /**
      * Controlador para eliminar publicaciones (diálogo de eliminación)
      */
     ControladorEliminarPublicacion controladorEliminarPublicacion;
@@ -55,7 +56,11 @@ public class Controlador {
     /**
      * Controlador de gestión de usuarios
      */
-    ControladorGestionUsuarios controladorGestionUsuarios = new ControladorGestionUsuarios();
+    ControladorGestionUsuarios controladorGestionUsuarios;
+    /**
+     * Controlador para el diálogo de nuevo usuario
+     */
+    ControladorNuevoUsuarioDialog controladorNuevoUsuarioDialog;
 
     // Getters y Setters
     /**
@@ -244,6 +249,15 @@ public class Controlador {
     }
 
     /**
+     * Obtiene el controlador encargado de crear nuevos usuarios desde el diálogo.
+     *
+     * @return controlador de nuevo usuario
+     */
+    public ControladorNuevoUsuarioDialog getControladorNuevoUsuarioDialog() {
+        return controladorNuevoUsuarioDialog;
+    }
+
+    /**
      * Establece el controlador encargado de crear nuevos ejemplares.
      *
      * @param controladorNuevoEjemplarDialog
@@ -305,6 +319,7 @@ public class Controlador {
         this.controladorNuevoEjemplarDialog = new ControladorNuevoEjemplarDialog(this);
         this.controladorEditarEjemplarDialog = new ControladorEditarEjemplarDialog(this);
         this.controladorEliminarEjemplarDialog = new ControladorEliminarEjemplarDialog(this);
+        this.controladorNuevoUsuarioDialog = new ControladorNuevoUsuarioDialog(this);
         this.controladorNavegacion = new ControladorNavegacion(this);
         
     }

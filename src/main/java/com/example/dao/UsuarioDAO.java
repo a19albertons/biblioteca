@@ -183,4 +183,44 @@ public class UsuarioDAO {
         }
         return devolver;
     }
+
+    /**
+     * Inserta un nuevo usuario usando la conexión proporcionada. NO cierra la
+     * conexión (permite uso transaccional).
+     *
+     * @param conexion
+     * @param dni
+     * @param nombre
+     * @param apellido1
+     * @param apellido2
+     * @param email
+     * @param contrasena
+     * @param tipo       código (E,P,A,C,L)
+     * @param estado     true = activo
+     * @return true si la inserción fue exitosa
+     */
+    public boolean insertarUsuario(Connection conexion, String dni, String nombre, String apellido1, String apellido2,
+            String email, String contrasena, String tipo, boolean estado) {
+                // Consulta SQL
+        String sql = "INSERT INTO usuarios (dni, nombre, apellido1, apellido2, email, contrasena, tipo, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // Asignar parámetros
+            ps.setString(1, dni);
+            ps.setString(2, nombre);
+            ps.setString(3, apellido1);
+            ps.setString(4, apellido2);
+            ps.setString(5, email);
+            ps.setString(6, contrasena);
+            ps.setString(7, tipo);
+            ps.setBoolean(8, estado);
+            // Ejecutar inserción
+            int rows = ps.executeUpdate();
+            return rows == 1;
+        } catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Error insertando usuario: " + e.getMessage());
+            System.out.println(e.getCause());
+            return false;
+        }
+    }
 }
