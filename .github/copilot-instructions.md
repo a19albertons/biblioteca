@@ -62,15 +62,29 @@ Concise, actionable guidance to get productive in this Java Swing (JDK 21) libra
 - `src/main/java/com/example/App.java` (startup)
 - `src/main/java/com/example/controlador/ControladorNavegacion.java` (view wiring, keys)
 - `src/main/java/com/example/controlador/Controlador.java` (central DI/constructors)
-- `src/main/java/com/example/conexiones/MySQLConnection.java` (DB connection/returns null on failure)
+- `src/main/java/com/example/conexiones/MySQLConnection.java` (DB connection; returns `null` on failure)
 - `src/main/java/com/example/utilities/ConfigLoader.java` (loads `application.properties` at class-load time)
 - `src/main/java/com/example/dao/PublicacionDAO.java` (DAO patterns + transactional overloads)
 - `src/main/java/com/example/controlador/ControladorNuevaPublicacionDialog.java` (transaction example)
 - `inicializacion.sql`, `docker-compose.yml`, `src/main/resources/application.properties`, `src/main/resources/fonts/`
 
+## Configuration / secrets 🔑
+- Application properties live at `src/main/resources/application.properties`. The app reads `mysql.url`, `mysql.user`, `mysql.password` via `ConfigLoader` on class load.
+- Docker Compose contains a ready-to-use MySQL setup (see `docker-compose.yml`):
+  - DB name: `biblioteca`
+  - User: `biblioteca_user`
+  - Password: `abc123.`
+  - Container name: `mysql_db` (port `3306` exposed)
+- Important: `MySQLConnection.getConnection()` catches SQL errors, prints to stderr, and **returns `null`** on failure — check for `null` or ensure the DB is reachable in test/CI runs.
+
+## Tests & CI 🧪
+- Tests use **JUnit 4** and are under `test/java/com/example/` (see names like `NuevoUsuarioTest`). Maven surefire reports appear in `target/surefire-reports/`.
+- Many integration tests rely on a seeded DB (`inicializacion.sql`) — start the DB before running tests: `docker compose up -d` then `mvn test` or `mvn -Dtest=ClassName test` for a single test.
+- For CI, start the MySQL service and wait for it to accept connections before running `mvn test`; consider a health-check or a short wait loop to avoid flaky failures.
+
 ---
 If helpful I can:
-- Add a small GitHub Actions job that brings up MySQL, runs `mvn test` (or only unit tests), and reports failures ✅
+- Add a small GitHub Actions workflow that brings up MySQL, waits for readiness, runs `mvn test`, and uploads surefire artifacts (unit + integration test support) ✅
 - Add a short integration test template that shows how to bootstrap the DB and assert a DAO method uses the seeded data ✅
 
 Would you like me to add either of those? Any part of these instructions unclear or missing examples you want included?
