@@ -16,10 +16,6 @@ public class ControladorEliminarPublicacion {
      */
     private final com.example.conexiones.DBConnection dbConnection;
 
-    public ControladorEliminarPublicacion() {
-        this.dbConnection = new com.example.conexiones.MySQLConnection();
-    }
-
     /**
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
