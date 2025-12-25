@@ -27,6 +27,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import com.example.controlador.Controlador;
+import com.example.utilities.BackgroundWorker;
 
 /**
  * Clase para la vista Gestión de usuarios
@@ -107,40 +108,12 @@ public class GestionUsuarios {
 
 
 
-        // Tabla con columnas y datos de ejemplo (incluye columna oculta ID en la posición 0)
+        // Tabla con columnas y datos (cargados en background)
         String[] cols = new String[] {"ID", "DNI", "NOMBRE Y APELLIDO", "TIPO", "ESTADO", "ACCIONES"};
-        // La DAO devuelve filas en formato: [id, dni, nombre_completo, sancion_activa, tipo]
-        String[][] rawData = controlador.getControladorGestionUsuarios().obtenerUsuariosYEstadoSancionActiva();
-        // Manejo de datos nulos o vacios
-        if (rawData == null) {
-            JOptionPane.showMessageDialog(null,
-                    "Error cargando la lista de usuarios. Compruebe la conexión a la base de datos.", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            rawData = new String[0][0];
-        } else if (rawData.length == 0) {
-            JOptionPane.showMessageDialog(null,
-                    "No hay usuarios registrados para mostrar.", "Información",
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
-        // Construir la matriz (incluye id en la primera columna)
-        String[][] data = new String[rawData.length][6];
-        for (int i = 0; i < rawData.length; i++) {
-            String[] r = rawData[i];
-            String id = (r.length > 0 && r[0] != null) ? r[0] : "";
-            String dni = (r.length > 1 && r[1] != null) ? r[1] : "";
-            String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
-            String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
-            String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
-            data[i][0] = id;             // ID (oculto)
-            data[i][1] = dni;            // DNI
-            data[i][2] = nombre;         // NOMBRE Y APELLIDO
-            data[i][3] = tipo;           // TIPO
-            data[i][4] = sancion;        // ESTADO
-            data[i][5] = "";           // ACCIONES
-        }
+        String[][] initialData = new String[0][0];
 
         // Guardar modelo y tabla como campos para permitir refrescar desde fuera
-        final DefaultTableModel modelRef = new DefaultTableModel(data, cols) {
+        final DefaultTableModel modelRef = new DefaultTableModel(initialData, cols) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -150,6 +123,45 @@ public class GestionUsuarios {
         // Exponerlos mediante setters locales para usar en refrescarUsuarios
         this.usuariosModel = modelRef;
         this.usuariosTable = table;
+
+        // Cargar usuarios en background
+        BackgroundWorker.run(
+            () -> controlador.getControladorGestionUsuarios().obtenerUsuariosYEstadoSancionActiva(),
+            // Actualizar UI con resultados
+            rawData -> {
+                // Manejo de errores y mensajes
+                if (rawData == null) {
+                    JOptionPane.showMessageDialog(null,
+                            "Error cargando la lista de usuarios. Compruebe la conexión a la base de datos.", "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    rawData = new String[0][0];
+                } else if (rawData.length == 0) {
+                    JOptionPane.showMessageDialog(null,
+                            "No hay usuarios registrados para mostrar.", "Información",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
+                // Limpiar modelo y rellenar
+                for (int i = usuariosModel.getRowCount() - 1; i >= 0; i--) {
+                    usuariosModel.removeRow(i);
+                }
+                // Rellenar con datos nuevos
+                for (String[] r : rawData) {
+                    String dni = (r.length > 1 && r[1] != null) ? r[1] : "";
+                    String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
+                    String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
+                    String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
+                    usuariosModel.addRow(new Object[] { (r.length>0? r[0] : ""), dni, nombre, tipo, sancion, "" });
+                }
+                // Asegurarse de refrescar la tabla si está disponible
+                if (this.usuariosTable != null) {
+                    this.usuariosTable.revalidate();
+                    this.usuariosTable.repaint();
+                }
+            },
+            ex -> JOptionPane.showMessageDialog(null,
+                    "Error cargando la lista de usuarios. Compruebe la conexión a la base de datos.", "Error",
+                    JOptionPane.ERROR_MESSAGE)
+        );
 
         table.setRowHeight(48);
         table.setShowGrid(false);
@@ -335,27 +347,35 @@ public class GestionUsuarios {
         // Verificar que el modelo existe
         if (this.usuariosModel == null)
             return;
-        String[][] rawData = controlador.getControladorGestionUsuarios().obtenerUsuariosYEstadoSancionActiva();
-        // Comprobar null
-        if (rawData == null)
-            rawData = new String[0][0];
-        // Limpiar modelo
-        for (int i = usuariosModel.getRowCount() - 1; i >= 0; i--) {
-            usuariosModel.removeRow(i);
-        }
-        // Rellenar con datos nuevos
-        for (String[] r : rawData) {
-            String dni = (r.length > 1 && r[1] != null) ? r[1] : "";
-            String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
-            String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
-            String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
-            usuariosModel.addRow(new Object[] { (r.length>0? r[0] : ""), dni, nombre, tipo, sancion, "" });
-        }
-        // Asegurarse de refrescar la tabla si está disponible
-        if (this.usuariosTable != null) {
-            this.usuariosTable.revalidate();
-            this.usuariosTable.repaint();
-        }
+        // Cargar en background
+        BackgroundWorker.run(
+            () -> controlador.getControladorGestionUsuarios().obtenerUsuariosYEstadoSancionActiva(),
+            // Actualizar UI con resultados
+            rawData -> {
+                // Manejo de errores y mensajes
+                if (rawData == null) rawData = new String[0][0];
+                // Limpiar modelo
+                for (int i = usuariosModel.getRowCount() - 1; i >= 0; i--) {
+                    usuariosModel.removeRow(i);
+                }
+                // Rellenar con datos nuevos
+                for (String[] r : rawData) {
+                    String dni = (r.length > 1 && r[1] != null) ? r[1] : "";
+                    String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
+                    String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
+                    String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
+                    usuariosModel.addRow(new Object[] { (r.length>0? r[0] : ""), dni, nombre, tipo, sancion, "" });
+                }
+                // Asegurarse de refrescar la tabla si está disponible
+                if (this.usuariosTable != null) {
+                    this.usuariosTable.revalidate();
+                    this.usuariosTable.repaint();
+                }
+            },
+            ex -> JOptionPane.showMessageDialog(null,
+                    "Error cargando la lista de usuarios. Compruebe la conexión a la base de datos.", "Error",
+                    JOptionPane.ERROR_MESSAGE)
+        );
     }
 
 }
