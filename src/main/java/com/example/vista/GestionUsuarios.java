@@ -106,8 +106,16 @@ public class GestionUsuarios {
         String[] cols = new String[] {"ID", "DNI", "NOMBRE Y APELLIDO", "TIPO", "ESTADO", "ACCIONES"};
         // La DAO devuelve filas en formato: [id, dni, nombre_completo, sancion_activa, tipo]
         String[][] rawData = controlador.getControladorGestionUsuarios().obtenerUsuariosYEstadoSancionActiva();
+        // Manejo de datos nulos o vacios
         if (rawData == null) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando la lista de usuarios. Compruebe la conexión a la base de datos.", "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
             rawData = new String[0][0];
+        } else if (rawData.length == 0) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "No hay usuarios registrados para mostrar.", "Información",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
         }
         // Construir la matriz (incluye id en la primera columna)
         String[][] data = new String[rawData.length][6];

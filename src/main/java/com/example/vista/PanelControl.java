@@ -97,8 +97,15 @@ public class PanelControl {
         tema1.setFont(new Font("Open Sans", Font.PLAIN, 12));
         card1.add(tema1);
 
-        // Valor -- provisional
-        valor1 = new JLabel(controlador.getControladorPanelControl().obtenerPrestamosHoy());
+        // Valor de préstamos hoy + comprobación de error
+        String prestamosHoyStr = controlador.getControladorPanelControl().obtenerPrestamosHoy();
+        if ("-1".equals(prestamosHoyStr)) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando número de préstamos de hoy. Compruebe la conexión a la base de datos.",
+                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            prestamosHoyStr = "—";
+        }
+        valor1 = new JLabel(prestamosHoyStr);
         valor1.setFont(valor1.getFont().deriveFont(36f));
         valor1.setBounds(10, 40, 150, 50);
         card1.add(valor1);
@@ -117,7 +124,15 @@ public class PanelControl {
         tema2.setFont(com.example.utilities.Fonts.openSans(12f));
         card2.add(tema2);
 
-        valor2 = new JLabel(controlador.getControladorPanelControl().obtenerPrestamosPendientes());
+        // Valor de préstamos pendientes + comprobación de error
+        String pendientesStr = controlador.getControladorPanelControl().obtenerPrestamosPendientes();
+        if ("-1".equals(pendientesStr)) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando número de préstamos pendientes. Compruebe la conexión a la base de datos.",
+                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            pendientesStr = "—";
+        }
+        valor2 = new JLabel(pendientesStr);
         valor2.setFont(valor2.getFont().deriveFont(36f));
         valor2.setBounds(10, 40, 150, 50);
         valor2.setForeground(Color.decode("#F4791B"));
@@ -139,7 +154,15 @@ public class PanelControl {
         tema3.setFont(com.example.utilities.Fonts.openSans(12f));
         card3.add(tema3);
 
-        valor3 = new JLabel(controlador.getControladorPanelControl().obtenerTotalSociosActivos());
+        // Valor de socios activos + comprobación de error
+        String sociosStr = controlador.getControladorPanelControl().obtenerTotalSociosActivos();
+        if ("-1".equals(sociosStr)) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando número de socios activos. Compruebe la conexión a la base de datos.",
+                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            sociosStr = "—";
+        }
+        valor3 = new JLabel(sociosStr);
         valor3.setFont(valor3.getFont().deriveFont(36f));
         valor3.setBounds(10, 40, 150, 50);
         // dejar valor en color por defecto (oscuro)
@@ -161,6 +184,18 @@ public class PanelControl {
         // Encabezado y datos
         String[] columnNames = new String[] { "ID EJEMPLAR", "LIBRO", "ESTADO" };
         String[][] data = controlador.getControladorPanelControl().obtenerUltimosMovimientos();
+        // Comprobación de error en datos nulos y vacios
+        if (data == null) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.", "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            data = new String[0][0];
+        } else if (data.length == 0) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "No hay movimientos para mostrar.", "Información",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            data = new String[0][0];
+        }
 
         // Modificación del modelo para que no sea editable
         model = new DefaultTableModel(data, columnNames) {
@@ -238,13 +273,48 @@ public class PanelControl {
      * movimientos).
      */
     public void refrescarPanel() {
-        // Actualizar tarjetas
-        valor1.setText(controlador.getControladorPanelControl().obtenerPrestamosHoy());
-        valor2.setText(controlador.getControladorPanelControl().obtenerPrestamosPendientes());
-        valor3.setText(controlador.getControladorPanelControl().obtenerTotalSociosActivos());
+        // Actualizar tarjetas con comprobación de errores
+        String pHoy = controlador.getControladorPanelControl().obtenerPrestamosHoy();
+        if ("-1".equals(pHoy)) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando número de préstamos de hoy. Compruebe la conexión a la base de datos.",
+                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            pHoy = "—";
+        }
+        valor1.setText(pHoy);
+
+        String pPend = controlador.getControladorPanelControl().obtenerPrestamosPendientes();
+        if ("-1".equals(pPend)) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando número de préstamos pendientes. Compruebe la conexión a la base de datos.",
+                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            pPend = "—";
+        }
+        valor2.setText(pPend);
+
+        String socios = controlador.getControladorPanelControl().obtenerTotalSociosActivos();
+        if ("-1".equals(socios)) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando número de socios activos. Compruebe la conexión a la base de datos.",
+                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            socios = "—";
+        }
+        valor3.setText(socios);
 
         // Actualizar tabla
         String[][] data = controlador.getControladorPanelControl().obtenerUltimosMovimientos();
+        // Comprobación de error en datos nulos y vacios
+        if (data == null) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.", "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            data = new String[0][0];
+        } else if (data.length == 0) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "No hay movimientos para mostrar.", "Información",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            data = new String[0][0];
+        }
         // Reemplazar todos los datos del modelo
         model.setDataVector(data, new String[] { "ID EJEMPLAR", "LIBRO", "ESTADO" });
 

@@ -517,7 +517,16 @@ public class Ejemplares {
             for (int i = ejemplaresModel.getRowCount() - 1; i >= 0; i--) {
                 ejemplaresModel.removeRow(i);
             }
-            if (ejemplaresData != null) {
+            // Cargar datos y comprobacion de nulos y vacios
+            if (ejemplaresData == null) {
+                javax.swing.JOptionPane.showMessageDialog(null,
+                        "Error cargando ejemplares de la publicación. Compruebe la conexión a la base de datos.", "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+            } else if (ejemplaresData.length == 0) {
+                javax.swing.JOptionPane.showMessageDialog(null,
+                        "No hay ejemplares disponibles para esta publicación.", "Información",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            } else {
                 for (String[] row : ejemplaresData) {
                     // row: id, num_ejemplar, fecha, estado
                     Object[] fila = new Object[] { "#" + row[0], row[1], row[2], row[3], null };

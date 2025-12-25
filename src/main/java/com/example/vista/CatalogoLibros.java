@@ -147,6 +147,17 @@ public class CatalogoLibros {
         comboCiclosField.setBounds(110, 130, 100, 20);
         comboCiclosField.addItem("Ciclos");
         String[] listaCiclos = controlador.getControladorPanelControl().listaCiclos();
+        // Manejo de lista ciclos nula o vacia
+        if (listaCiclos == null) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando lista de ciclos. Compruebe la conexión a la base de datos.", "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            listaCiclos = new String[0];
+        } else if (listaCiclos.length == 0) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "No hay ciclos disponibles para mostrar.", "Información",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
         for (String ciclo : listaCiclos) {
             comboCiclosField.addItem(ciclo);
         }
@@ -155,6 +166,17 @@ public class CatalogoLibros {
         comboEditorialField.setBounds(230, 130, 100, 20);
         comboEditorialField.addItem("Editorial");
         String[] listaEditoriales = controlador.getControladorPanelControl().listaEditoriales();
+        // Manejo de lista editoriales nula o vacia
+        if (listaEditoriales == null) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando lista de editoriales. Compruebe la conexión a la base de datos.", "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            listaEditoriales = new String[0];
+        } else if (listaEditoriales.length == 0) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "No hay editoriales disponibles para mostrar.", "Información",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
         for (String editorial : listaEditoriales) {
             comboEditorialField.addItem(editorial);
         }
@@ -166,6 +188,17 @@ public class CatalogoLibros {
 
         // Obtener resumen de publicaciones (datos sin filtrar)
         resumenPublicacionesField = controlador.getControladorPanelControl().listaPublicacionesResumen();
+        // Manejo de resumen publicaciones nulo o vacio
+        if (resumenPublicacionesField == null) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando resumen de publicaciones. Compruebe la conexión a la base de datos.", "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            resumenPublicacionesField = new String[0][0];
+        } else if (resumenPublicacionesField.length == 0) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "No hay publicaciones registradas para mostrar.", "Información",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
 
         // Scroll que contiene las cards
         scrollPublicaciones = new JScrollPane(cardsContainer);
@@ -371,6 +404,17 @@ public class CatalogoLibros {
         comboCiclosField.removeAllItems();
         comboCiclosField.addItem("Ciclos");
         String[] listaCiclos = controlador.getControladorPanelControl().listaCiclos();
+        // Manejo de lista ciclos nula o vacia
+        if (listaCiclos == null) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando lista de ciclos. Compruebe la conexión a la base de datos.", "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            listaCiclos = new String[0];
+        } else if (listaCiclos.length == 0) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "No hay ciclos disponibles para mostrar.", "Información",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
         for (String ciclo : listaCiclos) {
             comboCiclosField.addItem(ciclo);
         }
@@ -378,6 +422,17 @@ public class CatalogoLibros {
         comboEditorialField.removeAllItems();
         comboEditorialField.addItem("Editorial");
         String[] listaEditoriales = controlador.getControladorPanelControl().listaEditoriales();
+        // Manejo de lista editoriales nula o vacia
+        if (listaEditoriales == null) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando lista de editoriales. Compruebe la conexión a la base de datos.", "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            listaEditoriales = new String[0];
+        } else if (listaEditoriales.length == 0) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "No hay editoriales disponibles para mostrar.", "Información",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
         for (String editorial : listaEditoriales) {
             comboEditorialField.addItem(editorial);
         }
@@ -388,6 +443,17 @@ public class CatalogoLibros {
 
         // Actualizar datos
         resumenPublicacionesField = controlador.getControladorPanelControl().listaPublicacionesResumen();
+        // Manejo de resumen publicaciones nulo o vacio
+        if (resumenPublicacionesField == null) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "Error cargando resumen de publicaciones. Compruebe la conexión a la base de datos.", "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            resumenPublicacionesField = new String[0][0];
+        } else if (resumenPublicacionesField.length == 0) {
+            javax.swing.JOptionPane.showMessageDialog(null,
+                    "No hay publicaciones registradas para mostrar.", "Información",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
 
         // Repoblar con filtros actuales
         String criterio = buscadorField.getText().trim();
