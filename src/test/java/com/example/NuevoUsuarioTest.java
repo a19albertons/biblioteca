@@ -23,12 +23,12 @@ public class NuevoUsuarioTest {
         boolean ok = c.getControladorNuevoUsuarioDialog().crearUsuario(dni, nombre, apellidos, email, tipo);
         assertTrue(ok);
 
-        UsuarioDAO dao = new UsuarioDAO();
+        UsuarioDAO dao = new UsuarioDAO(c.getDbConnection());
         // debería encontrarse por usuario generado o por email
         assertTrue(dao.consultaRecuperarCuenta(email) != null);
 
         // limpiamos dejando el DB como estaba: borrar fila insertada
-        try (java.sql.Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        try (java.sql.Connection conexion = c.getDbConnection().getConnection();
                 java.sql.PreparedStatement ps = conexion.prepareStatement("DELETE FROM usuarios WHERE email = ?")) {
             ps.setString(1, email);
             ps.executeUpdate();

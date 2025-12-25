@@ -104,8 +104,7 @@ public class EliminarEjemplarDialog extends JDialog {
         eliminar.addActionListener(e -> {
             // Antes de eliminar, obtener id_publicacion para refrescar la vista tras la
             // operación
-            com.example.dao.EjemplarDAO dao = new com.example.dao.EjemplarDAO();
-            String[] detalles = dao.obtenerEjemplarPorId(idEjemplar);
+            String[] detalles = controlador.getControladorEjemplares().obtenerDetallesEjemplar(idEjemplar);
             int idPublicacion = -1;
             // extraer id_publicacion de los detalles obtenidos
             if (detalles != null && detalles.length > 1) {

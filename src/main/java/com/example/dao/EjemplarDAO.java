@@ -7,12 +7,27 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.conexiones.MySQLConnection;
+import com.example.conexiones.DBConnection;
 
 /**
  * DAO para la tabla ejemplares
  */
 public class EjemplarDAO {
+    /**
+     * DBConnection para la base de datos
+     */
+    private final DBConnection dbConnection;
+
+    /**
+     * Constructor del DAO
+     * @param dbConnection
+     */
+    public EjemplarDAO(DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
+    }
 
     /**
      * Lista los ejemplares de una publicación
@@ -26,7 +41,7 @@ public class EjemplarDAO {
         String sql = "SELECT e.id, e.num_ejemplar, e.fecha_adquisicion, e.estado AS en_servicio, "
                 + "(SELECT COUNT(*) FROM prestamos p WHERE p.id_ejemplar = e.id AND p.estado = TRUE) AS prestamos_activos "
                 + "FROM ejemplares e WHERE e.id_publicacion = ? ORDER BY e.num_ejemplar ASC";
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, idPublicacion);
             // Ejecutar consulta
@@ -123,7 +138,7 @@ public class EjemplarDAO {
     public String[] obtenerEjemplarPorId(int idEjemplar) {
         // Consulta SQL
         String sql = "SELECT id, id_publicacion, num_ejemplar, fecha_adquisicion, estado FROM ejemplares WHERE id = ?";
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
             ps.setInt(1, idEjemplar);
@@ -186,7 +201,7 @@ public class EjemplarDAO {
     public boolean tienePrestamosActivosEjemplar(int idEjemplar) {
         // Consulta SQL
         String sql = "SELECT COUNT(*) AS cnt FROM prestamos WHERE id_ejemplar = ? AND estado = TRUE";
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
             ps.setInt(1, idEjemplar);

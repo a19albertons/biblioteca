@@ -11,10 +11,21 @@ import com.example.dao.EjemplarDAO;
  */
 public class ControladorEliminarEjemplarDialog {
     /**
-     * Constructor
+     * DBConnection para conexiones a la base de datos
      */
-    public ControladorEliminarEjemplarDialog() {
-        // No state required
+    private final com.example.conexiones.DBConnection dbConnection;
+
+    /**
+     * Constructor que permite inyectar una `DBConnection` (recomendado para tests
+     * y para la nueva arquitectura).
+     * 
+     * @param dbConnection
+     */
+    public ControladorEliminarEjemplarDialog(com.example.conexiones.DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
     }
 
     /**
@@ -25,14 +36,14 @@ public class ControladorEliminarEjemplarDialog {
      *         error
      */
     public boolean eliminarEjemplar(int idEjemplar) {
-        EjemplarDAO ejemplarDAO = new EjemplarDAO();
+        EjemplarDAO ejemplarDAO = new EjemplarDAO(this.dbConnection);
         // Comprobar préstamos activos (solo lectura)
         if (ejemplarDAO.tienePrestamosActivosEjemplar(idEjemplar)) {
             return false;
         }
 
         // Realizar baja dentro de una transacción
-        Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        Connection conexion = this.dbConnection.getConnection();
         if (conexion == null) {
             System.out.println("No se puede obtener conexión a BD");
             return false;

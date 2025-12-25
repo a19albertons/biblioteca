@@ -5,12 +5,28 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import com.example.conexiones.MySQLConnection;
+import com.example.conexiones.DBConnection;
 
 /**
  * DAO para la tabla `modulo` (módulos).
  */
 public class ModuloDAO {
+    /**
+     * DBConnection para conexiones a la base de datos
+     */
+    private final DBConnection dbConnection;
+
+    /**
+     * Constructor del DAO
+     * 
+     * @param dbConnection
+     */
+    public ModuloDAO(DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
+    }
 
     /**
      * Obtiene id por nombre
@@ -19,7 +35,7 @@ public class ModuloDAO {
      * @return id o -1
      */
     public int obtenerIdPorNombre(String nombre) {
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement("SELECT id FROM modulo WHERE nombre = ?")) {
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
@@ -37,7 +53,7 @@ public class ModuloDAO {
      * Crea un módulo si no existe y devuelve su id
      */
     public int crearModulo(String nombre) {
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement("INSERT INTO modulo (nombre) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, nombre);
             ps.executeUpdate();

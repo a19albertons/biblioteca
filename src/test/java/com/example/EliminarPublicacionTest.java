@@ -23,7 +23,7 @@ public class EliminarPublicacionTest {
         // Debe devolver true
         org.junit.Assert.assertTrue(ok);
         // Después, obtenerResumenPublicacionPorId debe devolver null (porque p.estado = FALSE)
-        PublicacionDAO dao = new PublicacionDAO();
+        PublicacionDAO dao = new PublicacionDAO(c.getDbConnection());
         String[] resumen = dao.obtenerResumenPublicacionPorId(id);
         assertNull(resumen);
     }

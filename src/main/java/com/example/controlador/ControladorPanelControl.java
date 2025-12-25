@@ -9,6 +9,22 @@ import com.example.dao.UsuarioDAO;
  * Controlador para el panel de control
  */
 public class ControladorPanelControl {
+    /**
+     * DBConnection para conexiones a la base de datos
+     */
+    private final com.example.conexiones.DBConnection dbConnection;
+
+    /**
+     * Constructor con DBConnection (inyección)
+     * 
+     * @param dbConnection
+     */
+    public ControladorPanelControl(com.example.conexiones.DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
+    }
 
     /**
      * Obtiene el número de préstamos realizados hoy
@@ -16,7 +32,7 @@ public class ControladorPanelControl {
      * @return
      */
     public String obtenerPrestamosHoy() {
-        PrestamoDAO prestamoDAO = new PrestamoDAO();
+        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
         return prestamoDAO.prestamosHoy();
 
     }
@@ -27,7 +43,7 @@ public class ControladorPanelControl {
      * @return
      */
     public String obtenerPrestamosPendientes() {
-        PrestamoDAO prestamoDAO = new PrestamoDAO();
+        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
         return prestamoDAO.prestamosPendientes();
     }
 
@@ -37,7 +53,7 @@ public class ControladorPanelControl {
      * @return
      */
     public String obtenerTotalSociosActivos() {
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
         return usuarioDAO.totalSociosActivos();
     }
 
@@ -47,7 +63,7 @@ public class ControladorPanelControl {
      * @return
      */
     public String[][] obtenerUltimosMovimientos() {
-        PrestamoDAO prestamoDAO = new PrestamoDAO();
+        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
         return prestamoDAO.ultimosMovimientos();
     }
 
@@ -57,7 +73,7 @@ public class ControladorPanelControl {
      * @return
      */
     public String[] listaCiclos() {
-        CicloDAO cicloDAO = new CicloDAO();
+        CicloDAO cicloDAO = new CicloDAO(this.dbConnection);
         String[] listaCiclos = cicloDAO.listaCiclos();
         return listaCiclos;
     }
@@ -68,7 +84,7 @@ public class ControladorPanelControl {
      * @return
      */
     public String[] listaEditoriales() {
-        PublicacionDAO publicacionDAO = new PublicacionDAO();
+        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
         String[] listaEditoriales = publicacionDAO.listaEditoriales();
         return listaEditoriales;
     }
@@ -80,7 +96,7 @@ public class ControladorPanelControl {
      *         disponibles, id
      */
     public String[][] listaPublicacionesResumen() {
-        PublicacionDAO publicacionDAO = new PublicacionDAO();
+        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
         String[][] resumen = publicacionDAO.listaPublicacionesResumen();
         return resumen;
     }

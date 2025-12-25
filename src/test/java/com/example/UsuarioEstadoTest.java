@@ -12,7 +12,8 @@ public class UsuarioEstadoTest {
 
     @Test
     public void usuarioBajaPresente() {
-        UsuarioDAO dao = new UsuarioDAO();
+        com.example.controlador.Controlador c = new com.example.controlador.Controlador();
+        UsuarioDAO dao = new UsuarioDAO(c.getDbConnection());
         String[][] filas = dao.listaUsuariosYEstadoSancionActiva();
         boolean foundBaja = false;
         for (String[] f : filas) {

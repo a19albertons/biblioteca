@@ -10,10 +10,21 @@ import com.example.dao.EjemplarDAO;
  */
 public class ControladorEditarEjemplarDialog {
     /**
-     * Constructor
+     * DBConnection para conexiones a la base de datos
      */
-    public ControladorEditarEjemplarDialog() {
-        // No state required
+    private final com.example.conexiones.DBConnection dbConnection;
+
+    /**
+     * Constructor que permite inyectar una `DBConnection` (recomendado para tests
+     * y para la nueva arquitectura).
+     * 
+     * @param dbConnection
+     */
+    public ControladorEditarEjemplarDialog(com.example.conexiones.DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
     }
 
     /**
@@ -22,7 +33,7 @@ public class ControladorEditarEjemplarDialog {
      * estado}
      */
     public String[] obtenerDetallesEjemplar(int idEjemplar) {
-        EjemplarDAO dao = new EjemplarDAO();
+        EjemplarDAO dao = new EjemplarDAO(this.dbConnection);
         return dao.obtenerEjemplarPorId(idEjemplar);
     }
 
@@ -36,8 +47,8 @@ public class ControladorEditarEjemplarDialog {
      * @return true si actualización exitosa
      */
     public boolean editarEjemplar(int idEjemplar, java.time.LocalDate fechaAdquisicion) {
-        EjemplarDAO dao = new EjemplarDAO();
-        Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        EjemplarDAO dao = new EjemplarDAO(this.dbConnection);
+        Connection conexion = this.dbConnection.getConnection();
         // Comprobación básica de disponibilidad de conexión
         if (conexion == null) {
             System.out.println("No se puede obtener conexión a BD");

@@ -91,9 +91,18 @@ public class ControladorNavegacion {
     private JPanel panelPrincipal;
 
     /**
+     * Conexión compartida para uso interno del controlador de navegación cuando
+     * necesita realizar consultas/operaciones rápidas con DAOs.
+     */
+    private final com.example.conexiones.DBConnection dbConnection;
+
+    /**
      * Constructor del controlador de navegación
      */
     public ControladorNavegacion(Controlador controlador) {
+
+        // guardamos la conexión inyectada desde el Controlador principal
+        this.dbConnection = controlador.getDbConnection();
 
         // Inicializar vistas pasando el controlador
         this.panelControl = new PanelControl(controlador);
@@ -193,8 +202,8 @@ public class ControladorNavegacion {
      * @param idPublicacion id de la publicación a mostrar
      */
     public void mostrarEjemplaresParaPublicacion(int idPublicacion) {
-        // obtener resumen de la publicación y pedir a la vista que lo cargue
-        com.example.dao.PublicacionDAO publicacionDAO = new com.example.dao.PublicacionDAO();
+        // obtener resumen de la publicación usando la conexión compartida
+        com.example.dao.PublicacionDAO publicacionDAO = new com.example.dao.PublicacionDAO(this.dbConnection);
         String[] resumen = publicacionDAO.obtenerResumenPublicacionPorId(idPublicacion);
         if (resumen != null) {
             // cargar datos en la vista ejemplares

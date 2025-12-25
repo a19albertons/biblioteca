@@ -4,12 +4,28 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 
-import com.example.conexiones.MySQLConnection;
+import com.example.conexiones.DBConnection;
 
 /**
  * DAO para la tabla sanciones
  */
 public class SancionDAO {
+    /**
+     * DBConnection para la base de datos
+     */
+    private final DBConnection dbConnection;
+
+    /**
+     * Constructor del DAO
+     * 
+     * @param dbConnection
+     */
+    public SancionDAO(DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
+    }
 
     /**
      * Inserta una sanción en la tabla sanciones
@@ -24,7 +40,7 @@ public class SancionDAO {
     public boolean insertarSancion(int idUsuario, int idPrestamo, Date inicio, Date fin, String descripcion) {
         // insertar sanción
         String sql = "INSERT INTO sanciones (id_usuario, id_prestamo, inicio_sancion, fin_sancion, descripcion, estado) VALUES (?, ?, ?, ?, ?, TRUE)";
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetros
             ps.setInt(1, idUsuario);
@@ -52,7 +68,7 @@ public class SancionDAO {
     public String[] obtenerSancionActivaPorUsuario(int idUsuario) {
         // obtener sanción activa
         String sql = "SELECT id, fin_sancion FROM sanciones WHERE id_usuario = ? AND estado = TRUE LIMIT 1";
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetro
             ps.setInt(1, idUsuario);
@@ -84,7 +100,7 @@ public class SancionDAO {
     public boolean desactivarSancionPorId(int idSancion) {
         // consulta SQL para desactivar sanción
         String sql = "UPDATE sanciones SET estado = FALSE WHERE id = ?";
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetro
             ps.setInt(1, idSancion);

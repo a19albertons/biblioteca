@@ -7,12 +7,29 @@ import java.sql.Date;
 import java.sql.Statement; 
 import java.util.ArrayList;
 
-import com.example.conexiones.MySQLConnection;
+import com.example.conexiones.DBConnection;
 
 /**
  * DAO para Publicacion
  */
 public class PublicacionDAO {
+    /**
+     * DBConnection para conexiones a la base de datos
+     */
+    private final DBConnection dbConnection;
+
+    /**
+     * Constructor del DAO
+     * 
+     * @param dbConnection
+     */
+    public PublicacionDAO(DBConnection dbConnection) {
+        
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
+    }
     /**
      * Obtiene las editoriales de las publicaciones
      * 
@@ -21,7 +38,7 @@ public class PublicacionDAO {
     public String[] listaEditoriales() {
         // Listado de editoriales
         ArrayList<String> devolver = new ArrayList<>();
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 // Consulta SQL
                 PreparedStatement ps = conexion.prepareStatement(
                         "SELECT editorial FROM publicaciones GROUP BY editorial ORDER BY editorial ASC");) {
@@ -51,7 +68,7 @@ public class PublicacionDAO {
      * @return id generado o -1 en caso de error
      */
     public int insertarPublicacion(String titulo, String editorial, String codigoIsbn, String idioma, char tipo) {
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(
                         "INSERT INTO publicaciones (titulo, editorial, codigo_isbn, idioma, tipo) VALUES (?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
@@ -108,7 +125,7 @@ public class PublicacionDAO {
      * @return true si ok
      */
     public boolean insertarLibro(int idPublicacion, int numEdicion, Date fechaPublicacion) {
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(
                         "INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES (?, ?, ?)") ) {
             ps.setInt(1, idPublicacion);
@@ -150,7 +167,7 @@ public class PublicacionDAO {
      * @return true si ok
      */
     public boolean insertarRevista(int idPublicacion, String periodicidad, int numRevista) {
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(
                         "INSERT INTO revistas (id_publicacion, periodicidad, num_revista) VALUES (?, ?, ?)") ) {
             ps.setInt(1, idPublicacion);
@@ -187,7 +204,7 @@ public class PublicacionDAO {
      * Inserta relación publicacion <-> modulo
      */
     public boolean insertarPublicacionModulo(int idPublicacion, int idModulo) {
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(
                         "INSERT INTO publicacion_modulo (id_publicacion, id_modulo) VALUES (?, ?)") ) {
             ps.setInt(1, idPublicacion);
@@ -222,7 +239,7 @@ public class PublicacionDAO {
      * Inserta relación publicacion <-> ciclo
      */
     public boolean insertarPublicacionCiclo(int idPublicacion, int idCiclo) {
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(
                         "INSERT INTO publicacion_ciclo (id_publicacion, id_ciclo) VALUES (?, ?)") ) {
             ps.setInt(1, idPublicacion);
@@ -257,7 +274,7 @@ public class PublicacionDAO {
      * Inserta relación publicacion <-> tema
      */
     public boolean insertarPublicacionTema(int idPublicacion, int idTema) {
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(
                         "INSERT INTO publicacion_tema (id_publicacion, id_tema) VALUES (?, ?)") ) {
             ps.setInt(1, idPublicacion);
@@ -292,7 +309,7 @@ public class PublicacionDAO {
      * Inserta relación libro <-> autor
      */
     public boolean insertarLibroAutor(int idLibro, int idAutor) {
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(
                         "INSERT INTO libros_autores (id_libro, id_autor) VALUES (?, ?)") ) {
             ps.setInt(1, idLibro);
@@ -328,7 +345,7 @@ public class PublicacionDAO {
      * @return siguiente num_revista (>=1) o 1 en caso de error
      */
     public int siguienteNumRevista() {
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement("SELECT COALESCE(MAX(num_revista),0) AS m FROM revistas")) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -381,7 +398,7 @@ public class PublicacionDAO {
                 + "GROUP BY p.id "
                 + "ORDER BY p.titulo ASC";
 
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -441,7 +458,7 @@ public class PublicacionDAO {
                 + "GROUP BY p.id "
                 + "ORDER BY p.titulo ASC";
 
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -501,7 +518,7 @@ public class PublicacionDAO {
                 + "WHERE p.id = ? "
                 + "GROUP BY p.id";
 
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -649,7 +666,7 @@ public class PublicacionDAO {
      */
     public boolean tienePrestamosActivos(int idPublicacion) {
         String sql = "SELECT COUNT(*) AS cnt FROM prestamos p JOIN ejemplares e ON p.id_ejemplar = e.id WHERE e.id_publicacion = ? AND p.estado = TRUE";
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, idPublicacion);
             try (ResultSet rs = ps.executeQuery()) {

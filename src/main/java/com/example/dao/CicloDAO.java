@@ -6,12 +6,29 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import com.example.conexiones.MySQLConnection;
+import com.example.conexiones.DBConnection;
 
 /**
  * DAO para Ciclo
  */
 public class CicloDAO {
+    /**
+     * DBConnection para conexiones a la base de datos
+     */
+    private final DBConnection dbConnection;
+
+    /**
+     * Constructor del DAO
+     * 
+     * @param dbConnection
+     */
+    public CicloDAO(DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
+    }
+
     /**
      * Obtiene los nombres de los ciclos
      * 
@@ -20,7 +37,7 @@ public class CicloDAO {
     public String[] listaCiclos() {
         // Listado de ciclos
         ArrayList<String> devolver = new ArrayList<>();
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 // Consulta SQL
                 PreparedStatement ps = conexion.prepareStatement("SELECT nombre FROM ciclos ORDER BY nombre ASC");) {
             // Ejecutar consulta
@@ -44,7 +61,7 @@ public class CicloDAO {
      * @return id del ciclo o -1 en caso de error
      */
     public int obtenerOCrear(String nombre) {
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement("SELECT id FROM ciclos WHERE nombre = ?")) {
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
@@ -53,7 +70,8 @@ public class CicloDAO {
                 }
             }
             // Si no existe, insertamos
-            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO ciclos (nombre) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO ciclos (nombre) VALUES (?)",
+                    Statement.RETURN_GENERATED_KEYS)) {
                 ins.setString(1, nombre);
                 ins.executeUpdate();
                 try (ResultSet rs2 = ins.getGeneratedKeys()) {
@@ -80,7 +98,8 @@ public class CicloDAO {
                     return rs.getInt("id");
                 }
             }
-            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO ciclos (nombre) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO ciclos (nombre) VALUES (?)",
+                    Statement.RETURN_GENERATED_KEYS)) {
                 ins.setString(1, nombre);
                 ins.executeUpdate();
                 try (ResultSet rs2 = ins.getGeneratedKeys()) {

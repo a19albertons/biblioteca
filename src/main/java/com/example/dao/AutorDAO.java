@@ -5,12 +5,28 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import com.example.conexiones.MySQLConnection;
+import com.example.conexiones.DBConnection;
 
 /**
  * DAO para la tabla `autores`.
  */
 public class AutorDAO {
+    /**
+     * DBConnection para conexiones a la base de datos
+     */
+    private final DBConnection dbConnection;
+
+    /**
+     * Constructor del DAO
+     * 
+     * @param dbConnection
+     */
+    public AutorDAO(DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
+    }
 
     /**
      * Busca el id del autor por nombre
@@ -19,7 +35,7 @@ public class AutorDAO {
      * @return id si existe, -1 si no
      */
     public int obtenerIdPorNombre(String nombre) {
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement("SELECT id FROM autores WHERE nombre = ?")) {
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
@@ -60,13 +76,14 @@ public class AutorDAO {
      * Inserta un nuevo autor y devuelve su id generado.
      * Asigna nacionalidad 'ES' por defecto si no se proporciona.
      *
-     * @param nombre      nombre del autor
+     * @param nombre       nombre del autor
      * @param nacionalidad código de nacionalidad (ej: ES)
      * @return id generado o -1 en caso de error
      */
     public int crearAutor(String nombre, String nacionalidad) {
-        try (Connection conexion = new MySQLConnection().getConnection();
-                PreparedStatement ps = conexion.prepareStatement("INSERT INTO autores (nombre, nacionalidad) VALUES (?, ?)",
+        try (Connection conexion = dbConnection.getConnection();
+                PreparedStatement ps = conexion.prepareStatement(
+                        "INSERT INTO autores (nombre, nacionalidad) VALUES (?, ?)",
                         Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, nombre);
             ps.setString(2, nacionalidad == null || nacionalidad.trim().isEmpty() ? "ES" : nacionalidad);
@@ -93,7 +110,8 @@ public class AutorDAO {
      * @return id generado o -1
      */
     public int crearAutor(Connection conexion, String nombre, String nacionalidad) {
-        try (PreparedStatement ps = conexion.prepareStatement("INSERT INTO autores (nombre, nacionalidad) VALUES (?, ?)",
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "INSERT INTO autores (nombre, nacionalidad) VALUES (?, ?)",
                 Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, nombre);
             ps.setString(2, nacionalidad == null || nacionalidad.trim().isEmpty() ? "ES" : nacionalidad);

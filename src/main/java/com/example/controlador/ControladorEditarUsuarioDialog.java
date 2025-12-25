@@ -10,12 +10,23 @@ public class ControladorEditarUsuarioDialog {
      * DAO de usuarios
      */
     private UsuarioDAO usuarioDAO;
+    /**
+     * DBConnection para conexiones a la base de datos
+     */
+    private final com.example.conexiones.DBConnection dbConnection;
 
     /**
-     * Constructor
+     * Constructor que permite inyectar una `DBConnection` (recomendado para tests
+     * y para la nueva arquitectura).
+     * 
+     * @param dbConnection
      */
-    public ControladorEditarUsuarioDialog() {
-        this.usuarioDAO = new UsuarioDAO();
+    public ControladorEditarUsuarioDialog(com.example.conexiones.DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
+        this.usuarioDAO = new UsuarioDAO(this.dbConnection);
     }
 
     /**

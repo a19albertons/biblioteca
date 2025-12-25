@@ -13,10 +13,18 @@ import com.example.dao.UsuarioDAO;
  */
 public class ControladorConcederPrestamo {
     /**
-     * Constructor 
+     * DBConnection para conexiones a la base de datos
      */
-    public ControladorConcederPrestamo() {
-        
+    private final com.example.conexiones.DBConnection dbConnection;
+
+    /**
+     * Constructor con DBConnection (inyección)
+     */
+    public ControladorConcederPrestamo(com.example.conexiones.DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
     }
 
     /**
@@ -24,7 +32,7 @@ public class ControladorConcederPrestamo {
      * sancion_activa (SANCIONADO/ACTIVO/BAJA), tipo_desc
      */
     public String[] buscarUsuarioPorDniOId(String dniOrId) {
-        UsuarioDAO dao = new UsuarioDAO();
+        UsuarioDAO dao = new UsuarioDAO(this.dbConnection);
         return dao.obtenerUsuarioYEstadoPorDniOId(dniOrId == null ? "" : dniOrId.trim());
     }
 
@@ -34,8 +42,8 @@ public class ControladorConcederPrestamo {
      * numEdicion, tipoPublicacion
      */
     public String[] detectarEjemplar(int idEjemplar) {
-        EjemplarDAO ejemplarDAO = new EjemplarDAO();
-        PublicacionDAO publicacionDAO = new PublicacionDAO();
+        EjemplarDAO ejemplarDAO = new EjemplarDAO(this.dbConnection);
+        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
         // obtener info ejemplar
         String[] ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
         if (ejemplar == null) {
@@ -63,7 +71,7 @@ public class ControladorConcederPrestamo {
      */
     public String registrarPrestamo(int idUsuario, int idEjemplar) {
         // Validaciones
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
         String[] usuario = usuarioDAO.obtenerUsuarioYEstadoPorDniOId(String.valueOf(idUsuario));
         // comprobar usuario válido
         if (usuario == null) {
@@ -75,7 +83,7 @@ public class ControladorConcederPrestamo {
             return "El usuario tiene sanciones o está dado de baja";
         }
 
-        EjemplarDAO ejemplarDAO = new EjemplarDAO();
+        EjemplarDAO ejemplarDAO = new EjemplarDAO(this.dbConnection);
         // comprobar si el ejemplar ya tiene préstamo activo
         if (ejemplarDAO.tienePrestamosActivosEjemplar(idEjemplar)) {
             return "El ejemplar ya tiene un préstamo activo";
@@ -89,7 +97,7 @@ public class ControladorConcederPrestamo {
         
         // Obtiene detalles de la publicación
         int idPublicacion = Integer.parseInt(ejemplar[1]);
-        PublicacionDAO publicacionDAO = new PublicacionDAO();
+        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
         String[] detallesPub = publicacionDAO.obtenerPublicacionDetallesPorId(idPublicacion);
         if (detallesPub == null) {
             return "Publicación no encontrada";
@@ -99,7 +107,7 @@ public class ControladorConcederPrestamo {
         // Ver reglas: libros -> 7 días para todos. Revistas -> solo 1 concedida (por
         // usuario) y durante el propio día,
         // pero si eres profesor son 7 días
-        PrestamoDAO prestamoDAO = new PrestamoDAO();
+        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
         // comprobar revista activa por usuario
         if ("R".equalsIgnoreCase(tipoPub)) {
             // comprobar si ya tiene revista en préstamo activo

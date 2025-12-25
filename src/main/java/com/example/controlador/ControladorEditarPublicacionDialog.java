@@ -21,10 +21,21 @@ import com.example.dao.TemaDAO;
  */
 public class ControladorEditarPublicacionDialog {
     /**
-     * Constructor
+     * DBConnection para conexiones a la base de datos
      */
-    public ControladorEditarPublicacionDialog() {
-        
+    private final com.example.conexiones.DBConnection dbConnection;
+
+    /**
+     * Constructor que permite inyectar una `DBConnection` (recomendado para tests
+     * y para la nueva arquitectura).
+     * 
+     * @param dbConnection
+     */
+    public ControladorEditarPublicacionDialog(com.example.conexiones.DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
     }
 
     /**
@@ -37,7 +48,7 @@ public class ControladorEditarPublicacionDialog {
      *         autoresCSV, periodicidad, id — o null si no se encuentra
      */
     public String[] obtenerDetallesPublicacion(int id) {
-        PublicacionDAO dao = new PublicacionDAO();
+        PublicacionDAO dao = new PublicacionDAO(this.dbConnection);
         return dao.obtenerPublicacionDetallesPorId(id);
     }
 
@@ -61,13 +72,13 @@ public class ControladorEditarPublicacionDialog {
     public boolean editarPublicacionLibro(int idPublicacion, String isbn, String titulo, String idioma,
             String temasCsv, String modulosCsv, String ciclosCsv, String editorial, int numEdicion,
             LocalDate fechaPublic, String autoresCsv) {
-        PublicacionDAO publicacionDAO = new PublicacionDAO();
-        AutorDAO autorDAO = new AutorDAO();
-        ModuloDAO moduloDAO = new ModuloDAO();
-        TemaDAO temaDAO = new TemaDAO();
-        CicloDAO cicloDAO = new CicloDAO();
+        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+        AutorDAO autorDAO = new AutorDAO(this.dbConnection);
+        ModuloDAO moduloDAO = new ModuloDAO(this.dbConnection);
+        TemaDAO temaDAO = new TemaDAO(this.dbConnection);
+        CicloDAO cicloDAO = new CicloDAO(this.dbConnection);
 
-        Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        Connection conexion = this.dbConnection.getConnection();
         if (conexion == null) {
             System.out.println("No se puede obtener conexión a BD");
             return false;
@@ -217,12 +228,12 @@ public class ControladorEditarPublicacionDialog {
      */
     public boolean editarPublicacionRevista(int idPublicacion, String isbn, String titulo, String idioma,
             String temasCsv, String modulosCsv, String ciclosCsv, String editorial, String periodicidad) {
-        PublicacionDAO publicacionDAO = new PublicacionDAO();
-        ModuloDAO moduloDAO = new ModuloDAO();
-        TemaDAO temaDAO = new TemaDAO();
-        CicloDAO cicloDAO = new CicloDAO();
+        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+        ModuloDAO moduloDAO = new ModuloDAO(this.dbConnection);
+        TemaDAO temaDAO = new TemaDAO(this.dbConnection);
+        CicloDAO cicloDAO = new CicloDAO(this.dbConnection);
 
-        Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        Connection conexion = this.dbConnection.getConnection();
         if (conexion == null) {
             System.out.println("No se puede obtener conexión a BD");
             return false;
@@ -335,7 +346,5 @@ public class ControladorEditarPublicacionDialog {
             }
         }
     }
-
-
 
 }

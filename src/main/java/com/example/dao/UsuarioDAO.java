@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import com.example.conexiones.MySQLConnection;
+import com.example.conexiones.DBConnection;
 import com.example.modelo.TipoUsuario;
 import com.example.modelo.Usuario;
 
@@ -12,6 +12,23 @@ import com.example.modelo.Usuario;
  * Clase para el acceso a datos de Usuario
  */
 public class UsuarioDAO {
+    /**
+     * DBConnection para la base de datos
+     */
+    private final DBConnection dbConnection;
+
+    /**
+     * Constructor de UsuarioDAO
+     * 
+     * @param dbConnection
+     */
+    public UsuarioDAO(DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
+    }
+
     /**
      * Consulta el inicio de sesión de un usuario
      * 
@@ -21,7 +38,7 @@ public class UsuarioDAO {
      */
     public Usuario consultaInicioSesion(String usuario, String contrasena) {
         Usuario devolver = null;
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion
                         .prepareStatement("SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?")) {
             ps.setString(1, usuario);
@@ -67,7 +84,7 @@ public class UsuarioDAO {
      */
     public Usuario consultaRecuperarCuenta(String trim) {
         Usuario devolver = null;
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion
                         .prepareStatement("SELECT * FROM usuarios WHERE usuario = ? OR email = ?")) {
             ps.setString(1, trim);
@@ -113,7 +130,7 @@ public class UsuarioDAO {
     public String totalSociosActivos() {
         String totalSocios = "-1";
         // Consulta SQL para contar los socios activos
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion
                         .prepareStatement("SELECT COUNT(*) AS TOTAL FROM usuarios where estado = TRUE")) {
             try (ResultSet rs = ps.executeQuery()) {
@@ -141,7 +158,7 @@ public class UsuarioDAO {
     public String[][] listaUsuariosYEstadoSancionActiva() {
         // Listado de usuarios
         String[][] devolver = new String[0][0];
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 // Consulta SQL
                 PreparedStatement ps = conexion.prepareStatement(
                         "SELECT u.id, u.dni, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS nombre_completo, "
@@ -235,7 +252,7 @@ public class UsuarioDAO {
      */
     public String[] obtenerDetallesUsuario(int idUsuario) {
         String[] devolver = null;
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 // Consulta SQL
                 PreparedStatement ps = conexion.prepareStatement(
                         "SELECT id, dni, nombre, apellido1, apellido2, email, tipo, estado FROM usuarios WHERE id = ?")) {
@@ -275,7 +292,7 @@ public class UsuarioDAO {
     public String[] obtenerUsuarioYEstadoPorDniOId(String dniOrId) {
         // Listado de usuarios
         String[] devolver = null;
-        try (Connection conexion = new MySQLConnection().getConnection()) {
+        try (Connection conexion = dbConnection.getConnection()) {
             // Consulta SQL dependiendo si es número (id) o texto (dni)
             boolean esNumero = dniOrId != null && dniOrId.matches("^\\d+$");
             String sql = "SELECT u.id, u.dni, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS nombre_completo, "
@@ -301,6 +318,7 @@ public class UsuarioDAO {
                         devolver[3] = rs.getString("sancion_activa");
                         // convertir tipo a descripcion si es posible
                         String tipoCode = rs.getString("tipo");
+
                         String tipoDesc = tipoCode != null
                                 ? com.example.modelo.TipoUsuario.valueOf(tipoCode).getDescripcion()
                                 : "";
@@ -333,7 +351,7 @@ public class UsuarioDAO {
             String email, String tipo) {
         // Consulta SQL
         String sql = "UPDATE usuarios SET dni = ?, nombre = ?, apellido1 = ?, apellido2 = ?, email = ?, tipo = ? WHERE id = ?";
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
             ps.setString(1, dni);
@@ -362,7 +380,7 @@ public class UsuarioDAO {
     public boolean bajaUsuario(int idUsuario) {
         // Consulta SQL
         String sql = "UPDATE usuarios SET estado = FALSE WHERE id = ?";
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
             ps.setInt(1, idUsuario);
@@ -387,7 +405,7 @@ public class UsuarioDAO {
         // Consulta SQL
         String sql = "SELECT COUNT(*) AS total FROM prestamos WHERE id_usuario = ? AND estado = TRUE";
 
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
             ps.setInt(1, idUsuario);
@@ -414,7 +432,7 @@ public class UsuarioDAO {
         String sql = "SELECT u.id, u.dni, CONCAT(u.apellido1, ', ', u.nombre) AS nombre_completo, u.tipo "
                 + "FROM usuarios u WHERE u.tipo = 'E' AND u.estado = TRUE ORDER BY u.apellido1, u.nombre";
         java.util.List<String[]> rows = new java.util.ArrayList<>();
-        try (Connection conexion = new MySQLConnection().getConnection();
+        try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql);
                 // Ejecutar consulta
                 ResultSet rs = ps.executeQuery()) {

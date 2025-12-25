@@ -94,9 +94,8 @@ public class SancionManual {
 
         // Acción del botón Cambiar -> abrir modal con usuarios sancionables
         btnCambiarUsuario.addActionListener(e -> {
-            // obtener usuarios sancionables
-            com.example.dao.UsuarioDAO usuarioDAO = new com.example.dao.UsuarioDAO();
-            String[][] usuarios = usuarioDAO.obtenerUsuariosSancionables();
+            // obtener usuarios sancionables desde el controlador
+            String[][] usuarios = controlador.getControladorGestionUsuarios().obtenerUsuariosSancionables();
             if (usuarios == null || usuarios.length == 0) {
                 javax.swing.JOptionPane.showMessageDialog(null, "No hay usuarios sancionables", "Información",
                         javax.swing.JOptionPane.INFORMATION_MESSAGE);
@@ -243,8 +242,7 @@ public class SancionManual {
                 return;
             }
             // comprobar que el usuario fue el ultimo en tener el ejemplar
-            com.example.dao.PrestamoDAO prestamoDAO = new com.example.dao.PrestamoDAO();
-            String[] ultimo = prestamoDAO.obtenerUltimoPrestamoPorEjemplar(idEj);
+            String[] ultimo = controlador.getControladorSancionManual().obtenerUltimoPrestamoPorEjemplar(idEj);
             if (ultimo == null) {
                 javax.swing.JOptionPane.showMessageDialog(null,
                         "No se encontró historial de préstamos para este ejemplar", "Error",
@@ -280,9 +278,8 @@ public class SancionManual {
             String motivo = (String) comboMotivo.getSelectedItem();
             String descAd = txtDescripcion.getText().trim();
             String descripcionBase = motivo + " - " + (descAd.isEmpty() ? "" : descAd);
-            // comprobar sancion activa y acumulacion
-            com.example.dao.SancionDAO sancionDAO = new com.example.dao.SancionDAO();
-            String[] sancionActiva = sancionDAO.obtenerSancionActivaPorUsuario(usuarioSeleccionado[0]);
+            // comprobar sancion activa y acumulacion (usar controlador)
+            String[] sancionActiva = controlador.getControladorSancionManual().obtenerSancionActivaPorUsuario(usuarioSeleccionado[0]);
             String descripcion = descripcionBase;
             if (sancionActiva != null && sancionActiva[1] != null && !sancionActiva[1].isEmpty()) {
                 try {
@@ -329,7 +326,7 @@ public class SancionManual {
                     // intentar desactivar la sanción previa
                     try {
                         int idPrev = Integer.parseInt(sancionActiva[0]);
-                        previaDesactivada = sancionDAO.desactivarSancionPorId(idPrev);
+                        previaDesactivada = controlador.getControladorSancionManual().desactivarSancionPorId(idPrev);
                         if (previaDesactivada) {
                             notificacion += " La sanción previa ha sido desactivada.";
                         }
@@ -347,8 +344,8 @@ public class SancionManual {
             }
 
             // insertar sancion (usar idPrestamo obtenido del historial)
-            boolean ins = sancionDAO.insertarSancion(usuarioSeleccionado[0], idPrestamo, java.sql.Date.valueOf(hoy),
-                    java.sql.Date.valueOf(fin), descripcion);
+            boolean ins = controlador.getControladorSancionManual().insertarSancion(usuarioSeleccionado[0], idPrestamo,
+                    java.sql.Date.valueOf(hoy), java.sql.Date.valueOf(fin), descripcion);
             if (!ins) {
                 javax.swing.JOptionPane.showMessageDialog(null, "Error aplicando la sanción", "Error",
                         javax.swing.JOptionPane.ERROR_MESSAGE);

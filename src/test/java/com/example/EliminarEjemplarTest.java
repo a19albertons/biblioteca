@@ -21,7 +21,7 @@ public class EliminarEjemplarTest {
         // Debe fallar porque existe préstamo activo
         assertFalse(ok);
         // Estado debe seguir siendo DISPONIBLE
-        EjemplarDAO dao = new EjemplarDAO();
+        EjemplarDAO dao = new EjemplarDAO(c.getDbConnection());
         String[] detalles = dao.obtenerEjemplarPorId(idEjemplar);
         assertTrue(detalles != null && "DISPONIBLE".equals(detalles[4]));
     }
@@ -29,7 +29,7 @@ public class EliminarEjemplarTest {
     @Test
     public void eliminarEjemplarSinPrestamosDaBaja() {
         Controlador c = new Controlador();
-        EjemplarDAO dao = new EjemplarDAO();
+        EjemplarDAO dao = new EjemplarDAO(c.getDbConnection());
         int idEjemplar = 12; // en inicializacion.sql no tiene prestamos activos
 
         // Asegurar estado inicial
@@ -43,7 +43,7 @@ public class EliminarEjemplarTest {
         assertTrue(despues != null && "BAJA".equals(despues[4]));
 
         // Restaurar estado original (poner en servicio de nuevo) para no dejar side-effects
-        java.sql.Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        java.sql.Connection conexion = c.getDbConnection().getConnection();
         try {
             if (conexion != null) {
                 conexion.setAutoCommit(false);

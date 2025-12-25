@@ -17,7 +17,7 @@ public class EditarEjemplarTest {
     @Test
     public void editarFechaEjemplarYRestaurar() {
         Controlador c = new Controlador();
-        EjemplarDAO dao = new EjemplarDAO();
+        EjemplarDAO dao = new EjemplarDAO(c.getDbConnection());
         int idEjemplar = 12; // presente en inicializacion.sql
 
         String[] antes = dao.obtenerEjemplarPorId(idEjemplar);

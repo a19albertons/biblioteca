@@ -6,6 +6,11 @@ package com.example.controlador;
 public class Controlador {
     // Atributos del controlador
     /**
+     * Conexión compartida para DAOs/controladores (inyección)
+     */
+    private final com.example.conexiones.DBConnection dbConnection;
+
+    /**
      * Controlador de navegación
      */
     ControladorNavegacion controladorNavegacion;
@@ -39,13 +44,14 @@ public class Controlador {
      */
     ControladorEjemplares controladorEjemplares;
     /**
-     * Controlador de nueva publicación (encapsula la lógica de persistencia de publicaciones)
+     * Controlador de nueva publicación (encapsula la lógica de persistencia de
+     * publicaciones)
      */
     ControladorNuevaPublicacionDialog controladorNuevaPublicacionDialog;
     /**
      * Controlador para editar publicaciones (diálogo de edición)
      */
-    ControladorEditarPublicacionDialog controladorEditarPublicacionDialog;    
+    ControladorEditarPublicacionDialog controladorEditarPublicacionDialog;
     /**
      * Controlador para eliminar publicaciones (diálogo de eliminación)
      */
@@ -81,7 +87,22 @@ public class Controlador {
      */
     ControladorEliminarUsuario controladorEliminarUsuario;
 
+    /**
+     * Controlador para sanciones manuales
+     */
+    ControladorSancionManual controladorSancionManual;
+
     // Getters y Setters
+
+    /**
+     * Obtiene la conexión compartida
+     *
+     * @return DBConnection usada por este controlador
+     */
+    public com.example.conexiones.DBConnection getDbConnection() {
+        return this.dbConnection;
+    }
+
     /**
      * Obtiene el controlador de navegación
      * 
@@ -189,14 +210,16 @@ public class Controlador {
     public void setControladorPanelControl(ControladorPanelControl controladorPanelControl) {
         this.controladorPanelControl = controladorPanelControl;
     }
+
     /**
      * Obtiene el controlador de ejemplares
      * 
      * @return
-     */ 
+     */
     public ControladorEjemplares getControladorEjemplares() {
         return controladorEjemplares;
     }
+
     /**
      * Establece el controlador de ejemplares
      * 
@@ -205,6 +228,7 @@ public class Controlador {
     public void setControladorEjemplares(ControladorEjemplares controladorEjemplares) {
         this.controladorEjemplares = controladorEjemplares;
     }
+
     /**
      * Obtiene el controlador de gestión de usuarios
      * 
@@ -213,6 +237,7 @@ public class Controlador {
     public ControladorGestionUsuarios getControladorGestionUsuarios() {
         return controladorGestionUsuarios;
     }
+
     /**
      * Establece el controlador de gestión de usuarios
      * 
@@ -236,7 +261,8 @@ public class Controlador {
      *
      * @param controladorNuevaPublicacionDialog
      */
-    public void setControladorNuevaPublicacionDialog(ControladorNuevaPublicacionDialog controladorNuevaPublicacionDialog) {
+    public void setControladorNuevaPublicacionDialog(
+            ControladorNuevaPublicacionDialog controladorNuevaPublicacionDialog) {
         this.controladorNuevaPublicacionDialog = controladorNuevaPublicacionDialog;
     }
 
@@ -254,7 +280,8 @@ public class Controlador {
      *
      * @param controladorEditarPublicacionDialog controlador de edición
      */
-    public void setControladorEditarPublicacionDialog(ControladorEditarPublicacionDialog controladorEditarPublicacionDialog) {
+    public void setControladorEditarPublicacionDialog(
+            ControladorEditarPublicacionDialog controladorEditarPublicacionDialog) {
         this.controladorEditarPublicacionDialog = controladorEditarPublicacionDialog;
     }
 
@@ -296,6 +323,7 @@ public class Controlador {
 
     /**
      * Obtiene el controlador de edición de usuarios
+     * 
      * @return controlador de edición de usuarios
      */
     public ControladorEditarUsuarioDialog getControladorEditarUsuarioDialog() {
@@ -304,6 +332,7 @@ public class Controlador {
 
     /**
      * Obtiene el controlador de eliminación (desactivar) de usuarios
+     * 
      * @return controlador de eliminación de usuarios
      */
     public ControladorEliminarUsuario getControladorEliminarUsuario() {
@@ -351,37 +380,63 @@ public class Controlador {
      *
      * @param controladorEliminarEjemplarDialog
      */
-    public void setControladorEliminarEjemplarDialog(ControladorEliminarEjemplarDialog controladorEliminarEjemplarDialog) {
+    public void setControladorEliminarEjemplarDialog(
+            ControladorEliminarEjemplarDialog controladorEliminarEjemplarDialog) {
         this.controladorEliminarEjemplarDialog = controladorEliminarEjemplarDialog;
     }
 
-    // Constructores
     /**
-     * Constructor por defecto
+     * Obtiene el controlador encargado de la gestión de sanciones manuales
+     *
+     * @return controlador de sancion manual
      */
-    public Controlador() {
-        this.controladorInicioSesion = new ControladorInicioSesion();
-        this.controladorRecuperarCuenta = new ControladorRecuperarCuenta();
+    public ControladorSancionManual getControladorSancionManual() {
+        return controladorSancionManual;
+    }
+
+    /**
+     * Establece el controlador encargado de la gestión de sanciones manuales
+     *
+     * @param controladorSancionManual
+     */
+    public void setControladorSancionManual(ControladorSancionManual controladorSancionManual) {
+        this.controladorSancionManual = controladorSancionManual;
+    }
+    /**
+     * Constructor que acepta una conexión (DBConnection) y la pasa a los
+     * controladores que la requieren.
+     *
+     * @param dbConnection implementación de DBConnection (no puede ser null)
+     */
+    public Controlador(com.example.conexiones.DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
+        this.controladorInicioSesion = new ControladorInicioSesion(dbConnection);
+        this.controladorRecuperarCuenta = new ControladorRecuperarCuenta(dbConnection);
         this.controladorLogin = new ControladorLogin();
-        this.controladorPanelControl = new ControladorPanelControl();
-        this.controladorEjemplares = new ControladorEjemplares();
-        this.controladorGestionUsuarios = new ControladorGestionUsuarios();
-        this.controladorNuevaPublicacionDialog = new ControladorNuevaPublicacionDialog();
-        this.controladorEditarPublicacionDialog = new ControladorEditarPublicacionDialog();
-        this.controladorEliminarPublicacion = new ControladorEliminarPublicacion();
-        this.controladorNuevoEjemplarDialog = new ControladorNuevoEjemplarDialog();
-        this.controladorEditarEjemplarDialog = new ControladorEditarEjemplarDialog();
-        this.controladorEliminarEjemplarDialog = new ControladorEliminarEjemplarDialog();
-        this.controladorNuevoUsuarioDialog = new ControladorNuevoUsuarioDialog();
-        this.controladorEditarUsuarioDialog = new ControladorEditarUsuarioDialog();
-        this.controladorEliminarUsuario = new ControladorEliminarUsuario();
+        this.controladorPanelControl = new ControladorPanelControl(dbConnection);
+        this.controladorEjemplares = new ControladorEjemplares(dbConnection);
+        this.controladorGestionUsuarios = new ControladorGestionUsuarios(dbConnection);
+        this.controladorNuevaPublicacionDialog = new ControladorNuevaPublicacionDialog(dbConnection);
+        this.controladorEditarPublicacionDialog = new ControladorEditarPublicacionDialog(dbConnection);
+        this.controladorEliminarPublicacion = new ControladorEliminarPublicacion(dbConnection);
+        this.controladorNuevoEjemplarDialog = new ControladorNuevoEjemplarDialog(dbConnection);
+        this.controladorEditarEjemplarDialog = new ControladorEditarEjemplarDialog(dbConnection);
+        this.controladorEliminarEjemplarDialog = new ControladorEliminarEjemplarDialog(dbConnection);
+        this.controladorNuevoUsuarioDialog = new ControladorNuevoUsuarioDialog(dbConnection);
+        this.controladorEditarUsuarioDialog = new ControladorEditarUsuarioDialog(dbConnection);
+        this.controladorEliminarUsuario = new ControladorEliminarUsuario(dbConnection);
+        this.controladorSancionManual = new ControladorSancionManual(dbConnection);
         this.controladorNavegacion = new ControladorNavegacion(this);
-        this.controladorConcederPrestamo = new ControladorConcederPrestamo();
-        this.controladorDevolverPrestamo = new ControladorDevolverPrestamo();
-        
+        this.controladorConcederPrestamo = new ControladorConcederPrestamo(dbConnection);
+        this.controladorDevolverPrestamo = new ControladorDevolverPrestamo(dbConnection);
     }
 
     // Metodos del controlador
+
+
     /**
      * Inicia la aplicación
      */

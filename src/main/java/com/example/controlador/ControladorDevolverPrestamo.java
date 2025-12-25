@@ -1,5 +1,6 @@
 package com.example.controlador;
 
+import com.example.conexiones.DBConnection;
 import com.example.dao.EjemplarDAO;
 import com.example.dao.PrestamoDAO;
 import com.example.dao.PublicacionDAO;
@@ -11,15 +12,25 @@ import com.example.dao.UsuarioDAO;
  */
 public class ControladorDevolverPrestamo {
     /**
+     * DBConnection para la base de datos
+     */
+    private final DBConnection dbConnection;
+
+    /**
      * Mensaje informativo sobre sanción (si se creó/actualizó una sanción durante la operación)
      */
     private String ultimaNotificacionSancion = null;
 
     /**
      * Constructor
+     * 
+     * @param dbConnection
      */
-    public ControladorDevolverPrestamo() {
-        // No state required
+    public ControladorDevolverPrestamo(DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
     }
 
     /**
@@ -39,7 +50,7 @@ public class ControladorDevolverPrestamo {
      */
     public String[] buscarUsuarioPorDniOId(String dniOrId) {
         try {
-            UsuarioDAO dao = new UsuarioDAO();
+            UsuarioDAO dao = new UsuarioDAO(this.dbConnection);
             return dao.obtenerUsuarioYEstadoPorDniOId(dniOrId == null ? "" : dniOrId.trim());
         } catch (Throwable t) {
             // Evitar que errores de compilación/Classpath propaguen una excepción no
@@ -56,8 +67,8 @@ public class ControladorDevolverPrestamo {
      * numEdicion, tipoPublicacion
      */
     public String[] detectarEjemplar(int idEjemplar) {
-        EjemplarDAO ejemplarDAO = new EjemplarDAO();
-        PublicacionDAO publicacionDAO = new PublicacionDAO();
+        EjemplarDAO ejemplarDAO = new EjemplarDAO(this.dbConnection);
+        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
         // obtener info ejemplar
         String[] ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
         if (ejemplar == null) {
@@ -81,7 +92,7 @@ public class ControladorDevolverPrestamo {
      * Comprueba si existe un préstamo activo entre un usuario y un ejemplar
      */
     public boolean existePrestamoActivoUsuarioEjemplar(int idUsuario, int idEjemplar) {
-        PrestamoDAO prestamoDAO = new PrestamoDAO();
+        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
         return prestamoDAO.existePrestamoActivoUsuarioEjemplar(idUsuario, idEjemplar);
     }
 
@@ -91,14 +102,14 @@ public class ControladorDevolverPrestamo {
      */
     public String registrarDevolucion(int idUsuario, int idEjemplar) {
         // Validar usuario
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
         String[] usuario = usuarioDAO.obtenerUsuarioYEstadoPorDniOId(String.valueOf(idUsuario));
         // Si no existe el usuario, devolver error
         if (usuario == null) {
             return "Usuario no encontrado";
         }
         // comprobar que exista préstamo activo
-        PrestamoDAO prestamoDAO = new PrestamoDAO();
+        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
         String[] prestamo = prestamoDAO.obtenerPrestamoActivoPorUsuarioEjemplar(idUsuario, idEjemplar);
         // Si no existe préstamo activo, devolver error
         if (prestamo == null) {
@@ -126,12 +137,12 @@ public class ControladorDevolverPrestamo {
             // Si hay días de retraso
             if (diasRetraso > 0) {
                 // obtener tipo de publicacion para el ejemplar
-                EjemplarDAO ejemplarDAO = new EjemplarDAO();
+                EjemplarDAO ejemplarDAO = new EjemplarDAO(this.dbConnection);
                 String[] ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
                 String tipoPub = null;
                 if (ejemplar != null) {
                     int idPublicacion = Integer.parseInt(ejemplar[1]);
-                    PublicacionDAO publicacionDAO = new PublicacionDAO();
+                    PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
                     String[] detalles = publicacionDAO.obtenerPublicacionDetallesPorId(idPublicacion);
                     tipoPub = detalles != null ? detalles[0] : null;
                 }
@@ -145,7 +156,7 @@ public class ControladorDevolverPrestamo {
                 // aplicar sanción si hay días a sancionar
                 if (diasSancion > 0) {
                     java.time.LocalDate inicioSancion = hoy;
-                    SancionDAO sancionDAO = new SancionDAO();
+                    SancionDAO sancionDAO = new SancionDAO(this.dbConnection);
                     // Comprobar si ya existe una sanción activa para este usuario
                     String[] sancionActiva = sancionDAO.obtenerSancionActivaPorUsuario(idUsuario);
                     java.time.LocalDate finSancion;

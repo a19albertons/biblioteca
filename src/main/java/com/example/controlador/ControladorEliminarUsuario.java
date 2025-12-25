@@ -12,10 +12,24 @@ public class ControladorEliminarUsuario {
     private UsuarioDAO usuarioDAO;
 
     /**
-     * Constructor
+     * DBConnection para conexiones a la base de datos
      */
-    public ControladorEliminarUsuario() {
-        this.usuarioDAO = new UsuarioDAO();
+    private final com.example.conexiones.DBConnection dbConnection;
+
+
+
+    /**
+     * Constructor que permite inyectar una `DBConnection` (recomendado para tests
+     * y para la nueva arquitectura).
+     * 
+     * @param dbConnection
+     */
+    public ControladorEliminarUsuario(com.example.conexiones.DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
+        this.usuarioDAO = new UsuarioDAO(this.dbConnection);
     }
 
     /**

@@ -14,7 +14,8 @@ public class App
         // Aplicar Open Sans y estilo normal por defecto a etiquetas y botones
         Fonts.applyDefaultOpenSans();
 
-        Controlador controlador = new Controlador();
+        com.example.conexiones.DBConnection dbConnection = new com.example.conexiones.MySQLConnection();
+        Controlador controlador = new Controlador(dbConnection);
         controlador.iniciarAplicacion();
     }
 }

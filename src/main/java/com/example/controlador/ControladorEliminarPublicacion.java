@@ -12,10 +12,25 @@ import com.example.dao.PublicacionDAO;
  */
 public class ControladorEliminarPublicacion {
     /**
-     * Constructor
+     * DBConnection para conexiones a la base de datos
      */
+    private final com.example.conexiones.DBConnection dbConnection;
+
     public ControladorEliminarPublicacion() {
-        // No state required
+        this.dbConnection = new com.example.conexiones.MySQLConnection();
+    }
+
+    /**
+     * Constructor que permite inyectar una `DBConnection` (recomendado para tests
+     * y para la nueva arquitectura).
+     * 
+     * @param dbConnection
+     */
+    public ControladorEliminarPublicacion(com.example.conexiones.DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
     }
 
     /**
@@ -26,8 +41,8 @@ public class ControladorEliminarPublicacion {
      *         error
      */
     public boolean eliminarPublicacion(int idPublicacion) {
-        PublicacionDAO publicacionDAO = new PublicacionDAO();
-        Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+        Connection conexion = this.dbConnection.getConnection();
         if (conexion == null) {
             System.out.println("No se puede obtener conexión a BD");
             return false;

@@ -11,10 +11,21 @@ import com.example.dao.UsuarioDAO;
  */
 public class ControladorNuevoUsuarioDialog {
     /**
-     * Constructor
+     * DBConnection para conexiones a la base de datos
      */
-    public ControladorNuevoUsuarioDialog() {
-        // No state required
+    private final com.example.conexiones.DBConnection dbConnection;
+
+    /**
+     * Constructor que permite inyectar una `DBConnection` (recomendado para tests
+     * y para la nueva arquitectura).
+     * 
+     * @param dbConnection
+     */
+    public ControladorNuevoUsuarioDialog(com.example.conexiones.DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
     }
 
     /**
@@ -29,7 +40,7 @@ public class ControladorNuevoUsuarioDialog {
      * @return true si la creación y commit fue satisfactoria
      */
     public boolean crearUsuario(String dni, String nombre, String apellidos, String email, String tipoCode) {
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
         // Validaciones básicas
         if (dni == null || dni.trim().isEmpty() || nombre == null || nombre.trim().isEmpty()) {
             return false;
@@ -39,7 +50,7 @@ public class ControladorNuevoUsuarioDialog {
         String apellido2 = ""; // dejamos el campo apellido2 vacío por simplicidad
         String contrasena = dni.trim(); // la contraseña inicial es el DNI
 
-        Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        Connection conexion = this.dbConnection.getConnection();
         // Comprobar conexión
         if (conexion == null) {
             System.out.println("No se puede obtener conexión a BD");

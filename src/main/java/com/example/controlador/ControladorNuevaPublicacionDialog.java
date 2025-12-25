@@ -11,7 +11,8 @@ import com.example.dao.PublicacionDAO;
 import com.example.dao.TemaDAO;
 
 /**
- * Controlador responsable de la creación y persistencia de nuevas publicaciones.
+ * Controlador responsable de la creación y persistencia de nuevas
+ * publicaciones.
  *
  * Contiene métodos que encapsulan la lógica de inserción en varias tablas
  * relacionadas (`publicaciones`, `libros`/`revistas`, relaciones con módulos,
@@ -19,10 +20,23 @@ import com.example.dao.TemaDAO;
  */
 public class ControladorNuevaPublicacionDialog {
     /**
-     * Constructor
+     * DBConnection para conexiones a la base de datos
      */
-    public ControladorNuevaPublicacionDialog() {
-        // No state required
+    private final com.example.conexiones.DBConnection dbConnection;
+
+
+
+    /**
+     * Constructor que permite inyectar una `DBConnection` (recomendado para tests
+     * y para la nueva arquitectura).
+     * 
+     * @param dbConnection
+     */
+    public ControladorNuevaPublicacionDialog(com.example.conexiones.DBConnection dbConnection) {
+        if (dbConnection == null) {
+            throw new IllegalArgumentException("DBConnection cannot be null");
+        }
+        this.dbConnection = dbConnection;
     }
 
     /**
@@ -30,27 +44,27 @@ public class ControladorNuevaPublicacionDialog {
      * Connection y commit/rollback. Esto asegura consistencia si alguna inserción
      * falla.
      *
-     * @param isbn         código ISBN o identificador
-     * @param titulo       título de la publicación
-     * @param idioma       idioma
-     * @param temasCsv     lista de temas separados por comas
-     * @param modulosCsv   lista de módulos separados por comas
-     * @param ciclosCsv    lista de ciclos separados por comas
-     * @param editorial    editorial
-     * @param numEdicion   número de edición (>0)
-     * @param fechaPublic  fecha publicación (java.time.LocalDate)
-     * @param autoresCsv   lista de autores separados por comas
+     * @param isbn        código ISBN o identificador
+     * @param titulo      título de la publicación
+     * @param idioma      idioma
+     * @param temasCsv    lista de temas separados por comas
+     * @param modulosCsv  lista de módulos separados por comas
+     * @param ciclosCsv   lista de ciclos separados por comas
+     * @param editorial   editorial
+     * @param numEdicion  número de edición (>0)
+     * @param fechaPublic fecha publicación (java.time.LocalDate)
+     * @param autoresCsv  lista de autores separados por comas
      * @return true si la creación fue satisfactoria y commit realizado
      */
     public boolean crearPublicacionLibro(String isbn, String titulo, String idioma, String temasCsv, String modulosCsv,
             String ciclosCsv, String editorial, int numEdicion, LocalDate fechaPublic, String autoresCsv) {
-        PublicacionDAO publicacionDAO = new PublicacionDAO();
-        AutorDAO autorDAO = new AutorDAO();
-        ModuloDAO moduloDAO = new ModuloDAO();
-        TemaDAO temaDAO = new TemaDAO();
-        CicloDAO cicloDAO = new CicloDAO();
+        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+        AutorDAO autorDAO = new AutorDAO(this.dbConnection);
+        ModuloDAO moduloDAO = new ModuloDAO(this.dbConnection);
+        TemaDAO temaDAO = new TemaDAO(this.dbConnection);
+        CicloDAO cicloDAO = new CicloDAO(this.dbConnection);
 
-        Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        Connection conexion = this.dbConnection.getConnection();
         if (conexion == null) {
             System.out.println("No se puede obtener conexión a BD");
             return false;
@@ -185,12 +199,12 @@ public class ControladorNuevaPublicacionDialog {
      */
     public boolean crearPublicacionRevista(String isbn, String titulo, String idioma, String temasCsv,
             String modulosCsv, String ciclosCsv, String editorial, String periodicidad) {
-        PublicacionDAO publicacionDAO = new PublicacionDAO();
-        ModuloDAO moduloDAO = new ModuloDAO();
-        TemaDAO temaDAO = new TemaDAO();
-        CicloDAO cicloDAO = new CicloDAO();
+        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+        ModuloDAO moduloDAO = new ModuloDAO(this.dbConnection);
+        TemaDAO temaDAO = new TemaDAO(this.dbConnection);
+        CicloDAO cicloDAO = new CicloDAO(this.dbConnection);
 
-        Connection conexion = new com.example.conexiones.MySQLConnection().getConnection();
+        Connection conexion = this.dbConnection.getConnection();
         if (conexion == null) {
             System.out.println("No se puede obtener conexión a BD");
             return false;
@@ -287,7 +301,5 @@ public class ControladorNuevaPublicacionDialog {
             }
         }
     }
-
-
 
 }
