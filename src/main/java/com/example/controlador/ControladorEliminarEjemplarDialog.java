@@ -11,17 +11,10 @@ import com.example.dao.EjemplarDAO;
  */
 public class ControladorEliminarEjemplarDialog {
     /**
-     * Referencia al controlador principal
-     */
-    private Controlador controlador;
-
-    /**
      * Constructor
-     * 
-     * @param controlador
      */
-    public ControladorEliminarEjemplarDialog(Controlador controlador) {
-        this.controlador = controlador;
+    public ControladorEliminarEjemplarDialog() {
+        // No state required
     }
 
     /**

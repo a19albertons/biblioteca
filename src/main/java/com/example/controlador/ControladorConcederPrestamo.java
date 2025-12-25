@@ -13,17 +13,10 @@ import com.example.dao.UsuarioDAO;
  */
 public class ControladorConcederPrestamo {
     /**
-     * Controlador principal de la aplicación
+     * Constructor 
      */
-    private Controlador controlador;
-
-    /**
-     * Constructor
-     * 
-     * @param controlador
-     */
-    public ControladorConcederPrestamo(Controlador controlador) {
-        this.controlador = controlador;
+    public ControladorConcederPrestamo() {
+        
     }
 
     /**

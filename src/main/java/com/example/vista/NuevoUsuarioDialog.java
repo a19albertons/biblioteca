@@ -30,6 +30,10 @@ public class NuevoUsuarioDialog extends JDialog {
      * Ventana padre
      */
     private JFrame parentFrame;
+    /** 
+     * Guardar glass pane previo para restaurarlo 
+     */
+    private java.awt.Component previousGlassPane;
 
     /**
      * Constructor
@@ -232,7 +236,8 @@ public class NuevoUsuarioDialog extends JDialog {
             // Obtener el RootPaneContainer del frame padre
             javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
             java.awt.Component current = rpc.getRootPane().getGlassPane();
-            java.awt.Component previousGlassPane = current;
+            // Guardar la referencia previa en el campo para restaurarla al cerrar
+            this.previousGlassPane = current;
             javax.swing.JPanel overlay = new javax.swing.JPanel();
             overlay.setOpaque(true);
             overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
@@ -254,9 +259,15 @@ public class NuevoUsuarioDialog extends JDialog {
         if (parentFrame == null)
             return;
         try {
-            // Obtener el RootPaneContainer del frame padre
+            // Restaurar el glass pane previo (si lo tenemos)
             javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
-            rpc.getRootPane().getGlassPane().setVisible(false);
+            if (this.previousGlassPane != null) {
+                rpc.getRootPane().setGlassPane(this.previousGlassPane);
+                this.previousGlassPane.setVisible(false);
+                this.previousGlassPane = null;
+            } else {
+                rpc.getRootPane().getGlassPane().setVisible(false);
+            }
         } catch (Exception e) {
             System.out.println("No se pudo quitar overlay: " + e.getMessage());
         }

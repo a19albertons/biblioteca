@@ -11,17 +11,10 @@ import com.example.dao.UsuarioDAO;
  */
 public class ControladorNuevoUsuarioDialog {
     /**
-     * Referencia al controlador principal
-     */
-    private Controlador controlador;
-
-    /**
      * Constructor
-     * 
-     * @param controlador
      */
-    public ControladorNuevoUsuarioDialog(Controlador controlador) {
-        this.controlador = controlador;
+    public ControladorNuevoUsuarioDialog() {
+        // No state required
     }
 
     /**

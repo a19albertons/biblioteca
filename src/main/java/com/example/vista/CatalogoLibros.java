@@ -74,7 +74,7 @@ public class CatalogoLibros {
      * @return JPanel con la lista y filtros del catálogo
      */
     public JPanel pantalla() {
-        JPanel panel = new JPanel();
+        panel = new JPanel();
         panel.setPreferredSize(new Dimension(600, 600));
         panel.setBackground(Color.decode("#EDF3F6"));
         panel.setLayout(null);

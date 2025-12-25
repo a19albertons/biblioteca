@@ -12,17 +12,10 @@ import com.example.dao.PublicacionDAO;
  */
 public class ControladorEliminarPublicacion {
     /**
-     * Referencia al controlador principal
-     */
-    private Controlador controlador;
-
-    /**
      * Constructor
-     * 
-     * @param controlador
      */
-    public ControladorEliminarPublicacion(Controlador controlador) {
-        this.controlador = controlador;
+    public ControladorEliminarPublicacion() {
+        // No state required
     }
 
     /**

@@ -1,12 +1,12 @@
 package com.example;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import com.example.dao.EjemplarDAO;
-import com.example.controlador.Controlador;
 import org.junit.Test;
+
+import com.example.controlador.Controlador;
+import com.example.dao.EjemplarDAO;
 
 /**
  * Tests para la baja (eliminación lógica) de ejemplares.

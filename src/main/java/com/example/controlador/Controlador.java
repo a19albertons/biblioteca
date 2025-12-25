@@ -366,18 +366,18 @@ public class Controlador {
         this.controladorPanelControl = new ControladorPanelControl();
         this.controladorEjemplares = new ControladorEjemplares();
         this.controladorGestionUsuarios = new ControladorGestionUsuarios();
-        this.controladorNuevaPublicacionDialog = new ControladorNuevaPublicacionDialog(this);
-        this.controladorEditarPublicacionDialog = new ControladorEditarPublicacionDialog(this);
-        this.controladorEliminarPublicacion = new ControladorEliminarPublicacion(this);
-        this.controladorNuevoEjemplarDialog = new ControladorNuevoEjemplarDialog(this);
-        this.controladorEditarEjemplarDialog = new ControladorEditarEjemplarDialog(this);
-        this.controladorEliminarEjemplarDialog = new ControladorEliminarEjemplarDialog(this);
-        this.controladorNuevoUsuarioDialog = new ControladorNuevoUsuarioDialog(this);
-        this.controladorEditarUsuarioDialog = new ControladorEditarUsuarioDialog(this);
-        this.controladorEliminarUsuario = new ControladorEliminarUsuario(this);
+        this.controladorNuevaPublicacionDialog = new ControladorNuevaPublicacionDialog();
+        this.controladorEditarPublicacionDialog = new ControladorEditarPublicacionDialog();
+        this.controladorEliminarPublicacion = new ControladorEliminarPublicacion();
+        this.controladorNuevoEjemplarDialog = new ControladorNuevoEjemplarDialog();
+        this.controladorEditarEjemplarDialog = new ControladorEditarEjemplarDialog();
+        this.controladorEliminarEjemplarDialog = new ControladorEliminarEjemplarDialog();
+        this.controladorNuevoUsuarioDialog = new ControladorNuevoUsuarioDialog();
+        this.controladorEditarUsuarioDialog = new ControladorEditarUsuarioDialog();
+        this.controladorEliminarUsuario = new ControladorEliminarUsuario();
         this.controladorNavegacion = new ControladorNavegacion(this);
-        this.controladorConcederPrestamo = new ControladorConcederPrestamo(this);
-        this.controladorDevolverPrestamo = new ControladorDevolverPrestamo(this);
+        this.controladorConcederPrestamo = new ControladorConcederPrestamo();
+        this.controladorDevolverPrestamo = new ControladorDevolverPrestamo();
         
     }
 

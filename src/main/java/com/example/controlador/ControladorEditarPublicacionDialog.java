@@ -21,17 +21,10 @@ import com.example.dao.TemaDAO;
  */
 public class ControladorEditarPublicacionDialog {
     /**
-     * Controlador principal de la aplicación
-     */
-    private Controlador controlador;
-
-    /**
      * Constructor
-     * 
-     * @param controlador
      */
-    public ControladorEditarPublicacionDialog(Controlador controlador) {
-        this.controlador = controlador;
+    public ControladorEditarPublicacionDialog() {
+        
     }
 
     /**

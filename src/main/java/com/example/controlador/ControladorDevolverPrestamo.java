@@ -11,22 +11,15 @@ import com.example.dao.UsuarioDAO;
  */
 public class ControladorDevolverPrestamo {
     /**
-     * Controlador principal de la aplicación
-     */
-    private Controlador controlador;
-
-    /**
      * Mensaje informativo sobre sanción (si se creó/actualizó una sanción durante la operación)
      */
     private String ultimaNotificacionSancion = null;
 
     /**
      * Constructor
-     * 
-     * @param controlador
      */
-    public ControladorDevolverPrestamo(Controlador controlador) {
-        this.controlador = controlador;
+    public ControladorDevolverPrestamo() {
+        // No state required
     }
 
     /**

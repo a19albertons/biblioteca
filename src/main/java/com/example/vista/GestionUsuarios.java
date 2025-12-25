@@ -36,12 +36,12 @@ public class GestionUsuarios {
     /**
      * Modelo de tabla que contiene los usuarios (se guarda para permitir refrescar)
      */
-    private javax.swing.table.DefaultTableModel usuariosModel;
+    private DefaultTableModel usuariosModel;
 
     /**
      * Tabla que muestra los usuarios (se guarda para permitir refrescar)
      */
-    private javax.swing.JTable usuariosTable;
+    private JTable usuariosTable;
 
     /**
      * Constructor de la vista GestionUsuarios
@@ -345,6 +345,11 @@ public class GestionUsuarios {
             String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
             String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
             usuariosModel.addRow(new Object[] { (r.length>0? r[0] : ""), dni, nombre, tipo, sancion, "" });
+        }
+        // Asegurarse de refrescar la tabla si está disponible
+        if (this.usuariosTable != null) {
+            this.usuariosTable.revalidate();
+            this.usuariosTable.repaint();
         }
     }
 

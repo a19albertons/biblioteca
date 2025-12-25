@@ -170,9 +170,15 @@ public class EliminarUsuarioDialog extends JDialog {
         if (parentFrame == null)
             return;
         try {
-            // Restaurar el glass pane previo
+            // Restaurar el glass pane previo (si lo teníamos)
             javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
-            rpc.getRootPane().getGlassPane().setVisible(false);
+            if (previousGlassPane != null) {
+                rpc.getRootPane().setGlassPane(previousGlassPane);
+                previousGlassPane.setVisible(false);
+                previousGlassPane = null;
+            } else {
+                rpc.getRootPane().getGlassPane().setVisible(false);
+            }
         } catch (Exception e) {
             System.out.println("No se pudo quitar overlay: " + e.getMessage());
         }

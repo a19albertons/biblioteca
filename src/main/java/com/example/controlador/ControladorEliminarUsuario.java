@@ -7,21 +7,14 @@ import com.example.dao.UsuarioDAO;
  */
 public class ControladorEliminarUsuario {
     /**
-     * Controlador principal de la aplicación
-     */
-    private Controlador controlador;
-    /**
      * DAO de usuarios
      */
     private UsuarioDAO usuarioDAO;
 
     /**
      * Constructor
-     * 
-     * @param controlador
      */
-    public ControladorEliminarUsuario(Controlador controlador) {
-        this.controlador = controlador;
+    public ControladorEliminarUsuario() {
         this.usuarioDAO = new UsuarioDAO();
     }
 

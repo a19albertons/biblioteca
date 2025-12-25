@@ -26,10 +26,7 @@ public class ControladorNavegacion {
      * Ventana principal de la aplicación
      */
     private JFrame ventana;
-    /**
-     * Controlador principal de la aplicación
-     */
-    private Controlador controlador;
+
     /**
      * Vistas panel de control
      */
@@ -97,7 +94,6 @@ public class ControladorNavegacion {
      * Constructor del controlador de navegación
      */
     public ControladorNavegacion(Controlador controlador) {
-        this.controlador = controlador;
 
         // Inicializar vistas pasando el controlador
         this.panelControl = new PanelControl(controlador);

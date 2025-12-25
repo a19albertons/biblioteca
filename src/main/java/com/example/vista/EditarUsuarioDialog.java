@@ -248,12 +248,11 @@ public class EditarUsuarioDialog extends JDialog {
             // Rellenar campos
             dniField.setText(datos.length > 0 ? datos[0] : "");
             nombreField.setText(datos.length > 1 ? datos[1] : "");
-            apellidosField.setText(
-                    (datos.length > 2 ? datos[2] : "") + (datos.length > 3 && datos[3] != null ? " " + datos[3] : ""));
-            // Note: initial implementation used apellido1/apellido2 separately; we saved in
-            // array as apellido1, apellido2
+            // Rellenar apellidos (apellido1 [apellido2])
             if (datos.length > 2) {
                 apellidosField.setText(datos[2] + (datos.length > 3 && datos[3] != null ? " " + datos[3] : ""));
+            } else {
+                apellidosField.setText("");
             }
             emailField.setText(datos.length > 4 ? datos[4] : "");
             String tipoCode = datos.length > 5 ? datos[5] : "";
@@ -313,9 +312,16 @@ public class EditarUsuarioDialog extends JDialog {
         if (parentFrame == null)
             return;
         try {
-            // Restaura el glass pane previo
+            // Restaurar el glass pane previo (si lo teníamos)
             javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
-            rpc.getRootPane().getGlassPane().setVisible(false);
+            if (previousGlassPane != null) {
+                rpc.getRootPane().setGlassPane(previousGlassPane);
+                previousGlassPane.setVisible(false);
+                previousGlassPane = null;
+            } else {
+                // Si no tenemos referencia previa, simplemente ocultar el glass pane actual
+                rpc.getRootPane().getGlassPane().setVisible(false);
+            }
         } catch (Exception e) {
             System.out.println("No se pudo quitar overlay: " + e.getMessage());
         }

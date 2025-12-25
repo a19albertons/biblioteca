@@ -7,21 +7,14 @@ import com.example.dao.UsuarioDAO;
  */
 public class ControladorEditarUsuarioDialog {
     /**
-     * Controlador principal de la aplicación
-     */
-    private Controlador controlador;
-    /**
      * DAO de usuarios
      */
     private UsuarioDAO usuarioDAO;
 
     /**
      * Constructor
-     * 
-     * @param controlador
      */
-    public ControladorEditarUsuarioDialog(Controlador controlador) {
-        this.controlador = controlador;
+    public ControladorEditarUsuarioDialog() {
         this.usuarioDAO = new UsuarioDAO();
     }
 
