@@ -1,5 +1,6 @@
 package com.example.controlador;
 
+import com.example.conexiones.DBConnection;
 import com.example.dao.UsuarioDAO;
 
 /**
@@ -14,7 +15,7 @@ public class ControladorEliminarUsuario {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
 
 
@@ -24,7 +25,7 @@ public class ControladorEliminarUsuario {
      * 
      * @param dbConnection
      */
-    public ControladorEliminarUsuario(com.example.conexiones.DBConnection dbConnection) {
+    public ControladorEliminarUsuario(DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }

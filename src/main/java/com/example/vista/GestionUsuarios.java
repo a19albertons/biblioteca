@@ -9,11 +9,16 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -108,14 +113,14 @@ public class GestionUsuarios {
         String[][] rawData = controlador.getControladorGestionUsuarios().obtenerUsuariosYEstadoSancionActiva();
         // Manejo de datos nulos o vacios
         if (rawData == null) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando la lista de usuarios. Compruebe la conexión a la base de datos.", "Error",
-                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
             rawData = new String[0][0];
         } else if (rawData.length == 0) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "No hay usuarios registrados para mostrar.", "Información",
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
         }
         // Construir la matriz (incluye id en la primera columna)
         String[][] data = new String[rawData.length][6];
@@ -202,7 +207,7 @@ public class GestionUsuarios {
                 panelCell.setLayout(new FlowLayout(FlowLayout.RIGHT, 6, 6));
 
                 // Edit button (translucent)
-                java.net.URL editarIconUrl = getClass().getResource("/editar.png");
+                URL editarIconUrl = getClass().getResource("/editar.png");
                 final JButton editBtn = new JButton() {
                     @Override
                     protected void paintComponent(Graphics g) {
@@ -228,7 +233,7 @@ public class GestionUsuarios {
                 editBtn.setMargin(new Insets(0, 0, 0, 0));
 
                 // Delete button (translucent)
-                java.net.URL borrarIconUrl = getClass().getResource("/borrar.png");
+                URL borrarIconUrl = getClass().getResource("/borrar.png");
                 final JButton delBtn = new JButton() {
                     @Override
                     protected void paintComponent(Graphics g) {
@@ -271,9 +276,9 @@ public class GestionUsuarios {
         table.getColumnModel().getColumn(5).setCellRenderer(new ActionsRenderer());
 
         // Implementar click en ACCIONES para editar/eliminar (similar a Ejemplares)
-        table.addMouseListener(new java.awt.event.MouseAdapter() {
+        table.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 int row = table.rowAtPoint(e.getPoint());
                 int col = table.columnAtPoint(e.getPoint());
                 // Asegurarse de que es la columna ACCIONES
@@ -286,7 +291,7 @@ public class GestionUsuarios {
                             int idUsuario = Integer.parseInt(idStr.trim());
 
                             // Determinar si se hizo click en editar o eliminar
-                            java.awt.Rectangle cellRect = table.getCellRect(row, col, true);
+                            Rectangle cellRect = table.getCellRect(row, col, true);
                             int clickX = e.getX() - cellRect.x;
                             int deleteThreshold = cellRect.width - 32; // 24px botón + padding
                             // Determinar si se hizo click en editar o eliminar

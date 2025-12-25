@@ -129,8 +129,8 @@ public class PrestamoDAO {
      *
      * @param idUsuario
      * @param idEjemplar
-     * @param fechaInicio (java.sql.Date)
-     * @param fechaFin    (java.sql.Date)
+     * @param fechaInicio (Date)
+     * @param fechaFin    (Date)
      * @return true si se insertó correctamente
      */
     public boolean insertarPrestamo(int idUsuario, int idEjemplar, Date fechaInicio, Date fechaFin) {

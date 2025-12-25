@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.time.LocalDate;
 
+import com.example.conexiones.DBConnection;
 import com.example.dao.AutorDAO;
 import com.example.dao.CicloDAO;
 import com.example.dao.ModuloDAO;
@@ -23,7 +24,7 @@ public class ControladorEditarPublicacionDialog {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     /**
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
@@ -31,7 +32,7 @@ public class ControladorEditarPublicacionDialog {
      * 
      * @param dbConnection
      */
-    public ControladorEditarPublicacionDialog(com.example.conexiones.DBConnection dbConnection) {
+    public ControladorEditarPublicacionDialog(DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }

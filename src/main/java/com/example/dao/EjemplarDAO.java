@@ -31,6 +31,7 @@ public class EjemplarDAO {
 
     /**
      * Constructor del DAO
+     * 
      * @param dbConnection
      */
     public EjemplarDAO(DBConnection dbConnection) {
@@ -52,10 +53,12 @@ public class EjemplarDAO {
         final String sql = SQL_LISTA_EJEMPLARES_POR_PUBLICACION;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
+            // establecer parámetro
             ps.setInt(1, idPublicacion);
             // Ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
+                    // obtener datos
                     String id = String.valueOf(rs.getInt("id"));
                     String num = String.valueOf(rs.getInt("num_ejemplar"));
                     Date fecha = rs.getDate("fecha_adquisicion");

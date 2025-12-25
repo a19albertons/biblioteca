@@ -4,13 +4,20 @@ import com.example.controlador.Controlador;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 
 /**
  * Clase para la vista Sanción manual
@@ -97,13 +104,13 @@ public class SancionManual {
             // obtener usuarios sancionables desde el controlador
             String[][] usuarios = controlador.getControladorGestionUsuarios().obtenerUsuariosSancionables();
             if (usuarios == null || usuarios.length == 0) {
-                javax.swing.JOptionPane.showMessageDialog(null, "No hay usuarios sancionables", "Información",
-                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "No hay usuarios sancionables", "Información",
+                        JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
             // construir lista de strings y mapping a ids
             java.util.Map<String, Integer> mapa = new java.util.LinkedHashMap<>();
-            javax.swing.DefaultListModel<String> listModel = new javax.swing.DefaultListModel<>();
+            DefaultListModel<String> listModel = new DefaultListModel<>();
             for (String[] u : usuarios) {
                 String item = u[2] + " | DNI: " + u[1] + " | Estudiante"; // Apellido, Nombre
                 listModel.addElement(item);
@@ -111,15 +118,15 @@ public class SancionManual {
             }
 
             // mostrar diálogo con lista
-            javax.swing.JList<String> jlist = new javax.swing.JList<>(listModel);
-            jlist.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-            javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(jlist);
+            JList<String> jlist = new JList<>(listModel);
+            jlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            JScrollPane scroll = new JScrollPane(jlist);
             scroll.setPreferredSize(new java.awt.Dimension(400, 200));
-            int option = javax.swing.JOptionPane.showConfirmDialog(null, scroll, "Seleccione usuario",
-                    javax.swing.JOptionPane.OK_CANCEL_OPTION, javax.swing.JOptionPane.PLAIN_MESSAGE);
+            int option = JOptionPane.showConfirmDialog(null, scroll, "Seleccione usuario",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
             // si se seleccionó un usuario, actualizar resultadoSocio y usuarioSeleccionado
-            if (option == javax.swing.JOptionPane.OK_OPTION) {
+            if (option == JOptionPane.OK_OPTION) {
                 String sel = jlist.getSelectedValue();
                 if (sel != null) {
                     usuarioSeleccionado[0] = mapa.get(sel);
@@ -175,7 +182,7 @@ public class SancionManual {
         JTextField txtFechaInicio = new JTextField();
         txtFechaInicio.setBounds(20, 370, 200, 30);
         // fijar fecha inicio a hoy y no editable
-        String hoyStr = java.time.LocalDate.now().toString();
+        String hoyStr = LocalDate.now().toString();
         txtFechaInicio.setText(hoyStr);
         txtFechaInicio.setEditable(false);
         formularioSancion.add(txtFechaInicio);
@@ -222,56 +229,56 @@ public class SancionManual {
         btnAplicarSancion.addActionListener(e -> {
             // Validar usuario seleccionado
             if (usuarioSeleccionado[0] == -1) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Seleccione primero un usuario", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Seleccione primero un usuario", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             // validar ejemplar
             String idEjStr = txtEjemplar.getText().trim();
             if (idEjStr.isEmpty()) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             int idEj;
             try {
                 idEj = Integer.parseInt(idEjStr);
             } catch (NumberFormatException ex) {
-                javax.swing.JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             // comprobar que el usuario fue el ultimo en tener el ejemplar
             String[] ultimo = controlador.getControladorSancionManual().obtenerUltimoPrestamoPorEjemplar(idEj);
             if (ultimo == null) {
-                javax.swing.JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null,
                         "No se encontró historial de préstamos para este ejemplar", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             int idUsuarioUlt = Integer.parseInt(ultimo[1]);
             if (idUsuarioUlt != usuarioSeleccionado[0]) {
-                javax.swing.JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null,
                         "El usuario seleccionado no fue el último en tener el ejemplar", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             int idPrestamo = Integer.parseInt(ultimo[0]);
             // validar fecha fin
             String finStr = txtFechaFin.getText().trim();
-            java.time.LocalDate hoy = java.time.LocalDate.parse(txtFechaInicio.getText().trim());
-            java.time.LocalDate fin;
+            LocalDate hoy = LocalDate.parse(txtFechaInicio.getText().trim());
+            LocalDate fin;
             try {
-                fin = java.time.LocalDate.parse(finStr);
+                fin = LocalDate.parse(finStr);
             } catch (Exception ex) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Fecha fin inválida (formato YYYY-MM-DD)", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Fecha fin inválida (formato YYYY-MM-DD)", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             if (fin.isBefore(hoy)) {
-                javax.swing.JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null,
                         "La fecha fin no puede ser anterior a la fecha de inicio", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             // preparar descripcion
@@ -283,12 +290,12 @@ public class SancionManual {
             String descripcion = descripcionBase;
             if (sancionActiva != null && sancionActiva[1] != null && !sancionActiva[1].isEmpty()) {
                 try {
-                    java.time.LocalDate finAct = java.time.LocalDate.parse(sancionActiva[1]);
+                    LocalDate finAct = LocalDate.parse(sancionActiva[1]);
                     // días restantes de la sanción activa desde hoy (si es negativa, 0)
-                    long diasRestantes = java.time.temporal.ChronoUnit.DAYS.between(hoy, finAct);
+                    long diasRestantes = ChronoUnit.DAYS.between(hoy, finAct);
                     if (diasRestantes > 0) {
                         // extender la fecha fin propuesta sumando los días restantes
-                        java.time.LocalDate finExtendida = fin.plusDays(diasRestantes);
+                        LocalDate finExtendida = fin.plusDays(diasRestantes);
                         descripcion = descripcionBase + " (Acumulativa: sanción activa hasta " + finAct + "; se añaden "
                                 + diasRestantes + " días)";
                         // usar la fin extendida como fecha final real
@@ -312,11 +319,11 @@ public class SancionManual {
             if (sancionActiva != null && sancionActiva[1] != null && !sancionActiva[1].isEmpty()) {
                 try {
                     // analizar sanción activa previa para el mensaje
-                    java.time.LocalDate finAct = java.time.LocalDate.parse(sancionActiva[1]);
-                    long diasRestantes = java.time.temporal.ChronoUnit.DAYS.between(hoy, finAct);
+                    LocalDate finAct = LocalDate.parse(sancionActiva[1]);
+                    long diasRestantes = ChronoUnit.DAYS.between(hoy, finAct);
                     // construir mensaje adecuado
                     if (diasRestantes > 0) {
-                        java.time.LocalDate finExtendida = fin;
+                        LocalDate finExtendida = fin;
                         notificacion = "Sanción acumulativa: anterior fin " + finAct + ", nuevo fin " + finExtendida
                                 + ", se añadieron " + diasRestantes + " días.";
                     } else {
@@ -347,16 +354,16 @@ public class SancionManual {
             boolean ins = controlador.getControladorSancionManual().insertarSancion(usuarioSeleccionado[0], idPrestamo,
                     java.sql.Date.valueOf(hoy), java.sql.Date.valueOf(fin), descripcion);
             if (!ins) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Error aplicando la sanción", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Error aplicando la sanción", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            javax.swing.JOptionPane.showMessageDialog(null, "Sanción aplicada correctamente", "Éxito",
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Sanción aplicada correctamente", "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE);
             // notificar acumulación si aplica
             if (notificacion != null && !notificacion.isEmpty()) {
-                javax.swing.JOptionPane.showMessageDialog(null, notificacion, "Información",
-                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, notificacion, "Información",
+                        JOptionPane.INFORMATION_MESSAGE);
             }
             // limpiar
             btnLimpiar.doClick();

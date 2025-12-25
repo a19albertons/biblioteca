@@ -1,5 +1,6 @@
 package com.example.controlador;
 
+import com.example.conexiones.DBConnection;
 import com.example.dao.UsuarioDAO;
 import com.example.modelo.Usuario;
 
@@ -10,14 +11,14 @@ public class ControladorRecuperarCuenta {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     /**
      * Constructor con DBConnection (inyección)
      * 
      * @param dbConnection
      */
-    public ControladorRecuperarCuenta(com.example.conexiones.DBConnection dbConnection) {
+    public ControladorRecuperarCuenta(DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }

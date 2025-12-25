@@ -36,11 +36,14 @@ public final class Fonts {
      * @return
      */
     private static Font loadAndRegister(String resourceName) {
+        // Intentar cargar la fuente desde recursos
         try (InputStream is = Fonts.class.getResourceAsStream("/fonts/" + resourceName)) {
+            // Si no se encuentra el recurso, devolver null
             if (is == null) {
                 LOGGER.log(Level.FINE, "Fuente no encontrada en recursos: {0}", resourceName);
                 return null;
             }
+            // Crear la fuente y registrarla
             Font f = Font.createFont(Font.TRUETYPE_FONT, is);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(f);
@@ -62,6 +65,7 @@ public final class Fonts {
      * @return
      */
     public static Font openSans(float size) {
+        // Devuelve la fuente Open Sans en tamaño específico
         if (openSansRegular != null) {
             return openSansRegular.deriveFont(Font.PLAIN, Math.round(size));
         }
@@ -78,9 +82,11 @@ public final class Fonts {
         // Intentar cargar las fuentes embebidas (si existen en recursos)
         openSansRegular = loadAndRegister("OpenSans-Regular.ttf");
 
+        // Obtener tamaño por defecto de JLabel para mantener coherencia
         Font labelFont = UIManager.getFont("Label.font");
         int size = (labelFont != null) ? labelFont.getSize() : 12;
 
+        // Configurar la fuente base
         Font base;
         if (openSansRegular != null) {
             base = openSansRegular.deriveFont(Font.PLAIN, size);
@@ -90,6 +96,7 @@ public final class Fonts {
             LOGGER.log(Level.INFO, "Usando fallback de familia 'Open Sans' o la fuente por defecto del sistema");
         }
 
+        // Aplicar la fuente a componentes UI comunes
         UIManager.put("Label.font", base);
         UIManager.put("Button.font", base);
         UIManager.put("TextField.font", base);

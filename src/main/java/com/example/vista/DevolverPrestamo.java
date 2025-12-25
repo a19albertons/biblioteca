@@ -6,8 +6,11 @@ import java.awt.Font;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
 import javax.swing.BorderFactory;
 
 import com.example.controlador.Controlador;
@@ -133,7 +136,7 @@ public class DevolverPrestamo {
         contenido.add(txtPublicacion);
 
         // Detectar automáticamente al escribir ID de ejemplar
-        txtIdEjemplar.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        txtIdEjemplar.getDocument().addDocumentListener(new DocumentListener() {
             private void doDetect() {
                 String idEjStr = txtIdEjemplar.getText().trim();
                 // Si está vacío, limpiar y salir
@@ -173,19 +176,19 @@ public class DevolverPrestamo {
 
             // modifcacion del texto de ejemplar
             @Override
-            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+            public void insertUpdate(DocumentEvent e) {
                 doDetect();
             }
 
             // modifcacion del texto de ejemplar
             @Override
-            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+            public void removeUpdate(DocumentEvent e) {
                 doDetect();
             }
 
             // modifcacion del texto de ejemplar
             @Override
-            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+            public void changedUpdate(DocumentEvent e) {
                 doDetect();
             }
         });
@@ -253,44 +256,44 @@ public class DevolverPrestamo {
         btnDevolverPrestamo.addActionListener(e -> {
             // Validar que se haya seleccionado usuario
             if (usuarioSeleccionado[0] == -1) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Seleccione primero un usuario válido", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Seleccione primero un usuario válido", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             // validar id ejemplar
             String idEjStr = txtIdEjemplar.getText().trim();
             if (idEjStr.isEmpty()) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             int idEj;
             try {
                 idEj = Integer.parseInt(idEjStr);
             } catch (NumberFormatException ex) {
-                javax.swing.JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             // comprobar que exista préstamo activo entre usuario y ejemplar
             boolean existe = controlador.getControladorDevolverPrestamo()
                     .existePrestamoActivoUsuarioEjemplar(usuarioSeleccionado[0], idEj);
             if (!existe) {
-                javax.swing.JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null,
                         "No existe un préstamo activo entre este usuario y el ejemplar", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             // ejecutar devolución
             String err = controlador.getControladorDevolverPrestamo().registrarDevolucion(usuarioSeleccionado[0],
                     idEj);
             if (err == null) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Devolución registrada correctamente", "Éxito",
-                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Devolución registrada correctamente", "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
                 // Mostrar notificación sobre sanción si existe
                 String notif = controlador.getControladorDevolverPrestamo().obtenerYLimpiarUltimaNotificacionSancion();
                 if (notif != null) {
-                    javax.swing.JOptionPane.showMessageDialog(null, notif, "Información", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, notif, "Información", JOptionPane.INFORMATION_MESSAGE);
                 }
                 // refrescar vistas dependientes y volver al panelControl
                 controlador.getControladorNavegacion().refrescarPublicaciones();
@@ -298,7 +301,7 @@ public class DevolverPrestamo {
                 controlador.getControladorNavegacion().marcarPantallaActiva("panelControl");
                 controlador.getControladorNavegacion().cambiarPantallaHijo("panelControl");
             } else {
-                javax.swing.JOptionPane.showMessageDialog(null, err, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, err, "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 

@@ -1,11 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.example.EditarEjemplarTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0 s <<< FAILURE! - in com.example.EditarEjemplarTest
-editarFechaEjemplarYRestaurar(com.example.EditarEjemplarTest)  Time elapsed: 0 s  <<< ERROR!
-java.lang.Error: 
-Unresolved compilation problem: 
-	The constructor Controlador() is undefined
-
-	at com.example.EditarEjemplarTest.editarFechaEjemplarYRestaurar(EditarEjemplarTest.java:19)
-
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.721 s - in com.example.EditarEjemplarTest

@@ -3,6 +3,7 @@ package com.example;
 import static org.junit.Assert.assertTrue;
 
 import com.example.dao.UsuarioDAO;
+import com.example.controlador.Controlador;
 import org.junit.Test;
 
 /**
@@ -12,7 +13,7 @@ public class UsuarioEstadoTest {
 
     @Test
     public void usuarioBajaPresente() {
-        com.example.controlador.Controlador c = new com.example.controlador.Controlador();
+        Controlador c = new Controlador();
         UsuarioDAO dao = new UsuarioDAO(c.getDbConnection());
         String[][] filas = dao.listaUsuariosYEstadoSancionActiva();
         boolean foundBaja = false;

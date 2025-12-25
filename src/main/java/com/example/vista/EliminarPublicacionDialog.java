@@ -2,15 +2,22 @@ package com.example.vista;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.RootPaneContainer;
 
 import com.example.controlador.Controlador;
 
@@ -27,7 +34,7 @@ public class EliminarPublicacionDialog extends JDialog {
     /**
      * Frame padre (para overlay)
      */
-    private javax.swing.JFrame parentFrame;
+    private JFrame parentFrame;
     /**
      * ID de la publicación a eliminar
      */
@@ -35,10 +42,11 @@ public class EliminarPublicacionDialog extends JDialog {
     /**
      * Componente previo del glass pane (para restaurar al cerrar el diálogo)
      */
-    private java.awt.Component previousGlassPane;
+    private Component previousGlassPane;
 
     /**
      * Constructor del diálogo
+     * 
      * @param parent
      * @param controlador
      * @param idPublicacion
@@ -52,14 +60,14 @@ public class EliminarPublicacionDialog extends JDialog {
         setSize(new Dimension(360, 160));
         setLocationRelativeTo(parent);
 
-        addWindowListener(new java.awt.event.WindowAdapter() {
+        addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
+            public void windowClosed(WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(java.awt.event.WindowEvent e) {
+            public void windowClosing(WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -73,16 +81,16 @@ public class EliminarPublicacionDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
         JPanel contenido = new JPanel(new BorderLayout());
         contenido.setBackground(Color.white);
-        contenido.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        contenido.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
         // Título y mensaje
         JLabel titulo = new JLabel("Eliminar Publicación");
-        titulo.setFont(titulo.getFont().deriveFont(java.awt.Font.BOLD, 16f));
+        titulo.setFont(titulo.getFont().deriveFont(Font.BOLD, 16f));
         contenido.add(titulo, BorderLayout.NORTH);
 
         // Mensaje de confirmación
         JLabel texto = new JLabel("Seguro que quieres eliminar la publicación?");
-        texto.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 6, 12, 6));
+        texto.setBorder(BorderFactory.createEmptyBorder(12, 6, 12, 6));
         contenido.add(texto, BorderLayout.CENTER);
 
         // Botones
@@ -143,15 +151,15 @@ public class EliminarPublicacionDialog extends JDialog {
             return;
         try {
             // Guardar el componente previo del glass pane para restaurarlo después
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
-            java.awt.Component current = rpc.getRootPane().getGlassPane();
+            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+            Component current = rpc.getRootPane().getGlassPane();
             previousGlassPane = current;
 
             // Crear overlay semitransparente
-            javax.swing.JPanel overlay = new javax.swing.JPanel();
+            JPanel overlay = new JPanel();
             overlay.setOpaque(true);
-            overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
-            overlay.addMouseListener(new java.awt.event.MouseAdapter() {
+            overlay.setBackground(new Color(217, 217, 217, 153));
+            overlay.addMouseListener(new MouseAdapter() {
             });
 
             // Asignar overlay como glass pane
@@ -170,7 +178,7 @@ public class EliminarPublicacionDialog extends JDialog {
             return;
         try {
             // Restaurar el componente previo del glass pane
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
+            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
             if (previousGlassPane != null) {
                 rpc.getRootPane().setGlassPane(previousGlassPane);
                 previousGlassPane.setVisible(false);

@@ -1,11 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.example.NuevoUsuarioTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0 s <<< FAILURE! - in com.example.NuevoUsuarioTest
-crearUsuario(com.example.NuevoUsuarioTest)  Time elapsed: 0 s  <<< ERROR!
-java.lang.Error: 
-Unresolved compilation problem: 
-	The constructor Controlador() is undefined
-
-	at com.example.NuevoUsuarioTest.crearUsuario(NuevoUsuarioTest.java:16)
-
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.078 s - in com.example.NuevoUsuarioTest

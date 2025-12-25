@@ -1,5 +1,6 @@
 package com.example.controlador;
 
+import com.example.conexiones.DBConnection;
 import java.sql.Date;
 import java.time.LocalDate;
 
@@ -15,12 +16,12 @@ public class ControladorConcederPrestamo {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     /**
      * Constructor con DBConnection (inyección)
      */
-    public ControladorConcederPrestamo(com.example.conexiones.DBConnection dbConnection) {
+    public ControladorConcederPrestamo(DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }

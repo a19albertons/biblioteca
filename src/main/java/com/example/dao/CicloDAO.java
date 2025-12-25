@@ -68,7 +68,9 @@ public class CicloDAO {
     public int obtenerOCrear(String nombre) {
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_CICLO_ID_POR_NOMBRE)) {
+            // establecer parámetro
             ps.setString(1, nombre);
+            // ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("id");
@@ -97,12 +99,15 @@ public class CicloDAO {
      */
     public int obtenerOCrear(Connection conexion, String nombre) {
         try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_CICLO_ID_POR_NOMBRE)) {
+            // establecer parámetro
             ps.setString(1, nombre);
+            // ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("id");
                 }
             }
+            // Si no existe, insertamos
             try (PreparedStatement ins = conexion.prepareStatement(SQL_INSERT_CICLO,
                     Statement.RETURN_GENERATED_KEYS)) {
                 ins.setString(1, nombre);

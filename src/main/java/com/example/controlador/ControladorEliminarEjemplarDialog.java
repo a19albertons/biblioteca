@@ -2,6 +2,7 @@ package com.example.controlador;
 
 import java.sql.Connection;
 
+import com.example.conexiones.DBConnection;
 import com.example.dao.EjemplarDAO;
 
 /**
@@ -13,7 +14,7 @@ public class ControladorEliminarEjemplarDialog {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     /**
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
@@ -21,7 +22,7 @@ public class ControladorEliminarEjemplarDialog {
      * 
      * @param dbConnection
      */
-    public ControladorEliminarEjemplarDialog(com.example.conexiones.DBConnection dbConnection) {
+    public ControladorEliminarEjemplarDialog(DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }

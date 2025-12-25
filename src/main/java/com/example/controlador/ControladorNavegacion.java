@@ -1,5 +1,7 @@
 package com.example.controlador;
 
+import com.example.conexiones.DBConnection;
+import com.example.dao.PublicacionDAO;
 import java.awt.CardLayout;
 
 import javax.swing.BoxLayout;
@@ -94,7 +96,7 @@ public class ControladorNavegacion {
      * Conexión compartida para uso interno del controlador de navegación cuando
      * necesita realizar consultas/operaciones rápidas con DAOs.
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     /**
      * Constructor del controlador de navegación
@@ -203,7 +205,7 @@ public class ControladorNavegacion {
      */
     public void mostrarEjemplaresParaPublicacion(int idPublicacion) {
         // obtener resumen de la publicación usando la conexión compartida
-        com.example.dao.PublicacionDAO publicacionDAO = new com.example.dao.PublicacionDAO(this.dbConnection);
+        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
         String[] resumen = publicacionDAO.obtenerResumenPublicacionPorId(idPublicacion);
         if (resumen != null) {
             // cargar datos en la vista ejemplares

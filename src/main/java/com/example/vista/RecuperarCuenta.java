@@ -20,6 +20,7 @@ import javax.swing.JTextField;
 
 import com.example.controlador.Controlador;
 import com.example.modelo.Usuario;
+import com.example.utilities.Fonts;
 
 /**
  * Clase para la vista Recuperar cuenta
@@ -109,7 +110,7 @@ public class RecuperarCuenta {
                 "<html>¿Recordaste tu contraseña? <span style='color:#468DAE; font-weight:bold'>Volver al inicio</span></html>");
         volver.setBounds(30, 170, 240, 22);
         // Usar Open Sans en estilo normal
-        volver.setFont(com.example.utilities.Fonts.openSans(11f));
+        volver.setFont(Fonts.openSans(11f));
         // Cambiar cursor y manejar click
         volver.addMouseListener(new MouseAdapter() {
             @Override

@@ -1,5 +1,6 @@
 package com.example.controlador;
 
+import com.example.conexiones.DBConnection;
 import com.example.dao.UsuarioDAO;
 
 /**
@@ -13,7 +14,7 @@ public class ControladorEditarUsuarioDialog {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     /**
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
@@ -21,7 +22,7 @@ public class ControladorEditarUsuarioDialog {
      * 
      * @param dbConnection
      */
-    public ControladorEditarUsuarioDialog(com.example.conexiones.DBConnection dbConnection) {
+    public ControladorEditarUsuarioDialog(DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }

@@ -13,11 +13,15 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 
 import com.example.controlador.Controlador;
+import com.example.utilities.Fonts;
+import java.awt.event.MouseAdapter;
 
 /**
  * Clase para la vista Publicaciones
@@ -124,7 +128,7 @@ public class CatalogoLibros {
             }
         };
         buscadorField.setBounds(30, 80, 350, 40);
-        buscadorField.setFont(com.example.utilities.Fonts.openSans(12f));
+        buscadorField.setFont(Fonts.openSans(12f));
         buscadorField.setBackground(Color.white);
         buscadorField.setForeground(Color.decode("#000000"));
         // padding izquierdo 8px y borde para el input
@@ -149,14 +153,14 @@ public class CatalogoLibros {
         String[] listaCiclos = controlador.getControladorPanelControl().listaCiclos();
         // Manejo de lista ciclos nula o vacia
         if (listaCiclos == null) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando lista de ciclos. Compruebe la conexión a la base de datos.", "Error",
-                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
             listaCiclos = new String[0];
         } else if (listaCiclos.length == 0) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "No hay ciclos disponibles para mostrar.", "Información",
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
         }
         for (String ciclo : listaCiclos) {
             comboCiclosField.addItem(ciclo);
@@ -168,14 +172,14 @@ public class CatalogoLibros {
         String[] listaEditoriales = controlador.getControladorPanelControl().listaEditoriales();
         // Manejo de lista editoriales nula o vacia
         if (listaEditoriales == null) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando lista de editoriales. Compruebe la conexión a la base de datos.", "Error",
-                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
             listaEditoriales = new String[0];
         } else if (listaEditoriales.length == 0) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "No hay editoriales disponibles para mostrar.", "Información",
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
         }
         for (String editorial : listaEditoriales) {
             comboEditorialField.addItem(editorial);
@@ -190,20 +194,20 @@ public class CatalogoLibros {
         resumenPublicacionesField = controlador.getControladorPanelControl().listaPublicacionesResumen();
         // Manejo de resumen publicaciones nulo o vacio
         if (resumenPublicacionesField == null) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando resumen de publicaciones. Compruebe la conexión a la base de datos.", "Error",
-                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
             resumenPublicacionesField = new String[0][0];
         } else if (resumenPublicacionesField.length == 0) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "No hay publicaciones registradas para mostrar.", "Información",
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
         }
 
         // Scroll que contiene las cards
         scrollPublicaciones = new JScrollPane(cardsContainer);
         scrollPublicaciones.setBounds(20, 170, 570, 380);
-        scrollPublicaciones.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPublicaciones.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         // Función para poblar las cards aplicando filtros de búsqueda, ciclo y editorial
         poblarCards(cardsContainer, resumenPublicacionesField, "", "Ciclos", "Editorial");
@@ -304,32 +308,38 @@ public class CatalogoLibros {
                 card.setBackground(Color.white);
                 card.setBorder(null);
 
+                // Contenido de la card
                 JPanel placeholder = new JPanel();
                 placeholder.setBackground(Color.decode("#EEEEEE"));
                 placeholder.setBounds(0, 0, 170, 100);
                 card.add(placeholder);
 
+                // titulo
                 JLabel tituloLabel = new JLabel(tituloTxt);
                 tituloLabel.setBounds(10, 110, 150, 20);
                 card.add(tituloLabel);
 
+                // isbn
                 JLabel isbnLabel = new JLabel("ISBN: " + isbnTxt);
                 isbnLabel.setBounds(10, 135, 150, 16);
                 isbnLabel.setFont(isbnLabel.getFont().deriveFont(11f));
                 card.add(isbnLabel);
 
+                // autores
                 JLabel autoresLabel = new JLabel("Autor(es): " + autoresTxt);
                 autoresLabel.setBounds(10, 150, 150, 18);
                 autoresLabel.setFont(autoresLabel.getFont().deriveFont(10f));
                 autoresLabel.setForeground(Color.decode("#666666"));
                 card.add(autoresLabel);
 
+                // ciclos
                 JLabel ciclosLabel = new JLabel("Ciclos: " + ciclosTxt);
                 ciclosLabel.setBounds(10, 165, 150, 18);
                 ciclosLabel.setFont(ciclosLabel.getFont().deriveFont(10f));
                 ciclosLabel.setForeground(Color.decode("#666666"));
                 card.add(ciclosLabel);
 
+                // editorial
                 JLabel editorialLabel = new JLabel("Ed: " + editorialTxt);
                 editorialLabel.setBounds(10, 180, 150, 18);
                 card.add(editorialLabel);
@@ -352,7 +362,7 @@ public class CatalogoLibros {
 
                 // Click para ir a ejemplares
                 card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                card.addMouseListener(new java.awt.event.MouseAdapter() {
+                card.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         // Navegar a la pantalla de ejemplares y cargar la publicación seleccionada
@@ -406,14 +416,14 @@ public class CatalogoLibros {
         String[] listaCiclos = controlador.getControladorPanelControl().listaCiclos();
         // Manejo de lista ciclos nula o vacia
         if (listaCiclos == null) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando lista de ciclos. Compruebe la conexión a la base de datos.", "Error",
-                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
             listaCiclos = new String[0];
         } else if (listaCiclos.length == 0) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "No hay ciclos disponibles para mostrar.", "Información",
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
         }
         for (String ciclo : listaCiclos) {
             comboCiclosField.addItem(ciclo);
@@ -424,14 +434,14 @@ public class CatalogoLibros {
         String[] listaEditoriales = controlador.getControladorPanelControl().listaEditoriales();
         // Manejo de lista editoriales nula o vacia
         if (listaEditoriales == null) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando lista de editoriales. Compruebe la conexión a la base de datos.", "Error",
-                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
             listaEditoriales = new String[0];
         } else if (listaEditoriales.length == 0) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "No hay editoriales disponibles para mostrar.", "Información",
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
         }
         for (String editorial : listaEditoriales) {
             comboEditorialField.addItem(editorial);
@@ -445,14 +455,14 @@ public class CatalogoLibros {
         resumenPublicacionesField = controlador.getControladorPanelControl().listaPublicacionesResumen();
         // Manejo de resumen publicaciones nulo o vacio
         if (resumenPublicacionesField == null) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando resumen de publicaciones. Compruebe la conexión a la base de datos.", "Error",
-                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
             resumenPublicacionesField = new String[0][0];
         } else if (resumenPublicacionesField.length == 0) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "No hay publicaciones registradas para mostrar.", "Información",
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
         }
 
         // Repoblar con filtros actuales

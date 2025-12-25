@@ -41,7 +41,9 @@ public class ModuloDAO {
     public int obtenerIdPorNombre(String nombre) {
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_MODULO_ID_POR_NOMBRE)) {
+            // establecer parámetro
             ps.setString(1, nombre);
+            // ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next())
                     return rs.getInt("id");
@@ -59,8 +61,11 @@ public class ModuloDAO {
     public int crearModulo(String nombre) {
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_MODULO, Statement.RETURN_GENERATED_KEYS)) {
+            // establecer parámetro
             ps.setString(1, nombre);
+            // ejecutar
             ps.executeUpdate();
+            // obtener id generado
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next())
                     return rs.getInt(1);
@@ -72,6 +77,12 @@ public class ModuloDAO {
         return -1;
     }
 
+    /**
+     * Obtiene o crea un módulo
+     * 
+     * @param nombre
+     * @return
+     */
     public int obtenerOCrear(String nombre) {
         int id = obtenerIdPorNombre(nombre);
         if (id != -1)
@@ -85,12 +96,16 @@ public class ModuloDAO {
     public int obtenerOCrear(Connection conexion, String nombre) {
         int id = -1;
         try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_MODULO_ID_POR_NOMBRE)) {
+            // establecer parámetro
             ps.setString(1, nombre);
+            // ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next())
                     return rs.getInt("id");
             }
-            try (PreparedStatement ins = conexion.prepareStatement(SQL_INSERT_MODULO, Statement.RETURN_GENERATED_KEYS)) {
+            // Si no existe, insertamos
+            try (PreparedStatement ins = conexion.prepareStatement(SQL_INSERT_MODULO,
+                    Statement.RETURN_GENERATED_KEYS)) {
                 ins.setString(1, nombre);
                 ins.executeUpdate();
                 try (ResultSet rs2 = ins.getGeneratedKeys()) {

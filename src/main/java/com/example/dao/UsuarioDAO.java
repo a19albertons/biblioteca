@@ -64,10 +64,13 @@ public class UsuarioDAO {
         Usuario devolver = null;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(SQL_CONSULTA_INICIO_SESION)) {
+                    // establecer parámetros
             ps.setString(1, usuario);
             ps.setString(2, contrasena);
+            // ejecutar consulta
             try (ResultSet resultado = ps.executeQuery()) {
                 if (resultado.next()) {
+                    // crear objeto Usuario con los datos obtenidos
                     devolver = new Usuario(
                             resultado.getInt("id"),
                             resultado.getString("dni"),
@@ -109,10 +112,13 @@ public class UsuarioDAO {
         Usuario devolver = null;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(SQL_CONSULTA_RECUPERAR_CUENTA)) {
+                    // establecer parámetros
             ps.setString(1, trim);
             ps.setString(2, trim);
+            // ejecutar consulta
             try (ResultSet resultado = ps.executeQuery()) {
                 if (resultado.next()) {
+                    // crear objeto Usuario con los datos obtenidos
                     devolver = new Usuario(
                             resultado.getInt("id"),
                             resultado.getString("dni"),
@@ -154,6 +160,7 @@ public class UsuarioDAO {
         // Consulta SQL para contar los socios activos
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(SQL_TOTAL_SOCIOS_ACTIVOS)) {
+                    // ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     totalSocios = rs.getString("TOTAL");
@@ -328,7 +335,7 @@ public class UsuarioDAO {
                         String tipoCode = rs.getString("tipo");
 
                         String tipoDesc = tipoCode != null
-                                ? com.example.modelo.TipoUsuario.valueOf(tipoCode).getDescripcion()
+                                ? TipoUsuario.valueOf(tipoCode).getDescripcion()
                                 : "";
                         devolver[4] = tipoDesc;
                     }

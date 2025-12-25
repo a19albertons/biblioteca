@@ -3,11 +3,14 @@ package com.example.vista;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 
 import javax.swing.BorderFactory;
@@ -19,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.RootPaneContainer;
 
 import com.example.controlador.Controlador;
 import com.example.utilities.Fonts;
@@ -49,7 +53,7 @@ public class NuevaPublicacionDialog extends JDialog {
     /**
      * Overlay (glass pane) previo, para restaurarlo al cerrar el modal
      */
-    private java.awt.Component previousGlassPane;
+    private Component previousGlassPane;
 
     // Step 1 fields
     /**
@@ -120,14 +124,14 @@ public class NuevaPublicacionDialog extends JDialog {
         setLocationRelativeTo(parent);
 
         // Asegurar que si el diálogo se cierra por otros medios, el overlay se restaura
-        addWindowListener(new java.awt.event.WindowAdapter() {
+        addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
+            public void windowClosed(WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(java.awt.event.WindowEvent e) {
+            public void windowClosing(WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -157,6 +161,9 @@ public class NuevaPublicacionDialog extends JDialog {
         getContentPane().add(cardPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Sobrescribe setVisible para instalar/quitar overlay en el padre.
+     */
     @Override
     public void setVisible(boolean b) {
         if (b) {
@@ -173,20 +180,25 @@ public class NuevaPublicacionDialog extends JDialog {
      * Color: #D9D9D9 con 60% opacidad.
      */
     private void installOverlay() {
+        // Comprobar que el parentFrame no es nulo
         if (parentFrame == null)
             return;
         try {
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
-            java.awt.Component current = rpc.getRootPane().getGlassPane();
+            // Guardar el glass pane previo para restaurarlo después
+            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+            Component current = rpc.getRootPane().getGlassPane();
             previousGlassPane = current;
 
-            javax.swing.JPanel overlay = new javax.swing.JPanel();
+            // Crear el overlay
+            JPanel overlay = new JPanel();
             overlay.setOpaque(true);
             // Color D9D9D9 con alpha 60% -> rgba(217,217,217,153)
             overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
             // Consumir eventos para que el overlay bloquee interacción con la ventana
-            overlay.addMouseListener(new java.awt.event.MouseAdapter() {});
+            overlay.addMouseListener(new java.awt.event.MouseAdapter() {
+            });
 
+            // Asignar el overlay como glass pane
             rpc.getRootPane().setGlassPane(overlay);
             overlay.setVisible(true);
         } catch (Exception e) {
@@ -198,10 +210,12 @@ public class NuevaPublicacionDialog extends JDialog {
      * Restaura el glass pane previo del frame padre.
      */
     private void removeOverlay() {
+        // Comprobar que el parentFrame no es nulo
         if (parentFrame == null)
             return;
         try {
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
+            // Restaurar el glass pane previo
+            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
             if (previousGlassPane != null) {
                 rpc.getRootPane().setGlassPane(previousGlassPane);
                 previousGlassPane.setVisible(false);
@@ -245,7 +259,8 @@ public class NuevaPublicacionDialog extends JDialog {
         panel.add(new JLabel("ISBN"), c);
         isbnField = new JTextField();
         configurarCampo(isbnField);
-        // Formatos aceptados: ISBN clásico o códigos de revista (ej. 978-1-23456-789-0 o RV-2024-001)
+        // Formatos aceptados: ISBN clásico o códigos de revista (ej. 978-1-23456-789-0
+        // o RV-2024-001)
         isbnField.setToolTipText("Formato ISBN o código de revista. Ej: 978-1-23456-789-0 o RV-2024-001");
         c.gridx = 1;
         panel.add(isbnField, c);
@@ -408,9 +423,11 @@ public class NuevaPublicacionDialog extends JDialog {
 
         // Acción botón añadir
         añadir.addActionListener(e -> {
+            // Validar campos
             if (!validarPasoLibro())
                 return;
             try {
+                // Intentar crear la publicación
                 boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionLibro(
                         isbnField.getText().trim(),
                         tituloField.getText().trim(),
@@ -420,8 +437,9 @@ public class NuevaPublicacionDialog extends JDialog {
                         ciclosField.getText().trim(),
                         editorialField.getText().trim(),
                         Integer.parseInt(numeroEdicionField.getText().trim()),
-                        java.time.LocalDate.parse(fechaPublicacionField.getText().trim()),
+                        LocalDate.parse(fechaPublicacionField.getText().trim()),
                         autoresField.getText().trim());
+                // Mostrar resultado
                 if (ok) {
                     JOptionPane.showMessageDialog(this, "Publicación tipo Libro añadida", "Éxito",
                             JOptionPane.INFORMATION_MESSAGE);
@@ -494,9 +512,11 @@ public class NuevaPublicacionDialog extends JDialog {
 
         // Acción botón añadir
         añadir.addActionListener(e -> {
+            // Validar campos
             if (!validarPasoRevista())
                 return;
             try {
+                // Intentar crear la publicación
                 boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionRevista(
                         isbnField.getText().trim(),
                         tituloField.getText().trim(),
@@ -506,6 +526,7 @@ public class NuevaPublicacionDialog extends JDialog {
                         ciclosField.getText().trim(),
                         editorialField.getText().trim(),
                         periodicidadField.getText().trim());
+                // Mostrar resultado
                 if (ok) {
                     JOptionPane.showMessageDialog(this, "Publicación tipo Revista añadida", "Éxito",
                             JOptionPane.INFORMATION_MESSAGE);

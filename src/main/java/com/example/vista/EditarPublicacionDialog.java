@@ -9,6 +9,9 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 
 import javax.swing.BorderFactory;
@@ -129,14 +132,14 @@ public class EditarPublicacionDialog extends JDialog {
         setSize(new Dimension(340, 500));
         setLocationRelativeTo(parent);
 
-        addWindowListener(new java.awt.event.WindowAdapter() {
+        addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
+            public void windowClosed(WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(java.awt.event.WindowEvent e) {
+            public void windowClosing(WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -149,7 +152,7 @@ public class EditarPublicacionDialog extends JDialog {
      * Inicializa la interfaz del diálogo
      */
     private void initUI() {
-        cardLayout = new java.awt.CardLayout();
+        cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
         JPanel paso1 = crearPaso1();
@@ -246,14 +249,14 @@ public class EditarPublicacionDialog extends JDialog {
         if (parentFrame == null)
             return;
         try {
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
-            java.awt.Component current = rpc.getRootPane().getGlassPane();
+            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+            Component current = rpc.getRootPane().getGlassPane();
             previousGlassPane = current;
 
-            javax.swing.JPanel overlay = new javax.swing.JPanel();
+            JPanel overlay = new JPanel();
             overlay.setOpaque(true);
-            overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
-            overlay.addMouseListener(new java.awt.event.MouseAdapter() {
+            overlay.setBackground(new Color(217, 217, 217, 153));
+            overlay.addMouseListener(new MouseAdapter() {
             });
 
             rpc.getRootPane().setGlassPane(overlay);
@@ -289,6 +292,7 @@ public class EditarPublicacionDialog extends JDialog {
      * @return
      */
     private JPanel crearPaso1() {
+        // Crear panel para paso 1
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.white);
         GridBagConstraints c = new GridBagConstraints();
@@ -296,6 +300,7 @@ public class EditarPublicacionDialog extends JDialog {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.WEST;
 
+        // Título
         JLabel title = new JLabel("Editar Publicación");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
         c.gridx = 0;
@@ -303,6 +308,8 @@ public class EditarPublicacionDialog extends JDialog {
         c.gridwidth = 2;
         panel.add(title, c);
 
+        // Campos comunes
+        // isbn
         c.gridwidth = 1;
         c.gridy++;
         panel.add(new JLabel("ISBN"), c);
@@ -311,6 +318,7 @@ public class EditarPublicacionDialog extends JDialog {
         c.gridx = 1;
         panel.add(isbnField, c);
 
+        // titulo
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Titulo"), c);
@@ -319,6 +327,7 @@ public class EditarPublicacionDialog extends JDialog {
         c.gridx = 1;
         panel.add(tituloField, c);
 
+        // idioma
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Idioma"), c);
@@ -327,6 +336,7 @@ public class EditarPublicacionDialog extends JDialog {
         c.gridx = 1;
         panel.add(idiomaField, c);
 
+        // temas
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Temas"), c);
@@ -335,6 +345,7 @@ public class EditarPublicacionDialog extends JDialog {
         c.gridx = 1;
         panel.add(temasField, c);
 
+        // modulos
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Modulos"), c);
@@ -343,6 +354,7 @@ public class EditarPublicacionDialog extends JDialog {
         c.gridx = 1;
         panel.add(modulosField, c);
 
+        // ciclos
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Ciclos"), c);
@@ -351,6 +363,7 @@ public class EditarPublicacionDialog extends JDialog {
         c.gridx = 1;
         panel.add(ciclosField, c);
 
+        // editorial
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Editorial"), c);
@@ -359,6 +372,7 @@ public class EditarPublicacionDialog extends JDialog {
         c.gridx = 1;
         panel.add(editorialField, c);
 
+        // tipo
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Tipo"), c);
@@ -368,6 +382,7 @@ public class EditarPublicacionDialog extends JDialog {
         c.gridx = 1;
         panel.add(tipoCombo, c);
 
+        // Botón Siguiente
         JButton siguiente = new JButton("Siguiente");
         siguiente.setBackground(Color.decode("#F4791B"));
         siguiente.setForeground(Color.white);
@@ -377,6 +392,7 @@ public class EditarPublicacionDialog extends JDialog {
         c.anchor = GridBagConstraints.EAST;
         panel.add(siguiente, c);
 
+        // Acción botón Siguiente
         siguiente.addActionListener(e -> {
             String tipo = (String) tipoCombo.getSelectedItem();
             if ("Libro".equals(tipo)) {
@@ -389,6 +405,11 @@ public class EditarPublicacionDialog extends JDialog {
         return panel;
     }
 
+    /**
+     * Crea el panel del paso Libro del wizard
+     * 
+     * @return
+     */
     private JPanel crearPasoLibro() {
         // Crear panel para paso Libro
         JPanel panel = new JPanel(new GridBagLayout());
@@ -443,6 +464,7 @@ public class EditarPublicacionDialog extends JDialog {
         c.anchor = GridBagConstraints.EAST;
         panel.add(guardar, c);
 
+        // Acción botón Guardar
         guardar.addActionListener(e -> {
             // Validar y guardar cambios
             if (!validarPasoLibro())
@@ -459,7 +481,7 @@ public class EditarPublicacionDialog extends JDialog {
                         ciclosField.getText().trim(),
                         editorialField.getText().trim(),
                         Integer.parseInt(numeroEdicionField.getText().trim()),
-                        java.time.LocalDate.parse(fechaPublicacionField.getText().trim()),
+                        LocalDate.parse(fechaPublicacionField.getText().trim()),
                         autoresField.getText().trim());
                 // devuelve true si se actualizó correctamente
                 if (ok) {
@@ -533,6 +555,7 @@ public class EditarPublicacionDialog extends JDialog {
         c.anchor = GridBagConstraints.EAST;
         panel.add(guardar, c);
 
+        // Acción botón Guardar
         guardar.addActionListener(e -> {
             // Validar y guardar cambios
             if (!validarPasoRevista())

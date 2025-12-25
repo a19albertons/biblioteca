@@ -2,7 +2,9 @@ package com.example.controlador;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.time.LocalDate;
 
+import com.example.conexiones.DBConnection;
 import com.example.dao.EjemplarDAO;
 
 /**
@@ -12,7 +14,7 @@ public class ControladorEditarEjemplarDialog {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     /**
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
@@ -20,7 +22,7 @@ public class ControladorEditarEjemplarDialog {
      * 
      * @param dbConnection
      */
-    public ControladorEditarEjemplarDialog(com.example.conexiones.DBConnection dbConnection) {
+    public ControladorEditarEjemplarDialog(DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -43,10 +45,10 @@ public class ControladorEditarEjemplarDialog {
      * Operación transaccional.
      *
      * @param idEjemplar
-     * @param fechaAdquisicion java.time.LocalDate
+     * @param fechaAdquisicion LocalDate
      * @return true si actualización exitosa
      */
-    public boolean editarEjemplar(int idEjemplar, java.time.LocalDate fechaAdquisicion) {
+    public boolean editarEjemplar(int idEjemplar, LocalDate fechaAdquisicion) {
         EjemplarDAO dao = new EjemplarDAO(this.dbConnection);
         Connection conexion = this.dbConnection.getConnection();
         // Comprobación básica de disponibilidad de conexión

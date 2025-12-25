@@ -2,19 +2,25 @@ package com.example.vista;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
-
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.RootPaneContainer;
 
 import com.example.controlador.Controlador;
 
@@ -38,7 +44,7 @@ public class EditarEjemplarDialog extends JDialog {
     /**
      * Componente previo del glass pane (para restaurar al cerrar el diálogo)
      */
-    private java.awt.Component previousGlassPane;
+    private Component previousGlassPane;
 
     /**
      * Constructor del diálogo
@@ -58,14 +64,14 @@ public class EditarEjemplarDialog extends JDialog {
         setLocationRelativeTo(parent);
 
         // Guardar componente previo del glass pane y mostrar overlay
-        addWindowListener(new java.awt.event.WindowAdapter() {
+        addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
+            public void windowClosed(WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(java.awt.event.WindowEvent e) {
+            public void windowClosing(WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -79,17 +85,17 @@ public class EditarEjemplarDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
         JPanel content = new JPanel(new BorderLayout());
         content.setBackground(Color.white);
-        content.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        content.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
         // Título
         JLabel title = new JLabel("Editar Ejemplar");
-        title.setFont(title.getFont().deriveFont(java.awt.Font.BOLD, 16f));
+        title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
         content.add(title, BorderLayout.NORTH);
 
         // Centro con campos
         JPanel center = new JPanel(new FlowLayout(FlowLayout.LEFT));
         center.setBackground(Color.white);
-        center.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        center.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
         // Obtener datos actuales
         String[] datos = controlador.getControladorEditarEjemplarDialog().obtenerDetallesEjemplar(idEjemplar);
@@ -191,15 +197,15 @@ public class EditarEjemplarDialog extends JDialog {
             return;
         try {
             // Guardar el componente previo del glass pane para restaurarlo después
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
-            java.awt.Component current = rpc.getRootPane().getGlassPane();
+            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+            Component current = rpc.getRootPane().getGlassPane();
             previousGlassPane = current;
 
             // Crear un panel semitransparente para el overlay
-            javax.swing.JPanel overlay = new javax.swing.JPanel();
+            JPanel overlay = new JPanel();
             overlay.setOpaque(true);
-            overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
-            overlay.addMouseListener(new java.awt.event.MouseAdapter() {
+            overlay.setBackground(new Color(217, 217, 217, 153));
+            overlay.addMouseListener(new MouseAdapter() {
             });
 
             // Asignar el overlay como glass pane
@@ -219,7 +225,7 @@ public class EditarEjemplarDialog extends JDialog {
             return;
         try {
             // Restaurar el componente previo del glass pane
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
+            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
             // Restaura el componente previo del glass pane
             if (previousGlassPane != null) {
                 rpc.getRootPane().setGlassPane(previousGlassPane);

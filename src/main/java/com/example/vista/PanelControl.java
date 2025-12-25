@@ -7,9 +7,11 @@ import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -100,9 +102,9 @@ public class PanelControl {
         // Valor de préstamos hoy + comprobación de error
         String prestamosHoyStr = controlador.getControladorPanelControl().obtenerPrestamosHoy();
         if ("-1".equals(prestamosHoyStr)) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando número de préstamos de hoy. Compruebe la conexión a la base de datos.",
-                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    "Error", JOptionPane.ERROR_MESSAGE);
             prestamosHoyStr = "—";
         }
         valor1 = new JLabel(prestamosHoyStr);
@@ -121,15 +123,15 @@ public class PanelControl {
         JLabel tema2 = new JLabel("Pendientes");
         tema2.setBounds(10, 10, 150, 30);
         // Fuente Open Sans, texto normal
-        tema2.setFont(com.example.utilities.Fonts.openSans(12f));
+        tema2.setFont(Fonts.openSans(12f));
         card2.add(tema2);
 
         // Valor de préstamos pendientes + comprobación de error
         String pendientesStr = controlador.getControladorPanelControl().obtenerPrestamosPendientes();
         if ("-1".equals(pendientesStr)) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando número de préstamos pendientes. Compruebe la conexión a la base de datos.",
-                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    "Error", JOptionPane.ERROR_MESSAGE);
             pendientesStr = "—";
         }
         valor2 = new JLabel(pendientesStr);
@@ -151,15 +153,15 @@ public class PanelControl {
         JLabel tema3 = new JLabel("Socios activos");
         tema3.setBounds(10, 10, 150, 30);
         // Fuente Open Sans, texto normal
-        tema3.setFont(com.example.utilities.Fonts.openSans(12f));
+        tema3.setFont(Fonts.openSans(12f));
         card3.add(tema3);
 
         // Valor de socios activos + comprobación de error
         String sociosStr = controlador.getControladorPanelControl().obtenerTotalSociosActivos();
         if ("-1".equals(sociosStr)) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando número de socios activos. Compruebe la conexión a la base de datos.",
-                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    "Error", JOptionPane.ERROR_MESSAGE);
             sociosStr = "—";
         }
         valor3 = new JLabel(sociosStr);
@@ -186,14 +188,14 @@ public class PanelControl {
         String[][] data = controlador.getControladorPanelControl().obtenerUltimosMovimientos();
         // Comprobación de error en datos nulos y vacios
         if (data == null) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.", "Error",
-                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
             data = new String[0][0];
         } else if (data.length == 0) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "No hay movimientos para mostrar.", "Información",
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
             data = new String[0][0];
         }
 
@@ -234,7 +236,7 @@ public class PanelControl {
                     boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 String s = (value != null) ? value.toString().toUpperCase() : "";
-                setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                setHorizontalAlignment(SwingConstants.CENTER);
                 setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
                 if ("DEVUELTO".equals(s)) {
                     setBackground(Color.decode("#E6FFF0"));
@@ -276,27 +278,27 @@ public class PanelControl {
         // Actualizar tarjetas con comprobación de errores
         String pHoy = controlador.getControladorPanelControl().obtenerPrestamosHoy();
         if ("-1".equals(pHoy)) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando número de préstamos de hoy. Compruebe la conexión a la base de datos.",
-                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    "Error", JOptionPane.ERROR_MESSAGE);
             pHoy = "—";
         }
         valor1.setText(pHoy);
 
         String pPend = controlador.getControladorPanelControl().obtenerPrestamosPendientes();
         if ("-1".equals(pPend)) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando número de préstamos pendientes. Compruebe la conexión a la base de datos.",
-                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    "Error", JOptionPane.ERROR_MESSAGE);
             pPend = "—";
         }
         valor2.setText(pPend);
 
         String socios = controlador.getControladorPanelControl().obtenerTotalSociosActivos();
         if ("-1".equals(socios)) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando número de socios activos. Compruebe la conexión a la base de datos.",
-                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    "Error", JOptionPane.ERROR_MESSAGE);
             socios = "—";
         }
         valor3.setText(socios);
@@ -305,14 +307,14 @@ public class PanelControl {
         String[][] data = controlador.getControladorPanelControl().obtenerUltimosMovimientos();
         // Comprobación de error en datos nulos y vacios
         if (data == null) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.", "Error",
-                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
             data = new String[0][0];
         } else if (data.length == 0) {
-            javax.swing.JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null,
                     "No hay movimientos para mostrar.", "Información",
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
             data = new String[0][0];
         }
         // Reemplazar todos los datos del modelo
@@ -325,7 +327,7 @@ public class PanelControl {
                     boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 String s = (value != null) ? value.toString().toUpperCase() : "";
-                setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                setHorizontalAlignment(SwingConstants.CENTER);
                 setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
                 if ("DEVUELTO".equals(s)) {
                     setBackground(Color.decode("#E6FFF0"));

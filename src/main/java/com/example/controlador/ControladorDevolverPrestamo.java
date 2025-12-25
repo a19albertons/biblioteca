@@ -1,5 +1,8 @@
 package com.example.controlador;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.sql.Date;
 import com.example.conexiones.DBConnection;
 import com.example.dao.EjemplarDAO;
 import com.example.dao.PrestamoDAO;
@@ -117,8 +120,8 @@ public class ControladorDevolverPrestamo {
         }
         // antes de marcar devolución, obtener detalles necesarios para sanción
         int idPrestamo = Integer.parseInt(prestamo[0]);
-        java.time.LocalDate fechaFin = prestamo[2] == null || prestamo[2].isEmpty() ? null
-                : java.time.LocalDate.parse(prestamo[2]);
+        LocalDate fechaFin = prestamo[2] == null || prestamo[2].isEmpty() ? null
+                : LocalDate.parse(prestamo[2]);
 
         // ejecutar devolución
         boolean ok = prestamoDAO.devolverPrestamoUsuarioEjemplar(idUsuario, idEjemplar);
@@ -132,8 +135,8 @@ public class ControladorDevolverPrestamo {
         String tipoCode = detUsuario != null ? detUsuario[5] : null; // E,P,...
         // Si es estudiante y hay fecha fin de préstamo
         if ("E".equalsIgnoreCase(tipoCode) && fechaFin != null) {
-            java.time.LocalDate hoy = java.time.LocalDate.now();
-            long diasRetraso = java.time.temporal.ChronoUnit.DAYS.between(fechaFin, hoy);
+            LocalDate hoy = LocalDate.now();
+            long diasRetraso = ChronoUnit.DAYS.between(fechaFin, hoy);
             // Si hay días de retraso
             if (diasRetraso > 0) {
                 // obtener tipo de publicacion para el ejemplar
@@ -155,18 +158,18 @@ public class ControladorDevolverPrestamo {
                 }
                 // aplicar sanción si hay días a sancionar
                 if (diasSancion > 0) {
-                    java.time.LocalDate inicioSancion = hoy;
+                    LocalDate inicioSancion = hoy;
                     SancionDAO sancionDAO = new SancionDAO(this.dbConnection);
                     // Comprobar si ya existe una sanción activa para este usuario
                     String[] sancionActiva = sancionDAO.obtenerSancionActivaPorUsuario(idUsuario);
-                    java.time.LocalDate finSancion;
+                    LocalDate finSancion;
                     String descripcionBase = "Retraso en devolución " + diasRetraso + " días";
                     String descripcion = descripcionBase;
                     boolean previaDesactivada = false;
                     // Si ya hay sanción activa, acumular días y desactivar la previa
                     if (sancionActiva != null && sancionActiva[1] != null && !sancionActiva[1].isEmpty()) {
                         try {
-                            java.time.LocalDate finAct = java.time.LocalDate.parse(sancionActiva[1]);
+                            LocalDate finAct = LocalDate.parse(sancionActiva[1]);
                             // Extender la fecha final acumulando los días nuevos
                             finSancion = finAct.plusDays(diasSancion);
                             descripcion = descripcionBase + " (Acumulativa: sanción activa hasta " + finAct
@@ -193,8 +196,8 @@ public class ControladorDevolverPrestamo {
                     }
                     // insertar sanción
                     boolean ins = sancionDAO.insertarSancion(idUsuario, idPrestamo,
-                            java.sql.Date.valueOf(inicioSancion),
-                            java.sql.Date.valueOf(finSancion), descripcion);
+                            Date.valueOf(inicioSancion),
+                            Date.valueOf(finSancion), descripcion);
                     if (!ins) {
                         return "Devolución registrada, pero error aplicando sanción automática";
                     }
@@ -204,8 +207,8 @@ public class ControladorDevolverPrestamo {
                         String finActStr = sancionActiva != null ? (sancionActiva[1] == null ? "" : sancionActiva[1]) : null;
                         // construir mensaje adecuado
                         if (finActStr != null && !finActStr.isEmpty()) {
-                            java.time.LocalDate finAct = java.time.LocalDate.parse(finActStr);
-                            java.time.LocalDate finNuevo = finSancion;
+                            LocalDate finAct = LocalDate.parse(finActStr);
+                            LocalDate finNuevo = finSancion;
                             // comparar fechas
                             if (finNuevo.isAfter(finAct)) {
                                 ultimaNotificacionSancion = "Se ha aplicado una sanción acumulativa: anterior fin " + finAct + 

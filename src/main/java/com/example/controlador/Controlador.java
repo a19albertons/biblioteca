@@ -1,5 +1,7 @@
 package com.example.controlador;
 
+import com.example.conexiones.DBConnection;
+
 /**
  * Controlador principal de la aplicación
  */
@@ -8,7 +10,7 @@ public class Controlador {
     /**
      * Conexión compartida para DAOs/controladores (inyección)
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     /**
      * Controlador de navegación
@@ -99,7 +101,7 @@ public class Controlador {
      *
      * @return DBConnection usada por este controlador
      */
-    public com.example.conexiones.DBConnection getDbConnection() {
+    public DBConnection getDbConnection() {
         return this.dbConnection;
     }
 
@@ -408,7 +410,7 @@ public class Controlador {
      *
      * @param dbConnection implementación de DBConnection (no puede ser null)
      */
-    public Controlador(com.example.conexiones.DBConnection dbConnection) {
+    public Controlador(DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }

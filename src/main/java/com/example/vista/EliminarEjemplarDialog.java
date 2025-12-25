@@ -2,15 +2,20 @@ package com.example.vista;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.RootPaneContainer;
 
 import com.example.controlador.Controlador;
 
@@ -34,7 +39,7 @@ public class EliminarEjemplarDialog extends JDialog {
     /**
      * Componente previo del glass pane (para restaurar al cerrar el diálogo)
      */
-    private java.awt.Component previousGlassPane;
+    private Component previousGlassPane;
 
     /**
      * Constructor del diálogo
@@ -74,16 +79,16 @@ public class EliminarEjemplarDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
         JPanel content = new JPanel(new BorderLayout());
         content.setBackground(Color.white);
-        content.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        content.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
         // Título y mensaje
         JLabel title = new JLabel("Eliminar Ejemplar");
-        title.setFont(title.getFont().deriveFont(java.awt.Font.BOLD, 16f));
+        title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
         content.add(title, BorderLayout.NORTH);
 
         // Mensaje de confirmación
         JLabel texto = new JLabel("Seguro que quieres eliminar el ejemplar?");
-        texto.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 6, 12, 6));
+        texto.setBorder(BorderFactory.createEmptyBorder(12, 6, 12, 6));
         content.add(texto, BorderLayout.CENTER);
 
         // Botones
@@ -166,15 +171,15 @@ public class EliminarEjemplarDialog extends JDialog {
             return;
         try {
             // Guardar el componente previo del glass pane para restaurarlo después
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
-            java.awt.Component current = rpc.getRootPane().getGlassPane();
+            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+            Component current = rpc.getRootPane().getGlassPane();
             previousGlassPane = current;
 
             // Crear un panel semitransparente para el overlay
-            javax.swing.JPanel overlay = new javax.swing.JPanel();
+            JPanel overlay = new JPanel();
             overlay.setOpaque(true);
-            overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
-            overlay.addMouseListener(new java.awt.event.MouseAdapter() {
+            overlay.setBackground(new Color(217, 217, 217, 153));
+            overlay.addMouseListener(new MouseAdapter() {
             });
 
             // Asignar el overlay como glass pane
@@ -194,7 +199,7 @@ public class EliminarEjemplarDialog extends JDialog {
             return;
         try {
             // Restaurar el componente previo del glass pane
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
+            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
             if (previousGlassPane != null) {
                 rpc.getRootPane().setGlassPane(previousGlassPane);
                 previousGlassPane.setVisible(false);

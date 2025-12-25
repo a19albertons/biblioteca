@@ -1,5 +1,9 @@
 package com.example.controlador;
 
+import com.example.conexiones.DBConnection;
+import com.example.dao.PrestamoDAO;
+import com.example.dao.SancionDAO;
+
 /**
  * Controlador dedicado a operaciones relacionadas con sanciones manuales y
  * consultas auxiliares necesarias por la vista de sanción manual.
@@ -9,14 +13,14 @@ public class ControladorSancionManual {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     /**
      * Constructor con DBConnection (inyección)
      * 
      * @param dbConnection
      */
-    public ControladorSancionManual(com.example.conexiones.DBConnection dbConnection) {
+    public ControladorSancionManual(DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -30,7 +34,7 @@ public class ControladorSancionManual {
      * @return arreglo con {id_prestamo, id_usuario, fecha_inicio, fecha_fin} o null
      */
     public String[] obtenerUltimoPrestamoPorEjemplar(int idEjemplar) {
-        com.example.dao.PrestamoDAO prestamoDAO = new com.example.dao.PrestamoDAO(this.dbConnection);
+        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
         return prestamoDAO.obtenerUltimoPrestamoPorEjemplar(idEjemplar);
     }
 
@@ -41,7 +45,7 @@ public class ControladorSancionManual {
      * @return arreglo {id, fin_sancion} o null
      */
     public String[] obtenerSancionActivaPorUsuario(int idUsuario) {
-        com.example.dao.SancionDAO sancionDAO = new com.example.dao.SancionDAO(this.dbConnection);
+        SancionDAO sancionDAO = new SancionDAO(this.dbConnection);
         return sancionDAO.obtenerSancionActivaPorUsuario(idUsuario);
     }
 
@@ -52,7 +56,7 @@ public class ControladorSancionManual {
      * @return true si desactivó la sanción
      */
     public boolean desactivarSancionPorId(int idSancion) {
-        com.example.dao.SancionDAO sancionDAO = new com.example.dao.SancionDAO(this.dbConnection);
+        SancionDAO sancionDAO = new SancionDAO(this.dbConnection);
         return sancionDAO.desactivarSancionPorId(idSancion);
     }
 
@@ -68,7 +72,7 @@ public class ControladorSancionManual {
      */
     public boolean insertarSancion(int idUsuario, int idPrestamo, java.sql.Date inicio, java.sql.Date fin,
             String descripcion) {
-        com.example.dao.SancionDAO sancionDAO = new com.example.dao.SancionDAO(this.dbConnection);
+        SancionDAO sancionDAO = new SancionDAO(this.dbConnection);
         return sancionDAO.insertarSancion(idUsuario, idPrestamo, inicio, fin, descripcion);
     }
 

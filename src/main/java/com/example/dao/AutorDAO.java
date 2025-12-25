@@ -41,6 +41,7 @@ public class AutorDAO {
     public int obtenerIdPorNombre(String nombre) {
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_AUTOR_ID_POR_NOMBRE)) {
+            // establecer parámetro
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -63,8 +64,10 @@ public class AutorDAO {
      */
     public int obtenerIdPorNombre(Connection conexion, String nombre) {
         try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_AUTOR_ID_POR_NOMBRE)) {
+            // establecer parámetro
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
+                // verificar resultado
                 if (rs.next()) {
                     return rs.getInt("id");
                 }
@@ -86,9 +89,11 @@ public class AutorDAO {
      */
     public int crearAutor(String nombre, String nacionalidad) {
         try (Connection conexion = dbConnection.getConnection();
+                // preparar sentencia
                 PreparedStatement ps = conexion.prepareStatement(
                         SQL_INSERT_AUTOR,
                         Statement.RETURN_GENERATED_KEYS)) {
+            // establecer parámetros
             ps.setString(1, nombre);
             ps.setString(2, nacionalidad == null || nacionalidad.trim().isEmpty() ? "ES" : nacionalidad);
             ps.executeUpdate();
@@ -117,9 +122,11 @@ public class AutorDAO {
         try (PreparedStatement ps = conexion.prepareStatement(
                 SQL_INSERT_AUTOR,
                 Statement.RETURN_GENERATED_KEYS)) {
+            // establecer parámetros
             ps.setString(1, nombre);
             ps.setString(2, nacionalidad == null || nacionalidad.trim().isEmpty() ? "ES" : nacionalidad);
             ps.executeUpdate();
+            // obtener id generado
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     return rs.getInt(1);

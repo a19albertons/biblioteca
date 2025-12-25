@@ -1,7 +1,10 @@
 package com.example.controlador;
 
 import java.sql.Connection;
+import java.sql.Date;
+import java.time.LocalDate;
 
+import com.example.conexiones.DBConnection;
 import com.example.dao.EjemplarDAO;
 
 /**
@@ -13,14 +16,14 @@ public class ControladorNuevoEjemplarDialog {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     /**
     
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
      */
-    public ControladorNuevoEjemplarDialog(com.example.conexiones.DBConnection dbConnection) {
+    public ControladorNuevoEjemplarDialog(DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -37,12 +40,12 @@ public class ControladorNuevoEjemplarDialog {
      * @param fechaAdquisicion fecha de adquisición (java.time.LocalDate)
      * @return true si la inserción fue satisfactoria
      */
-    public boolean crearEjemplar(int idPublicacion, java.time.LocalDate fechaAdquisicion) {
+    public boolean crearEjemplar(int idPublicacion, LocalDate fechaAdquisicion) {
         EjemplarDAO ejemplarDAO = new EjemplarDAO(this.dbConnection);
-        // Convertir la fecha proporcionada (java.time.LocalDate) a java.sql.Date
+        // Convertir la fecha proporcionada (LocalDate) a java.sql.Date
         // Si no se proporciona fecha, usar la fecha actual
-        java.sql.Date fechaSql = (fechaAdquisicion != null) ? java.sql.Date.valueOf(fechaAdquisicion)
-                : new java.sql.Date(System.currentTimeMillis());
+        Date fechaSql = (fechaAdquisicion != null) ? Date.valueOf(fechaAdquisicion)
+                : new Date(System.currentTimeMillis());
 
         // Obtener conexión a la base de datos
         Connection conexion = this.dbConnection.getConnection();

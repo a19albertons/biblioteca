@@ -9,6 +9,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
 
 import javax.swing.BorderFactory;
@@ -151,10 +154,10 @@ public class Ejemplares {
         JButton btnEditarEjemplar = new JButton() {
             // Asegura que el color de la opacidad sea el debido
             @Override
-            protected void paintComponent(java.awt.Graphics g) {
+            protected void paintComponent(Graphics g) {
                 // paint custom background with alpha and keep icon/text on top
                 Graphics2D g2 = (Graphics2D) g.create();
-                g2.setComposite(java.awt.AlphaComposite.SrcOver);
+                g2.setComposite(AlphaComposite.SrcOver);
                 // fill with background color (includes alpha)
                 g2.setColor(getBackground());
                 g2.fillRect(0, 0, getWidth(), getHeight());
@@ -191,9 +194,9 @@ public class Ejemplares {
                 // refrescar la vista de ejemplares para mostrar cambios
                 controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
             } else {
-                javax.swing.JOptionPane.showMessageDialog(publicacionPanel,
+                JOptionPane.showMessageDialog(publicacionPanel,
                         "No hay publicación seleccionada para editar", "Aviso",
-                        javax.swing.JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -236,9 +239,9 @@ public class Ejemplares {
                 // refrescar para mostrar posibles cambios
                 controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
             } else {
-                javax.swing.JOptionPane.showMessageDialog(publicacionPanel,
+                JOptionPane.showMessageDialog(publicacionPanel,
                         "No hay publicación seleccionada para eliminar", "Aviso",
-                        javax.swing.JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -272,9 +275,9 @@ public class Ejemplares {
                 // refrescar la vista tras cerrar
                 controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
             } else {
-                javax.swing.JOptionPane.showMessageDialog(ejemplares,
+                JOptionPane.showMessageDialog(ejemplares,
                         "No hay publicación seleccionada para añadir ejemplares", "Aviso",
-                        javax.swing.JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.WARNING_MESSAGE);
             }
         });
 
@@ -374,7 +377,7 @@ public class Ejemplares {
                         controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
                     } else {
                         JOptionPane.showMessageDialog(panelCell, "No hay publicación seleccionada para editar", "Aviso",
-                                javax.swing.JOptionPane.WARNING_MESSAGE);
+                                JOptionPane.WARNING_MESSAGE);
                     }
                 });
 
@@ -419,9 +422,9 @@ public class Ejemplares {
 
         // Hacer que al hacer click en la columna ACCIONES se abra el diálogo de editar
         // ejemplar
-        ejemplaresTable.addMouseListener(new java.awt.event.MouseAdapter() {
+        ejemplaresTable.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 int row = ejemplaresTable.rowAtPoint(e.getPoint());
                 int col = ejemplaresTable.columnAtPoint(e.getPoint());
                 // Si se hizo click en la columna ACCIONES (4)
@@ -434,7 +437,7 @@ public class Ejemplares {
                         try {
                             int idEjemplar = Integer.parseInt(idStr.trim());
                             // Determinar la X relativa dentro de la celda para distinguir botones
-                            java.awt.Rectangle cellRect = ejemplaresTable.getCellRect(row, col, true);
+                            Rectangle cellRect = ejemplaresTable.getCellRect(row, col, true);
                             int clickX = e.getX() - cellRect.x;
                             // Definir la zona de 'eliminar' como los ~32 píxeles finales (botón + margen)
                             int deleteThreshold = cellRect.width - 32; // 24px botón + padding
@@ -460,6 +463,7 @@ public class Ejemplares {
             }
         });
 
+        // Scroll pane para la tabla
         JScrollPane scroll = new JScrollPane(ejemplaresTable);
         scroll.setBounds(10, 50, 540, 320);
         scroll.setBorder(null);
@@ -481,9 +485,11 @@ public class Ejemplares {
      * @param resumen arreglo: titulo,isbn,autores,ciclos,editorial,disponibles,id
      */
     public void cargarPublicacionResumen(String[] resumen) {
+        // Comprobación básica
         if (resumen == null) {
             return;
         }
+        // Extraer datos con comprobación de longitud
         String titulo = resumen.length > 0 ? resumen[0] : "";
         String isbn = resumen.length > 1 ? resumen[1] : "";
         String autores = resumen.length > 2 ? resumen[2] : "";
@@ -491,6 +497,7 @@ public class Ejemplares {
         String disponibles = resumen.length > 5 ? resumen[5] : "";
         String idStr = resumen.length > 6 ? resumen[6] : "";
 
+        // Cargar datos en etiquetas
         if (tituloPublicacion != null) {
             tituloPublicacion.setText(titulo);
         }
@@ -519,13 +526,13 @@ public class Ejemplares {
             }
             // Cargar datos y comprobacion de nulos y vacios
             if (ejemplaresData == null) {
-                javax.swing.JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null,
                         "Error cargando ejemplares de la publicación. Compruebe la conexión a la base de datos.", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.ERROR_MESSAGE);
             } else if (ejemplaresData.length == 0) {
-                javax.swing.JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null,
                         "No hay ejemplares disponibles para esta publicación.", "Información",
-                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
                 for (String[] row : ejemplaresData) {
                     // row: id, num_ejemplar, fecha, estado

@@ -41,7 +41,10 @@ public class TemaDAO {
     public int obtenerIdPorNombre(String nombre) {
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_TEMA_ID_POR_NOMBRE)) {
+            // establecer parámetro
             ps.setString(1, nombre);
+
+            // ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next())
                     return rs.getInt("id");
@@ -63,13 +66,17 @@ public class TemaDAO {
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_TEMA,
                         Statement.RETURN_GENERATED_KEYS)) {
+            // establecer parámetro
             ps.setString(1, nombre);
+            // ejecutar
             ps.executeUpdate();
+            // obtener id generado
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next())
                     return rs.getInt(1);
             }
         } catch (Exception e) {
+            // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
         }
@@ -94,11 +101,14 @@ public class TemaDAO {
      */
     public int obtenerOCrear(Connection conexion, String nombre) {
         try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_TEMA_ID_POR_NOMBRE)) {
+            // establecer parámetro
             ps.setString(1, nombre);
+            // ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next())
                     return rs.getInt("id");
             }
+            // Si no existe, insertamos
             try (PreparedStatement ins = conexion.prepareStatement(SQL_INSERT_TEMA,
                     Statement.RETURN_GENERATED_KEYS)) {
                 ins.setString(1, nombre);
@@ -109,6 +119,7 @@ public class TemaDAO {
                 }
             }
         } catch (Exception e) {
+            // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
         }

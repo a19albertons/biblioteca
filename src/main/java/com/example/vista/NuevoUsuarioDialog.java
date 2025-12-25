@@ -2,9 +2,18 @@ package com.example.vista;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -13,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.RootPaneContainer;
 
 import com.example.controlador.Controlador;
 import com.example.modelo.TipoUsuario;
@@ -33,7 +43,7 @@ public class NuevoUsuarioDialog extends JDialog {
     /** 
      * Guardar glass pane previo para restaurarlo 
      */
-    private java.awt.Component previousGlassPane;
+    private Component previousGlassPane;
 
     /**
      * Constructor
@@ -51,14 +61,14 @@ public class NuevoUsuarioDialog extends JDialog {
         setLocationRelativeTo(parent);
 
         // Añadir listener para quitar overlay al cerrar
-        addWindowListener(new java.awt.event.WindowAdapter() {
+        addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
+            public void windowClosed(WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(java.awt.event.WindowEvent e) {
+            public void windowClosing(WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -72,32 +82,31 @@ public class NuevoUsuarioDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
         JPanel content = new JPanel(new BorderLayout());
         content.setBackground(Color.white);
-        content.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        content.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
         // Título
         JLabel title = new JLabel("Nuevo Usuario");
-        title.setFont(title.getFont().deriveFont(java.awt.Font.BOLD, 16f));
+        title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
         content.add(title, BorderLayout.NORTH);
 
         // Centro con formulario
-        JPanel center = new JPanel(new java.awt.GridBagLayout());
+        JPanel center = new JPanel(new GridBagLayout());
         center.setBackground(Color.white);
-        center.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        center.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
         // GridBagConstraints para el formulario
-        java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
+        GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new java.awt.Insets(6, 6, 6, 6);
-        gbc.anchor = java.awt.GridBagConstraints.WEST;
-
+        gbc.insets = new Insets(6, 6, 6, 6);
+        gbc.anchor = GridBagConstraints.WEST;
         // DNI
         gbc.gridx = 0;
         gbc.weightx = 0;
         center.add(new JLabel("DNI / ID"), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         JTextField dniField = new JTextField(20);
         center.add(dniField, gbc);
 
@@ -105,11 +114,11 @@ public class NuevoUsuarioDialog extends JDialog {
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.weightx = 0;
-        gbc.fill = java.awt.GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.NONE;
         center.add(new JLabel("Nombre"), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         JTextField nombreField = new JTextField(20);
         center.add(nombreField, gbc);
 
@@ -117,11 +126,11 @@ public class NuevoUsuarioDialog extends JDialog {
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.weightx = 0;
-        gbc.fill = java.awt.GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.NONE;
         center.add(new JLabel("Apellidos"), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         JTextField apellidosField = new JTextField(20);
         center.add(apellidosField, gbc);
 
@@ -129,11 +138,11 @@ public class NuevoUsuarioDialog extends JDialog {
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.weightx = 0;
-        gbc.fill = java.awt.GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.NONE;
         center.add(new JLabel("Email"), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         JTextField emailField = new JTextField(20);
         center.add(emailField, gbc);
 
@@ -141,11 +150,11 @@ public class NuevoUsuarioDialog extends JDialog {
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.weightx = 0;
-        gbc.fill = java.awt.GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.NONE;
         center.add(new JLabel("Tipo"), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         // Rellenar JComboBox con descripciones de TipoUsuario
         String[] tiposDesc = new String[TipoUsuario.values().length];
         for (int i = 0; i < TipoUsuario.values().length; i++) {
@@ -234,14 +243,14 @@ public class NuevoUsuarioDialog extends JDialog {
             return;
         try {
             // Obtener el RootPaneContainer del frame padre
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
-            java.awt.Component current = rpc.getRootPane().getGlassPane();
+            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+            Component current = rpc.getRootPane().getGlassPane();
             // Guardar la referencia previa en el campo para restaurarla al cerrar
             this.previousGlassPane = current;
-            javax.swing.JPanel overlay = new javax.swing.JPanel();
+            JPanel overlay = new JPanel();
             overlay.setOpaque(true);
-            overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
-            overlay.addMouseListener(new java.awt.event.MouseAdapter() {
+            overlay.setBackground(new Color(217, 217, 217, 153));
+            overlay.addMouseListener(new MouseAdapter() {
             });
             // Asignar el overlay como glass pane
             rpc.getRootPane().setGlassPane(overlay);

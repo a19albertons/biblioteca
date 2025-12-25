@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.time.LocalDate;
 
+import com.example.conexiones.DBConnection;
 import com.example.dao.AutorDAO;
 import com.example.dao.CicloDAO;
 import com.example.dao.ModuloDAO;
@@ -22,7 +23,7 @@ public class ControladorNuevaPublicacionDialog {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
 
 
@@ -32,7 +33,7 @@ public class ControladorNuevaPublicacionDialog {
      * 
      * @param dbConnection
      */
-    public ControladorNuevaPublicacionDialog(com.example.conexiones.DBConnection dbConnection) {
+    public ControladorNuevaPublicacionDialog(DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }

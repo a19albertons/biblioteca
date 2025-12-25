@@ -27,23 +27,23 @@ public class BarraLateral {
     /**
      * Botón de inicio
      */
-    private javax.swing.JButton btnInicio;
+    private JButton btnInicio;
     /**
      * Botón de catálogo de libros
      */
-    private javax.swing.JButton btnCatalogoLibros;
+    private JButton btnCatalogoLibros;
     /**
      * Botón de préstamos
      */
-    private javax.swing.JButton btnPrestamos;
+    private JButton btnPrestamos;
     /**
      * Botón de socios / usuarios
      */
-    private javax.swing.JButton btnSocios;
+    private JButton btnSocios;
     /**
      * Botón de sanciones
      */
-    private javax.swing.JButton btnSanciones;
+    private JButton btnSanciones;
 
     /**
      * Constructor de la vista BarraLateral
@@ -203,8 +203,8 @@ public class BarraLateral {
      * @param active  botón que debe quedar marcado como activo
      * @param buttons lista completa de botones a evaluar y actualizar
      */
-    private void setActiveButton(javax.swing.JButton active, javax.swing.JButton... buttons) {
-        for (javax.swing.JButton b : buttons) {
+    private void setActiveButton(JButton active, JButton... buttons) {
+        for (JButton b : buttons) {
             if (b == active) {
                 b.setBackground(Color.decode("#444444"));
                 b.setForeground(Color.WHITE);

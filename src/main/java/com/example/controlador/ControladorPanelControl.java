@@ -1,5 +1,6 @@
 package com.example.controlador;
 
+import com.example.conexiones.DBConnection;
 import com.example.dao.CicloDAO;
 import com.example.dao.PrestamoDAO;
 import com.example.dao.PublicacionDAO;
@@ -12,14 +13,14 @@ public class ControladorPanelControl {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final com.example.conexiones.DBConnection dbConnection;
+    private final DBConnection dbConnection;
 
     /**
      * Constructor con DBConnection (inyección)
      * 
      * @param dbConnection
      */
-    public ControladorPanelControl(com.example.conexiones.DBConnection dbConnection) {
+    public ControladorPanelControl(DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }

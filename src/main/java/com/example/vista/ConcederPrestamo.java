@@ -1,13 +1,17 @@
 package com.example.vista;
 
+import java.time.LocalDate;
 import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.BorderFactory;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
 
 import com.example.controlador.Controlador;
 
@@ -155,7 +159,7 @@ public class ConcederPrestamo {
         contenido.add(txtFechaFin);
 
         // Detectar automáticamente al escribir ID de ejemplar
-        txtIdEjemplar.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+        txtIdEjemplar.getDocument().addDocumentListener(new DocumentListener() {
             private void doDetect() {
                 // si está vacío, limpiar campos
                 String idEjStr = txtIdEjemplar.getText().trim();
@@ -202,11 +206,11 @@ public class ConcederPrestamo {
                 }
 
                 // establecer fecha inicio como hoy
-                java.time.LocalDate hoy = java.time.LocalDate.now();
+                LocalDate hoy = LocalDate.now();
                 txtFechaInicio.setText(hoy.toString());
                 // calcular fecha fin segun reglas y tipo de usuario
                 int idUsuarioSel = usuarioSeleccionado[0];
-                java.time.LocalDate fechaFinLocal;
+                LocalDate fechaFinLocal;
                 // para revistas, mismo día; para libros, +7 días (o +7 días si es profesor)
                 if ("R".equalsIgnoreCase(tipoPub)) {
                     // revista
@@ -233,19 +237,19 @@ public class ConcederPrestamo {
 
             // Detectar cambios en el campo de texto
             @Override
-            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+            public void insertUpdate(DocumentEvent e) {
                 doDetect();
             }
 
             // Detectar cambios en el campo de texto
             @Override
-            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+            public void removeUpdate(DocumentEvent e) {
                 doDetect();
             }
 
             // Detectar cambios en el campo de texto
             @Override
-            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+            public void changedUpdate(DocumentEvent e) {
                 doDetect();
             }
         });
@@ -312,15 +316,15 @@ public class ConcederPrestamo {
         btnRegistrarPrestamo.addActionListener(e -> {
             // Validar datos
             if (usuarioSeleccionado[0] == -1) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Seleccione primero un usuario válido", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Seleccione primero un usuario válido", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             // validar id ejemplar
             String idEjStr = txtIdEjemplar.getText().trim();
             if (idEjStr.isEmpty()) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             int idEj;
@@ -329,23 +333,23 @@ public class ConcederPrestamo {
                 idEj = Integer.parseInt(idEjStr);
             } catch (NumberFormatException ex) {
                 // mostrar error
-                javax.swing.JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
             // registrar préstamo
             String err = controlador.getControladorConcederPrestamo().registrarPrestamo(usuarioSeleccionado[0], idEj);
             // mostrar resultado
             if (err == null) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Préstamo registrado correctamente", "Éxito",
-                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Préstamo registrado correctamente", "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
                 // Refrescar vistas dependientes y marcar inicio como activo
                 controlador.getControladorNavegacion().refrescarPublicaciones();
                 controlador.getControladorNavegacion().refrescarPanelControl();
                 controlador.getControladorNavegacion().marcarPantallaActiva("panelControl");
                 controlador.getControladorNavegacion().cambiarPantallaHijo("panelControl");
             } else {
-                javax.swing.JOptionPane.showMessageDialog(null, err, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, err, "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 

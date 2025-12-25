@@ -2,10 +2,14 @@ package com.example.vista;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -15,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.RootPaneContainer;
 
 import com.example.controlador.Controlador;
 import com.example.modelo.TipoUsuario;
@@ -81,14 +86,14 @@ public class EditarUsuarioDialog extends JDialog {
         setLocationRelativeTo(parent);
 
         // Añadir listener para manejar el overlay al cerrar
-        addWindowListener(new java.awt.event.WindowAdapter() {
+        addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
+            public void windowClosed(WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(java.awt.event.WindowEvent e) {
+            public void windowClosing(WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -109,7 +114,7 @@ public class EditarUsuarioDialog extends JDialog {
 
         // Título
         JLabel title = new JLabel("Editar Usuario");
-        title.setFont(title.getFont().deriveFont(java.awt.Font.BOLD, 16f));
+        title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 2;
@@ -289,10 +294,10 @@ public class EditarUsuarioDialog extends JDialog {
             return;
         try {
             // Recordar el glass pane previo
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
-            java.awt.Component current = rpc.getRootPane().getGlassPane();
+            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+            Component current = rpc.getRootPane().getGlassPane();
             previousGlassPane = current;
-            javax.swing.JPanel overlay = new javax.swing.JPanel();
+            JPanel overlay = new JPanel();
 
             // Hacerlo translúcido
             overlay.setOpaque(true);
@@ -313,7 +318,7 @@ public class EditarUsuarioDialog extends JDialog {
             return;
         try {
             // Restaurar el glass pane previo (si lo teníamos)
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
+            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
             if (previousGlassPane != null) {
                 rpc.getRootPane().setGlassPane(previousGlassPane);
                 previousGlassPane.setVisible(false);
