@@ -17,6 +17,30 @@ public class UsuarioDAO {
      */
     private final DBConnection dbConnection;
 
+    // SQL constants 🔧
+    private static final String SQL_CONSULTA_INICIO_SESION = "SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?";
+    private static final String SQL_CONSULTA_RECUPERAR_CUENTA = "SELECT * FROM usuarios WHERE usuario = ? OR email = ?";
+    private static final String SQL_TOTAL_SOCIOS_ACTIVOS = "SELECT COUNT(*) AS TOTAL FROM usuarios where estado = TRUE";
+    private static final String SQL_LISTA_USUARIOS_ESTADO = "SELECT u.id, u.dni, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS nombre_completo, "
+            + "CASE WHEN u.estado = FALSE THEN 'BAJA' "
+            + "WHEN EXISTS (SELECT 1 FROM sanciones s WHERE s.id_usuario = u.id AND s.estado = TRUE) "
+            + "THEN 'SANCIONADO' ELSE 'ACTIVO' END AS sancion_activa, "
+            + "u.tipo "
+            + "FROM usuarios u ORDER BY u.nombre ASC, u.apellido1 ASC, u.apellido2 ASC";
+    private static final String SQL_INSERT_USUARIO = "INSERT INTO usuarios (dni, nombre, apellido1, apellido2, email, contrasena, tipo, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_SELECT_USUARIO_POR_ID = "SELECT id, dni, nombre, apellido1, apellido2, email, tipo, estado FROM usuarios WHERE id = ?";
+    private static final String SQL_USUARIO_Y_ESTADO_BASE = "SELECT u.id, u.dni, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS nombre_completo, "
+            + "CASE WHEN u.estado = FALSE THEN 'BAJA' "
+            + "WHEN EXISTS (SELECT 1 FROM sanciones s WHERE s.id_usuario = u.id AND s.estado = TRUE) "
+            + "THEN 'SANCIONADO' ELSE 'ACTIVO' END AS sancion_activa, "
+            + "u.tipo "
+            + "FROM usuarios u";
+    private static final String SQL_UPDATE_USUARIO = "UPDATE usuarios SET dni = ?, nombre = ?, apellido1 = ?, apellido2 = ?, email = ?, tipo = ? WHERE id = ?";
+    private static final String SQL_BAJA_USUARIO = "UPDATE usuarios SET estado = FALSE WHERE id = ?";
+    private static final String SQL_CUENTA_PRESTAMOS_ACTIVOS_POR_USUARIO = "SELECT COUNT(*) AS total FROM prestamos WHERE id_usuario = ? AND estado = TRUE";
+    private static final String SQL_USUARIOS_SANCIONABLES = "SELECT u.id, u.dni, CONCAT(u.apellido1, ', ', u.nombre) AS nombre_completo, u.tipo "
+            + "FROM usuarios u WHERE u.tipo = 'E' AND u.estado = TRUE ORDER BY u.apellido1, u.nombre";
+
     /**
      * Constructor de UsuarioDAO
      * 
@@ -39,8 +63,7 @@ public class UsuarioDAO {
     public Usuario consultaInicioSesion(String usuario, String contrasena) {
         Usuario devolver = null;
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion
-                        .prepareStatement("SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?")) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_CONSULTA_INICIO_SESION)) {
             ps.setString(1, usuario);
             ps.setString(2, contrasena);
             try (ResultSet resultado = ps.executeQuery()) {
@@ -85,8 +108,7 @@ public class UsuarioDAO {
     public Usuario consultaRecuperarCuenta(String trim) {
         Usuario devolver = null;
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion
-                        .prepareStatement("SELECT * FROM usuarios WHERE usuario = ? OR email = ?")) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_CONSULTA_RECUPERAR_CUENTA)) {
             ps.setString(1, trim);
             ps.setString(2, trim);
             try (ResultSet resultado = ps.executeQuery()) {
@@ -131,8 +153,7 @@ public class UsuarioDAO {
         String totalSocios = "-1";
         // Consulta SQL para contar los socios activos
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion
-                        .prepareStatement("SELECT COUNT(*) AS TOTAL FROM usuarios where estado = TRUE")) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_TOTAL_SOCIOS_ACTIVOS)) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     totalSocios = rs.getString("TOTAL");
@@ -160,14 +181,7 @@ public class UsuarioDAO {
         String[][] devolver = new String[0][0];
         try (Connection conexion = dbConnection.getConnection();
                 // Consulta SQL
-                PreparedStatement ps = conexion.prepareStatement(
-                        "SELECT u.id, u.dni, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS nombre_completo, "
-                                + "CASE WHEN u.estado = FALSE THEN 'BAJA' "
-                                + "WHEN EXISTS (SELECT 1 FROM sanciones s WHERE s.id_usuario = u.id AND s.estado = TRUE) "
-                                + "THEN 'SANCIONADO' ELSE 'ACTIVO' END AS sancion_activa, "
-                                + "u.tipo "
-                                + "FROM usuarios u ORDER BY u.nombre ASC, u.apellido1 ASC, u.apellido2 ASC");) {
-            // Ejecutar consulta
+                PreparedStatement ps = conexion.prepareStatement(SQL_LISTA_USUARIOS_ESTADO);) { // Ejecutar consulta
             try (ResultSet rs = ps.executeQuery();) {
                 // Collect rows into a list (works with forward-only ResultSet)
                 java.util.List<String[]> rows = new java.util.ArrayList<>();
@@ -221,7 +235,7 @@ public class UsuarioDAO {
     public boolean insertarUsuario(Connection conexion, String dni, String nombre, String apellido1, String apellido2,
             String email, String contrasena, String tipo, boolean estado) {
         // Consulta SQL
-        String sql = "INSERT INTO usuarios (dni, nombre, apellido1, apellido2, email, contrasena, tipo, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        final String sql = SQL_INSERT_USUARIO;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
             ps.setString(1, dni);
@@ -254,8 +268,7 @@ public class UsuarioDAO {
         String[] devolver = null;
         try (Connection conexion = dbConnection.getConnection();
                 // Consulta SQL
-                PreparedStatement ps = conexion.prepareStatement(
-                        "SELECT id, dni, nombre, apellido1, apellido2, email, tipo, estado FROM usuarios WHERE id = ?")) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_USUARIO_POR_ID)) {
             // Asignar parámetro
             ps.setInt(1, idUsuario);
             // Ejecutar consulta
@@ -295,12 +308,7 @@ public class UsuarioDAO {
         try (Connection conexion = dbConnection.getConnection()) {
             // Consulta SQL dependiendo si es número (id) o texto (dni)
             boolean esNumero = dniOrId != null && dniOrId.matches("^\\d+$");
-            String sql = "SELECT u.id, u.dni, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS nombre_completo, "
-                    + "CASE WHEN u.estado = FALSE THEN 'BAJA' "
-                    + "WHEN EXISTS (SELECT 1 FROM sanciones s WHERE s.id_usuario = u.id AND s.estado = TRUE) "
-                    + "THEN 'SANCIONADO' ELSE 'ACTIVO' END AS sancion_activa, "
-                    + "u.tipo "
-                    + "FROM usuarios u WHERE " + (esNumero ? "u.id = ?" : "u.dni = ?");
+            final String sql = SQL_USUARIO_Y_ESTADO_BASE + (esNumero ? " WHERE u.id = ?" : " WHERE u.dni = ?");
             try (PreparedStatement ps = conexion.prepareStatement(sql)) {
                 // Asignar parámetro
                 if (esNumero) {
@@ -350,7 +358,7 @@ public class UsuarioDAO {
     public boolean actualizarUsuario(int idUsuario, String dni, String nombre, String apellido1, String apellido2,
             String email, String tipo) {
         // Consulta SQL
-        String sql = "UPDATE usuarios SET dni = ?, nombre = ?, apellido1 = ?, apellido2 = ?, email = ?, tipo = ? WHERE id = ?";
+        final String sql = SQL_UPDATE_USUARIO;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
@@ -379,7 +387,7 @@ public class UsuarioDAO {
      */
     public boolean bajaUsuario(int idUsuario) {
         // Consulta SQL
-        String sql = "UPDATE usuarios SET estado = FALSE WHERE id = ?";
+        final String sql = SQL_BAJA_USUARIO;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
@@ -403,7 +411,7 @@ public class UsuarioDAO {
      */
     public boolean tienePrestamosActivosUsuario(int idUsuario) {
         // Consulta SQL
-        String sql = "SELECT COUNT(*) AS total FROM prestamos WHERE id_usuario = ? AND estado = TRUE";
+        final String sql = SQL_CUENTA_PRESTAMOS_ACTIVOS_POR_USUARIO;
 
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -429,8 +437,7 @@ public class UsuarioDAO {
      */
     public String[][] obtenerUsuariosSancionables() {
         // Consulta SQL
-        String sql = "SELECT u.id, u.dni, CONCAT(u.apellido1, ', ', u.nombre) AS nombre_completo, u.tipo "
-                + "FROM usuarios u WHERE u.tipo = 'E' AND u.estado = TRUE ORDER BY u.apellido1, u.nombre";
+        final String sql = SQL_USUARIOS_SANCIONABLES;
         java.util.List<String[]> rows = new java.util.ArrayList<>();
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql);

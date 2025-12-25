@@ -16,6 +16,10 @@ public class AutorDAO {
      */
     private final DBConnection dbConnection;
 
+    // SQL constants 🔧
+    private static final String SQL_SELECT_AUTOR_ID_POR_NOMBRE = "SELECT id FROM autores WHERE nombre = ?";
+    private static final String SQL_INSERT_AUTOR = "INSERT INTO autores (nombre, nacionalidad) VALUES (?, ?)";
+
     /**
      * Constructor del DAO
      * 
@@ -36,7 +40,7 @@ public class AutorDAO {
      */
     public int obtenerIdPorNombre(String nombre) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement("SELECT id FROM autores WHERE nombre = ?")) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_AUTOR_ID_POR_NOMBRE)) {
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -58,7 +62,7 @@ public class AutorDAO {
      * @return id si existe o -1
      */
     public int obtenerIdPorNombre(Connection conexion, String nombre) {
-        try (PreparedStatement ps = conexion.prepareStatement("SELECT id FROM autores WHERE nombre = ?")) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_AUTOR_ID_POR_NOMBRE)) {
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -83,7 +87,7 @@ public class AutorDAO {
     public int crearAutor(String nombre, String nacionalidad) {
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(
-                        "INSERT INTO autores (nombre, nacionalidad) VALUES (?, ?)",
+                        SQL_INSERT_AUTOR,
                         Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, nombre);
             ps.setString(2, nacionalidad == null || nacionalidad.trim().isEmpty() ? "ES" : nacionalidad);
@@ -111,7 +115,7 @@ public class AutorDAO {
      */
     public int crearAutor(Connection conexion, String nombre, String nacionalidad) {
         try (PreparedStatement ps = conexion.prepareStatement(
-                "INSERT INTO autores (nombre, nacionalidad) VALUES (?, ?)",
+                SQL_INSERT_AUTOR,
                 Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, nombre);
             ps.setString(2, nacionalidad == null || nacionalidad.trim().isEmpty() ? "ES" : nacionalidad);

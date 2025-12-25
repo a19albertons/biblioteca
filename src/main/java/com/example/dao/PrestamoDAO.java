@@ -17,6 +17,17 @@ public class PrestamoDAO {
      */
     private final DBConnection dbConnection;
 
+    // SQL constants 🔧
+    private static final String SQL_PRESTAMOS_HOY = "SELECT COUNT(*) AS total FROM prestamos WHERE DATE(fecha_inicio) = ?";
+    private static final String SQL_PRESTAMOS_PENDIENTES = "SELECT COUNT(*) AS TOTAL FROM prestamos WHERE ? > fecha_fin AND estado = false";
+    private static final String SQL_ULTIMOS_MOVIMIENTOS = "SELECT p.estado, e.id AS id_ejemplar, pub.titulo FROM prestamos p JOIN ejemplares e ON p.id_ejemplar = e.id JOIN publicaciones pub ON e.id_publicacion = pub.id ORDER BY p.fecha_inicio DESC LIMIT 9";
+    private static final String SQL_INSERT_PRESTAMO = "INSERT INTO prestamos (id_usuario, id_ejemplar, fecha_inicio, fecha_fin, estado) VALUES (?, ?, ?, ?, TRUE)";
+    private static final String SQL_CNT_PRESTAMO_TIPO = "SELECT COUNT(*) AS cnt FROM prestamos p JOIN ejemplares e ON p.id_ejemplar = e.id JOIN publicaciones pub ON e.id_publicacion = pub.id WHERE p.id_usuario = ? AND p.estado = TRUE AND pub.tipo = ?";
+    private static final String SQL_CNT_PRESTAMO_USUARIO_EJEMPLAR = "SELECT COUNT(*) AS cnt FROM prestamos WHERE id_usuario = ? AND id_ejemplar = ? AND estado = TRUE";
+    private static final String SQL_UPDATE_DEVOLVER = "UPDATE prestamos SET estado = FALSE WHERE id_usuario = ? AND id_ejemplar = ? AND estado = TRUE";
+    private static final String SQL_SELECT_PRESTAMO_ACTIVO_POR_USUARIO_EJEMPLAR = "SELECT id, fecha_inicio, fecha_fin FROM prestamos WHERE id_usuario = ? AND id_ejemplar = ? AND estado = TRUE";
+    private static final String SQL_SELECT_ULTIMO_PRESTAMO_POR_EJEMPLAR = "SELECT id, id_usuario, fecha_inicio, fecha_fin, estado FROM prestamos WHERE id_ejemplar = ? ORDER BY fecha_inicio DESC, id DESC LIMIT 1";
+
     /**
      * Constructor con DBConnection (inyección)
      * 
@@ -40,8 +51,7 @@ public class PrestamoDAO {
         String totalPrestamos = "-1";
         // Consulta SQL para contar los préstamos de hoy
         try (Connection connection = dbConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(
-                        "SELECT COUNT(*) AS total FROM prestamos WHERE DATE(fecha_inicio) = ?")) {
+                PreparedStatement ps = connection.prepareStatement(SQL_PRESTAMOS_HOY)) {
             ps.setDate(1, Date.valueOf(hoy));
             // Obtiene el resultado y cierra el result set
             try (ResultSet rs = ps.executeQuery()) {
@@ -68,8 +78,7 @@ public class PrestamoDAO {
         String totalPendientes = "-1";
         // Consulta SQL para contar los préstamos pendientes
         try (Connection connection = dbConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(
-                        "SELECT COUNT(*) AS TOTAL FROM prestamos WHERE ? > fecha_fin AND estado = false")) {
+                PreparedStatement ps = connection.prepareStatement(SQL_PRESTAMOS_PENDIENTES)) {
             ps.setDate(1, Date.valueOf(hoy));
             // Obtiene el resultado y cierra el result set
             try (ResultSet rs = ps.executeQuery()) {
@@ -86,19 +95,15 @@ public class PrestamoDAO {
         return totalPendientes;
     }
 
-    // Ultimos movimientos de prestamos (Estado prestamos, id ejemplar, titulo
-    // publicacion)
+    /**
+     * Obtiene los últimos 9 movimientos de préstamos
+     * @return
+     */
     public String[][] ultimosMovimientos() {
         String[][] movimientos = new String[9][3];
         // Consulta SQL para obtener los últimos 9 movimientos de préstamos
         try (Connection connection = dbConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(
-                        "SELECT p.estado, e.id AS id_ejemplar, pub.titulo " +
-                                "FROM prestamos p " +
-                                "JOIN ejemplares e ON p.id_ejemplar = e.id " +
-                                "JOIN publicaciones pub ON e.id_publicacion = pub.id " +
-                                "ORDER BY p.fecha_inicio DESC " +
-                                "LIMIT 9")) {
+                PreparedStatement ps = connection.prepareStatement(SQL_ULTIMOS_MOVIMIENTOS)) {
             // Obtiene el resultado y cierra el result set
             try (ResultSet rs = ps.executeQuery()) {
                 int index = 0;
@@ -130,7 +135,7 @@ public class PrestamoDAO {
      */
     public boolean insertarPrestamo(int idUsuario, int idEjemplar, Date fechaInicio, Date fechaFin) {
         // Consulta SQL para insertar el préstamo
-        String sql = "INSERT INTO prestamos (id_usuario, id_ejemplar, fecha_inicio, fecha_fin, estado) VALUES (?, ?, ?, ?, TRUE)";
+        final String sql = SQL_INSERT_PRESTAMO;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
@@ -160,10 +165,7 @@ public class PrestamoDAO {
      */
     public boolean tienePrestamoActivoTipo(int idUsuario, char tipoPublicacion) {
         // Consulta SQL para comprobar préstamos activos por tipo
-        String sql = "SELECT COUNT(*) AS cnt FROM prestamos p "
-                + "JOIN ejemplares e ON p.id_ejemplar = e.id "
-                + "JOIN publicaciones pub ON e.id_publicacion = pub.id "
-                + "WHERE p.id_usuario = ? AND p.estado = TRUE AND pub.tipo = ?";
+        final String sql = SQL_CNT_PRESTAMO_TIPO;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
@@ -192,7 +194,7 @@ public class PrestamoDAO {
      */
     public boolean existePrestamoActivoUsuarioEjemplar(int idUsuario, int idEjemplar) {
         // Consulta SQL para comprobar préstamo activo entre usuario y ejemplar
-        String sql = "SELECT COUNT(*) AS cnt FROM prestamos WHERE id_usuario = ? AND id_ejemplar = ? AND estado = TRUE";
+        final String sql = SQL_CNT_PRESTAMO_USUARIO_EJEMPLAR;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
@@ -222,7 +224,7 @@ public class PrestamoDAO {
      */
     public boolean devolverPrestamoUsuarioEjemplar(int idUsuario, int idEjemplar) {
         // Consulta SQL para actualizar el estado del préstamo
-        String sql = "UPDATE prestamos SET estado = FALSE WHERE id_usuario = ? AND id_ejemplar = ? AND estado = TRUE";
+        final String sql = SQL_UPDATE_DEVOLVER;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
@@ -245,7 +247,7 @@ public class PrestamoDAO {
      */
     public String[] obtenerPrestamoActivoPorUsuarioEjemplar(int idUsuario, int idEjemplar) {
         // Consulta SQL para obtener el préstamo activo
-        String sql = "SELECT id, fecha_inicio, fecha_fin FROM prestamos WHERE id_usuario = ? AND id_ejemplar = ? AND estado = TRUE";
+        final String sql = SQL_SELECT_PRESTAMO_ACTIVO_POR_USUARIO_EJEMPLAR;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
@@ -278,7 +280,7 @@ public class PrestamoDAO {
      */
     public String[] obtenerUltimoPrestamoPorEjemplar(int idEjemplar) {
         // Consulta SQL para obtener el último préstamo por ejemplar
-        String sql = "SELECT id, id_usuario, fecha_inicio, fecha_fin, estado FROM prestamos WHERE id_ejemplar = ? ORDER BY fecha_inicio DESC, id DESC LIMIT 1";
+        final String sql = SQL_SELECT_ULTIMO_PRESTAMO_POR_EJEMPLAR;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro

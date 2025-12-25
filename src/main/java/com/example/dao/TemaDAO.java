@@ -16,6 +16,10 @@ public class TemaDAO {
      */
     private final DBConnection dbConnection;
 
+    // SQL constants 🔧
+    private static final String SQL_SELECT_TEMA_ID_POR_NOMBRE = "SELECT id FROM temas WHERE nombre = ?";
+    private static final String SQL_INSERT_TEMA = "INSERT INTO temas (nombre) VALUES (?)";
+
     /**
      * Constructor del DAO
      * 
@@ -28,9 +32,15 @@ public class TemaDAO {
         this.dbConnection = dbConnection;
     }
 
+    /**
+     * Obtiene id por nombre
+     * 
+     * @param nombre
+     * @return
+     */
     public int obtenerIdPorNombre(String nombre) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement("SELECT id FROM temas WHERE nombre = ?")) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_TEMA_ID_POR_NOMBRE)) {
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next())
@@ -43,9 +53,15 @@ public class TemaDAO {
         return -1;
     }
 
+    /**
+     * Crea un tema y devuelve su id
+     * 
+     * @param nombre
+     * @return
+     */
     public int crearTema(String nombre) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement("INSERT INTO temas (nombre) VALUES (?)",
+                PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_TEMA,
                         Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, nombre);
             ps.executeUpdate();
@@ -60,6 +76,12 @@ public class TemaDAO {
         return -1;
     }
 
+    /**
+     * Obtiene o crea un tema
+     * 
+     * @param nombre
+     * @return
+     */
     public int obtenerOCrear(String nombre) {
         int id = obtenerIdPorNombre(nombre);
         if (id != -1)
@@ -71,13 +93,13 @@ public class TemaDAO {
      * Variante que usa una Connection existente
      */
     public int obtenerOCrear(Connection conexion, String nombre) {
-        try (PreparedStatement ps = conexion.prepareStatement("SELECT id FROM temas WHERE nombre = ?")) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_TEMA_ID_POR_NOMBRE)) {
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next())
                     return rs.getInt("id");
             }
-            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO temas (nombre) VALUES (?)",
+            try (PreparedStatement ins = conexion.prepareStatement(SQL_INSERT_TEMA,
                     Statement.RETURN_GENERATED_KEYS)) {
                 ins.setString(1, nombre);
                 ins.executeUpdate();

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------------------
 Test set: com.example.UsuarioEstadoTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.857 s - in com.example.UsuarioEstadoTest
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0 s <<< FAILURE! - in com.example.UsuarioEstadoTest
+usuarioBajaPresente(com.example.UsuarioEstadoTest)  Time elapsed: 0 s  <<< ERROR!
+java.lang.Error: 
+Unresolved compilation problem: 
+	The constructor Controlador() is undefined
+
+	at com.example.UsuarioEstadoTest.usuarioBajaPresente(UsuarioEstadoTest.java:15)
+

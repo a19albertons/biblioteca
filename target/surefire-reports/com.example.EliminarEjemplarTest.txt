@@ -1,4 +1,18 @@
 -------------------------------------------------------------------------------
 Test set: com.example.EliminarEjemplarTest
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.536 s - in com.example.EliminarEjemplarTest
+Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.001 s <<< FAILURE! - in com.example.EliminarEjemplarTest
+eliminarEjemplarConPrestamoActivoFalla(com.example.EliminarEjemplarTest)  Time elapsed: 0 s  <<< ERROR!
+java.lang.Error: 
+Unresolved compilation problem: 
+	The constructor Controlador() is undefined
+
+	at com.example.EliminarEjemplarTest.eliminarEjemplarConPrestamoActivoFalla(EliminarEjemplarTest.java:18)
+
+eliminarEjemplarSinPrestamosDaBaja(com.example.EliminarEjemplarTest)  Time elapsed: 0 s  <<< ERROR!
+java.lang.Error: 
+Unresolved compilation problem: 
+	The constructor Controlador() is undefined
+
+	at com.example.EliminarEjemplarTest.eliminarEjemplarSinPrestamosDaBaja(EliminarEjemplarTest.java:31)
+

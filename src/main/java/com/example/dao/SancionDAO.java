@@ -15,6 +15,11 @@ public class SancionDAO {
      */
     private final DBConnection dbConnection;
 
+    // SQL constants 🔧
+    private static final String SQL_INSERT_SANCION = "INSERT INTO sanciones (id_usuario, id_prestamo, inicio_sancion, fin_sancion, descripcion, estado) VALUES (?, ?, ?, ?, ?, TRUE)";
+    private static final String SQL_SELECT_SANCION_ACTIVA_POR_USUARIO = "SELECT id, fin_sancion FROM sanciones WHERE id_usuario = ? AND estado = TRUE LIMIT 1";
+    private static final String SQL_UPDATE_DESACTIVAR_SANCION = "UPDATE sanciones SET estado = FALSE WHERE id = ?";
+
     /**
      * Constructor del DAO
      * 
@@ -39,7 +44,7 @@ public class SancionDAO {
      */
     public boolean insertarSancion(int idUsuario, int idPrestamo, Date inicio, Date fin, String descripcion) {
         // insertar sanción
-        String sql = "INSERT INTO sanciones (id_usuario, id_prestamo, inicio_sancion, fin_sancion, descripcion, estado) VALUES (?, ?, ?, ?, ?, TRUE)";
+        final String sql = SQL_INSERT_SANCION;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetros
@@ -67,7 +72,7 @@ public class SancionDAO {
      */
     public String[] obtenerSancionActivaPorUsuario(int idUsuario) {
         // obtener sanción activa
-        String sql = "SELECT id, fin_sancion FROM sanciones WHERE id_usuario = ? AND estado = TRUE LIMIT 1";
+        final String sql = SQL_SELECT_SANCION_ACTIVA_POR_USUARIO;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetro
@@ -99,7 +104,7 @@ public class SancionDAO {
      */
     public boolean desactivarSancionPorId(int idSancion) {
         // consulta SQL para desactivar sanción
-        String sql = "UPDATE sanciones SET estado = FALSE WHERE id = ?";
+        final String sql = SQL_UPDATE_DESACTIVAR_SANCION;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetro

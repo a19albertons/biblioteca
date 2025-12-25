@@ -16,6 +16,10 @@ public class ModuloDAO {
      */
     private final DBConnection dbConnection;
 
+    // SQL constants 🔧
+    private static final String SQL_SELECT_MODULO_ID_POR_NOMBRE = "SELECT id FROM modulo WHERE nombre = ?";
+    private static final String SQL_INSERT_MODULO = "INSERT INTO modulo (nombre) VALUES (?)";
+
     /**
      * Constructor del DAO
      * 
@@ -36,7 +40,7 @@ public class ModuloDAO {
      */
     public int obtenerIdPorNombre(String nombre) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement("SELECT id FROM modulo WHERE nombre = ?")) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_MODULO_ID_POR_NOMBRE)) {
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next())
@@ -54,7 +58,7 @@ public class ModuloDAO {
      */
     public int crearModulo(String nombre) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement("INSERT INTO modulo (nombre) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_MODULO, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, nombre);
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -80,13 +84,13 @@ public class ModuloDAO {
      */
     public int obtenerOCrear(Connection conexion, String nombre) {
         int id = -1;
-        try (PreparedStatement ps = conexion.prepareStatement("SELECT id FROM modulo WHERE nombre = ?")) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_MODULO_ID_POR_NOMBRE)) {
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next())
                     return rs.getInt("id");
             }
-            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO modulo (nombre) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ins = conexion.prepareStatement(SQL_INSERT_MODULO, Statement.RETURN_GENERATED_KEYS)) {
                 ins.setString(1, nombre);
                 ins.executeUpdate();
                 try (ResultSet rs2 = ins.getGeneratedKeys()) {

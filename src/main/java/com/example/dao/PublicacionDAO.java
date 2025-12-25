@@ -18,6 +18,76 @@ public class PublicacionDAO {
      */
     private final DBConnection dbConnection;
 
+    // SQL constants 🔧
+    private static final String SQL_LISTA_EDITORIALES = "SELECT editorial FROM publicaciones GROUP BY editorial ORDER BY editorial ASC";
+    private static final String SQL_INSERT_PUBLICACION = "INSERT INTO publicaciones (titulo, editorial, codigo_isbn, idioma, tipo) VALUES (?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_LIBRO = "INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES (?, ?, ?)";
+    private static final String SQL_INSERT_REVISTA = "INSERT INTO revistas (id_publicacion, periodicidad, num_revista) VALUES (?, ?, ?)";
+    private static final String SQL_INSERT_PUBLICACION_MODULO = "INSERT INTO publicacion_modulo (id_publicacion, id_modulo) VALUES (?, ?)";
+    private static final String SQL_INSERT_PUBLICACION_CICLO = "INSERT INTO publicacion_ciclo (id_publicacion, id_ciclo) VALUES (?, ?)";
+    private static final String SQL_INSERT_PUBLICACION_TEMA = "INSERT INTO publicacion_tema (id_publicacion, id_tema) VALUES (?, ?)";
+    private static final String SQL_INSERT_LIBRO_AUTOR = "INSERT INTO libros_autores (id_libro, id_autor) VALUES (?, ?)";
+    private static final String SQL_SELECT_MAX_NUM_REVISTA = "SELECT COALESCE(MAX(num_revista),0) AS m FROM revistas";
+    private static final String SQL_LISTA_PUBLICACIONES_RESUMEN = 
+            "SELECT p.id, p.titulo, p.codigo_isbn, "
+            + "COALESCE(GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', '),'') AS autores, "
+            + "COALESCE(GROUP_CONCAT(DISTINCT ci.nombre SEPARATOR ', '),'') AS ciclos, "
+            + "p.editorial, "
+            + "(SELECT COUNT(*) FROM ejemplares e WHERE e.id_publicacion = p.id AND e.estado = TRUE AND e.id NOT IN (SELECT id_ejemplar FROM prestamos WHERE estado = TRUE)) AS disponibles "
+            + "FROM publicaciones p "
+            + "LEFT JOIN libros_autores la ON p.id = la.id_libro "
+            + "LEFT JOIN autores a ON la.id_autor = a.id "
+            + "LEFT JOIN publicacion_ciclo pc ON p.id = pc.id_publicacion "
+            + "LEFT JOIN ciclos ci ON pc.id_ciclo = ci.id "
+            + "WHERE p.estado = TRUE "
+            + "GROUP BY p.id "
+            + "ORDER BY p.titulo ASC";
+    private static final String SQL_OBTENER_PUBLICACION_RESUMEN_POR_ID = 
+            "SELECT p.id, p.titulo, p.codigo_isbn, "
+            + "COALESCE(GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', '),'') AS autores, "
+            + "COALESCE(GROUP_CONCAT(DISTINCT ci.nombre SEPARATOR ', '),'') AS ciclos, "
+            + "p.editorial, "
+            + "(SELECT COUNT(*) FROM ejemplares e WHERE e.id_publicacion = p.id AND e.estado = TRUE AND e.id NOT IN (SELECT id_ejemplar FROM prestamos WHERE estado = TRUE)) AS disponibles "
+            + "FROM publicaciones p "
+            + "LEFT JOIN libros_autores la ON p.id = la.id_libro "
+            + "LEFT JOIN autores a ON la.id_autor = a.id "
+            + "LEFT JOIN publicacion_ciclo pc ON p.id = pc.id_publicacion "
+            + "LEFT JOIN ciclos ci ON pc.id_ciclo = ci.id "
+            + "WHERE p.estado = TRUE AND p.id = ? "
+            + "GROUP BY p.id "
+            + "ORDER BY p.titulo ASC";
+    private static final String SQL_PUBLICACION_DETALLES_POR_ID = 
+            "SELECT p.id, p.titulo, p.codigo_isbn, p.idioma, p.tipo, "
+            + "COALESCE(GROUP_CONCAT(DISTINCT t.nombre SEPARATOR ', '),'') AS temas, "
+            + "COALESCE(GROUP_CONCAT(DISTINCT m.nombre SEPARATOR ', '),'') AS modulos, "
+            + "COALESCE(GROUP_CONCAT(DISTINCT c.nombre SEPARATOR ', '),'') AS ciclos, "
+            + "p.editorial, l.num_edicion, l.fecha_publicacion, "
+            + "COALESCE(GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', '),'') AS autores, "
+            + "r.periodicidad "
+            + "FROM publicaciones p "
+            + "LEFT JOIN libros l ON p.id = l.id_publicacion "
+            + "LEFT JOIN revistas r ON p.id = r.id_publicacion "
+            + "LEFT JOIN libros_autores la ON p.id = la.id_libro "
+            + "LEFT JOIN autores a ON la.id_autor = a.id "
+            + "LEFT JOIN publicacion_tema pt ON p.id = pt.id_publicacion "
+            + "LEFT JOIN temas t ON pt.id_tema = t.id "
+            + "LEFT JOIN publicacion_modulo pm ON p.id = pm.id_publicacion "
+            + "LEFT JOIN modulo m ON pm.id_modulo = m.id "
+            + "LEFT JOIN publicacion_ciclo pc ON p.id = pc.id_publicacion "
+            + "LEFT JOIN ciclos c ON pc.id_ciclo = c.id "
+            + "WHERE p.id = ? "
+            + "GROUP BY p.id";
+    private static final String SQL_UPDATE_PUBLICACION = "UPDATE publicaciones SET titulo = ?, editorial = ?, codigo_isbn = ?, idioma = ?, tipo = ? WHERE id = ?";
+    private static final String SQL_UPDATE_LIBROS = "UPDATE libros SET num_edicion = ?, fecha_publicacion = ? WHERE id_publicacion = ?";
+    private static final String SQL_UPDATE_REVISTAS = "UPDATE revistas SET periodicidad = ? WHERE id_publicacion = ?";
+    private static final String SQL_DELETE_PUBLICACION_MODULO = "DELETE FROM publicacion_modulo WHERE id_publicacion = ?";
+    private static final String SQL_DELETE_PUBLICACION_CICLO = "DELETE FROM publicacion_ciclo WHERE id_publicacion = ?";
+    private static final String SQL_DELETE_PUBLICACION_TEMA = "DELETE FROM publicacion_tema WHERE id_publicacion = ?";
+    private static final String SQL_DELETE_LIBROS_AUTORES = "DELETE FROM libros_autores WHERE id_libro = ?";
+    private static final String SQL_TIENEPRESTAMOS_ACTIVOS = "SELECT COUNT(*) AS cnt FROM prestamos p JOIN ejemplares e ON p.id_ejemplar = e.id WHERE e.id_publicacion = ? AND p.estado = TRUE";
+    private static final String SQL_BAJA_EJEMPLARES = "UPDATE ejemplares SET estado = FALSE WHERE id_publicacion = ?";
+    private static final String SQL_BAJA_PUBLICACION = "UPDATE publicaciones SET estado = FALSE WHERE id = ?";
+
     /**
      * Constructor del DAO
      * 
@@ -40,8 +110,7 @@ public class PublicacionDAO {
         ArrayList<String> devolver = new ArrayList<>();
         try (Connection conexion = dbConnection.getConnection();
                 // Consulta SQL
-                PreparedStatement ps = conexion.prepareStatement(
-                        "SELECT editorial FROM publicaciones GROUP BY editorial ORDER BY editorial ASC");) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_LISTA_EDITORIALES);) {
             // Ejecutar consulta
             try (ResultSet rs = ps.executeQuery();) {
                 while (rs.next()) {
@@ -69,9 +138,7 @@ public class PublicacionDAO {
      */
     public int insertarPublicacion(String titulo, String editorial, String codigoIsbn, String idioma, char tipo) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement(
-                        "INSERT INTO publicaciones (titulo, editorial, codigo_isbn, idioma, tipo) VALUES (?, ?, ?, ?, ?)",
-                        Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, titulo);
             ps.setString(2, editorial);
             ps.setString(3, codigoIsbn);
@@ -95,9 +162,7 @@ public class PublicacionDAO {
      * una transacción
      */
     public int insertarPublicacion(Connection conexion, String titulo, String editorial, String codigoIsbn, String idioma, char tipo) {
-        try (PreparedStatement ps = conexion.prepareStatement(
-                "INSERT INTO publicaciones (titulo, editorial, codigo_isbn, idioma, tipo) VALUES (?, ?, ?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, titulo);
             ps.setString(2, editorial);
             ps.setString(3, codigoIsbn);
@@ -126,8 +191,7 @@ public class PublicacionDAO {
      */
     public boolean insertarLibro(int idPublicacion, int numEdicion, Date fechaPublicacion) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement(
-                        "INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES (?, ?, ?)") ) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_LIBRO) ) {
             ps.setInt(1, idPublicacion);
             ps.setInt(2, numEdicion);
             ps.setDate(3, fechaPublicacion);
@@ -144,8 +208,7 @@ public class PublicacionDAO {
      * Variante que utiliza una Connection existente (transacción)
      */
     public boolean insertarLibro(Connection conexion, int idPublicacion, int numEdicion, Date fechaPublicacion) {
-        try (PreparedStatement ps = conexion.prepareStatement(
-                "INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES (?, ?, ?)") ) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_LIBRO) ) {
             ps.setInt(1, idPublicacion);
             ps.setInt(2, numEdicion);
             ps.setDate(3, fechaPublicacion);
@@ -168,8 +231,7 @@ public class PublicacionDAO {
      */
     public boolean insertarRevista(int idPublicacion, String periodicidad, int numRevista) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement(
-                        "INSERT INTO revistas (id_publicacion, periodicidad, num_revista) VALUES (?, ?, ?)") ) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_REVISTA) ) {
             ps.setInt(1, idPublicacion);
             ps.setString(2, periodicidad);
             ps.setInt(3, numRevista);
@@ -186,8 +248,7 @@ public class PublicacionDAO {
      * Variante que utiliza una Connection existente (transaccional)
      */
     public boolean insertarRevista(Connection conexion, int idPublicacion, String periodicidad, int numRevista) {
-        try (PreparedStatement ps = conexion.prepareStatement(
-                "INSERT INTO revistas (id_publicacion, periodicidad, num_revista) VALUES (?, ?, ?)") ) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_REVISTA) ) {
             ps.setInt(1, idPublicacion);
             ps.setString(2, periodicidad);
             ps.setInt(3, numRevista);
@@ -205,8 +266,7 @@ public class PublicacionDAO {
      */
     public boolean insertarPublicacionModulo(int idPublicacion, int idModulo) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement(
-                        "INSERT INTO publicacion_modulo (id_publicacion, id_modulo) VALUES (?, ?)") ) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_MODULO) ) {
             ps.setInt(1, idPublicacion);
             ps.setInt(2, idModulo);
             ps.executeUpdate();
@@ -222,8 +282,7 @@ public class PublicacionDAO {
      * Variante transaccional que usa una Connection existente
      */
     public boolean insertarPublicacionModulo(Connection conexion, int idPublicacion, int idModulo) {
-        try (PreparedStatement ps = conexion.prepareStatement(
-                "INSERT INTO publicacion_modulo (id_publicacion, id_modulo) VALUES (?, ?)") ) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_MODULO) ) {
             ps.setInt(1, idPublicacion);
             ps.setInt(2, idModulo);
             ps.executeUpdate();
@@ -240,8 +299,7 @@ public class PublicacionDAO {
      */
     public boolean insertarPublicacionCiclo(int idPublicacion, int idCiclo) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement(
-                        "INSERT INTO publicacion_ciclo (id_publicacion, id_ciclo) VALUES (?, ?)") ) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_CICLO) ) {
             ps.setInt(1, idPublicacion);
             ps.setInt(2, idCiclo);
             ps.executeUpdate();
@@ -257,8 +315,7 @@ public class PublicacionDAO {
      * Variante transaccional que usa una Connection existente
      */
     public boolean insertarPublicacionCiclo(Connection conexion, int idPublicacion, int idCiclo) {
-        try (PreparedStatement ps = conexion.prepareStatement(
-                "INSERT INTO publicacion_ciclo (id_publicacion, id_ciclo) VALUES (?, ?)") ) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_CICLO) ) {
             ps.setInt(1, idPublicacion);
             ps.setInt(2, idCiclo);
             ps.executeUpdate();
@@ -275,8 +332,7 @@ public class PublicacionDAO {
      */
     public boolean insertarPublicacionTema(int idPublicacion, int idTema) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement(
-                        "INSERT INTO publicacion_tema (id_publicacion, id_tema) VALUES (?, ?)") ) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_TEMA) ) {
             ps.setInt(1, idPublicacion);
             ps.setInt(2, idTema);
             ps.executeUpdate();
@@ -292,8 +348,7 @@ public class PublicacionDAO {
      * Variante transaccional que usa una Connection existente
      */
     public boolean insertarPublicacionTema(Connection conexion, int idPublicacion, int idTema) {
-        try (PreparedStatement ps = conexion.prepareStatement(
-                "INSERT INTO publicacion_tema (id_publicacion, id_tema) VALUES (?, ?)") ) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_TEMA) ) {
             ps.setInt(1, idPublicacion);
             ps.setInt(2, idTema);
             ps.executeUpdate();
@@ -310,8 +365,7 @@ public class PublicacionDAO {
      */
     public boolean insertarLibroAutor(int idLibro, int idAutor) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement(
-                        "INSERT INTO libros_autores (id_libro, id_autor) VALUES (?, ?)") ) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_LIBRO_AUTOR) ) {
             ps.setInt(1, idLibro);
             ps.setInt(2, idAutor);
             ps.executeUpdate();
@@ -327,8 +381,7 @@ public class PublicacionDAO {
      * Variante transaccional que usa una Connection existente
      */
     public boolean insertarLibroAutor(Connection conexion, int idLibro, int idAutor) {
-        try (PreparedStatement ps = conexion.prepareStatement(
-                "INSERT INTO libros_autores (id_libro, id_autor) VALUES (?, ?)") ) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_LIBRO_AUTOR) ) {
             ps.setInt(1, idLibro);
             ps.setInt(2, idAutor);
             ps.executeUpdate();
@@ -346,7 +399,7 @@ public class PublicacionDAO {
      */
     public int siguienteNumRevista() {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement("SELECT COALESCE(MAX(num_revista),0) AS m FROM revistas")) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_MAX_NUM_REVISTA)) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("m") + 1;
@@ -363,7 +416,7 @@ public class PublicacionDAO {
      * Variante transaccional que usa una Connection existente
      */
     public int siguienteNumRevista(Connection conexion) {
-        try (PreparedStatement ps = conexion.prepareStatement("SELECT COALESCE(MAX(num_revista),0) AS m FROM revistas")) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_MAX_NUM_REVISTA)) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("m") + 1;
@@ -384,19 +437,7 @@ public class PublicacionDAO {
      */
     public String[][] listaPublicacionesResumen() {
         java.util.List<String[]> lista = new ArrayList<>();
-        String sql = "SELECT p.id, p.titulo, p.codigo_isbn, "
-                + "COALESCE(GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', '),'') AS autores, "
-                + "COALESCE(GROUP_CONCAT(DISTINCT ci.nombre SEPARATOR ', '),'') AS ciclos, "
-                + "p.editorial, "
-                + "(SELECT COUNT(*) FROM ejemplares e WHERE e.id_publicacion = p.id AND e.estado = TRUE AND e.id NOT IN (SELECT id_ejemplar FROM prestamos WHERE estado = TRUE)) AS disponibles "
-                + "FROM publicaciones p "
-                + "LEFT JOIN libros_autores la ON p.id = la.id_libro "
-                + "LEFT JOIN autores a ON la.id_autor = a.id "
-                + "LEFT JOIN publicacion_ciclo pc ON p.id = pc.id_publicacion "
-                + "LEFT JOIN ciclos ci ON pc.id_ciclo = ci.id "
-                + "WHERE p.estado = TRUE "
-                + "GROUP BY p.id "
-                + "ORDER BY p.titulo ASC";
+        final String sql = SQL_LISTA_PUBLICACIONES_RESUMEN; 
 
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -444,19 +485,7 @@ public class PublicacionDAO {
      * @return String[] con columnas: titulo,isbn,autores,ciclos,editorial,disponibles,id
      */
     public String[] obtenerResumenPublicacionPorId(int id) {
-        String sql = "SELECT p.id, p.titulo, p.codigo_isbn, "
-                + "COALESCE(GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', '),'') AS autores, "
-                + "COALESCE(GROUP_CONCAT(DISTINCT ci.nombre SEPARATOR ', '),'') AS ciclos, "
-                + "p.editorial, "
-                + "(SELECT COUNT(*) FROM ejemplares e WHERE e.id_publicacion = p.id AND e.estado = TRUE AND e.id NOT IN (SELECT id_ejemplar FROM prestamos WHERE estado = TRUE)) AS disponibles "
-                + "FROM publicaciones p "
-                + "LEFT JOIN libros_autores la ON p.id = la.id_libro "
-                + "LEFT JOIN autores a ON la.id_autor = a.id "
-                + "LEFT JOIN publicacion_ciclo pc ON p.id = pc.id_publicacion "
-                + "LEFT JOIN ciclos ci ON pc.id_ciclo = ci.id "
-                + "WHERE p.estado = TRUE AND p.id = ? "
-                + "GROUP BY p.id "
-                + "ORDER BY p.titulo ASC";
+        final String sql = SQL_OBTENER_PUBLICACION_RESUMEN_POR_ID; 
 
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -497,26 +526,7 @@ public class PublicacionDAO {
      *         (o null si no existe la publicación)
      */
     public String[] obtenerPublicacionDetallesPorId(int id) {
-        String sql = "SELECT p.id, p.titulo, p.codigo_isbn, p.idioma, p.tipo, "
-                + "COALESCE(GROUP_CONCAT(DISTINCT t.nombre SEPARATOR ', '),'') AS temas, "
-                + "COALESCE(GROUP_CONCAT(DISTINCT m.nombre SEPARATOR ', '),'') AS modulos, "
-                + "COALESCE(GROUP_CONCAT(DISTINCT c.nombre SEPARATOR ', '),'') AS ciclos, "
-                + "p.editorial, l.num_edicion, l.fecha_publicacion, "
-                + "COALESCE(GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', '),'') AS autores, "
-                + "r.periodicidad "
-                + "FROM publicaciones p "
-                + "LEFT JOIN libros l ON p.id = l.id_publicacion "
-                + "LEFT JOIN revistas r ON p.id = r.id_publicacion "
-                + "LEFT JOIN libros_autores la ON p.id = la.id_libro "
-                + "LEFT JOIN autores a ON la.id_autor = a.id "
-                + "LEFT JOIN publicacion_tema pt ON p.id = pt.id_publicacion "
-                + "LEFT JOIN temas t ON pt.id_tema = t.id "
-                + "LEFT JOIN publicacion_modulo pm ON p.id = pm.id_publicacion "
-                + "LEFT JOIN modulo m ON pm.id_modulo = m.id "
-                + "LEFT JOIN publicacion_ciclo pc ON p.id = pc.id_publicacion "
-                + "LEFT JOIN ciclos c ON pc.id_ciclo = c.id "
-                + "WHERE p.id = ? "
-                + "GROUP BY p.id";
+        final String sql = SQL_PUBLICACION_DETALLES_POR_ID; 
 
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -566,8 +576,7 @@ public class PublicacionDAO {
      */
     public boolean actualizarPublicacion(Connection conexion, int id, String titulo, String editorial,
             String codigoIsbn, String idioma, char tipo) {
-        try (PreparedStatement ps = conexion.prepareStatement(
-                "UPDATE publicaciones SET titulo = ?, editorial = ?, codigo_isbn = ?, idioma = ?, tipo = ? WHERE id = ?")) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_UPDATE_PUBLICACION)) {
             ps.setString(1, titulo);
             ps.setString(2, editorial);
             ps.setString(3, codigoIsbn);
@@ -587,8 +596,7 @@ public class PublicacionDAO {
      * Actualiza o inserta la fila en `libros` para la publicación dada.
      */
     public boolean actualizarLibro(Connection conexion, int idPublicacion, int numEdicion, Date fechaPublicacion) {
-        try (PreparedStatement ps = conexion.prepareStatement(
-                "UPDATE libros SET num_edicion = ?, fecha_publicacion = ? WHERE id_publicacion = ?")) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_UPDATE_LIBROS)) {
             ps.setInt(1, numEdicion);
             ps.setDate(2, fechaPublicacion);
             ps.setInt(3, idPublicacion);
@@ -609,8 +617,7 @@ public class PublicacionDAO {
      * Actualiza o inserta la fila en `revistas` para la publicación dada.
      */
     public boolean actualizarRevista(Connection conexion, int idPublicacion, String periodicidad) {
-        try (PreparedStatement ps = conexion.prepareStatement(
-                "UPDATE revistas SET periodicidad = ? WHERE id_publicacion = ?")) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_UPDATE_REVISTAS)) {
             ps.setString(1, periodicidad);
             ps.setInt(2, idPublicacion);
             int updated = ps.executeUpdate();
@@ -636,10 +643,10 @@ public class PublicacionDAO {
      * @return true si las eliminaciones se realizaron correctamente, false en caso de error
      */
     public boolean eliminarRelacionesPublicacion(Connection conexion, int idPublicacion) {
-        try (PreparedStatement ps1 = conexion.prepareStatement("DELETE FROM publicacion_modulo WHERE id_publicacion = ?");
-                PreparedStatement ps2 = conexion.prepareStatement("DELETE FROM publicacion_ciclo WHERE id_publicacion = ?");
-                PreparedStatement ps3 = conexion.prepareStatement("DELETE FROM publicacion_tema WHERE id_publicacion = ?");
-                PreparedStatement ps4 = conexion.prepareStatement("DELETE FROM libros_autores WHERE id_libro = ?")) {
+        try (PreparedStatement ps1 = conexion.prepareStatement(SQL_DELETE_PUBLICACION_MODULO);
+                PreparedStatement ps2 = conexion.prepareStatement(SQL_DELETE_PUBLICACION_CICLO);
+                PreparedStatement ps3 = conexion.prepareStatement(SQL_DELETE_PUBLICACION_TEMA);
+                PreparedStatement ps4 = conexion.prepareStatement(SQL_DELETE_LIBROS_AUTORES)) {
             ps1.setInt(1, idPublicacion);
             ps1.executeUpdate();
             ps2.setInt(1, idPublicacion);
@@ -665,7 +672,7 @@ public class PublicacionDAO {
      *         contrario
      */
     public boolean tienePrestamosActivos(int idPublicacion) {
-        String sql = "SELECT COUNT(*) AS cnt FROM prestamos p JOIN ejemplares e ON p.id_ejemplar = e.id WHERE e.id_publicacion = ? AND p.estado = TRUE";
+        final String sql = SQL_TIENEPRESTAMOS_ACTIVOS; 
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, idPublicacion);
@@ -690,8 +697,8 @@ public class PublicacionDAO {
      * @return true si OK
      */
     public boolean bajaPublicacion(Connection conexion, int idPublicacion) {
-        try (PreparedStatement ps1 = conexion.prepareStatement("UPDATE ejemplares SET estado = FALSE WHERE id_publicacion = ?");
-                PreparedStatement ps2 = conexion.prepareStatement("UPDATE publicaciones SET estado = FALSE WHERE id = ?")) {
+        try (PreparedStatement ps1 = conexion.prepareStatement(SQL_BAJA_EJEMPLARES);
+                PreparedStatement ps2 = conexion.prepareStatement(SQL_BAJA_PUBLICACION)) {
             ps1.setInt(1, idPublicacion);
             ps1.executeUpdate();
             ps2.setInt(1, idPublicacion);

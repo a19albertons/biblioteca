@@ -17,6 +17,11 @@ public class CicloDAO {
      */
     private final DBConnection dbConnection;
 
+    // SQL constants 🔧
+    private static final String SQL_LISTA_CICLOS = "SELECT nombre FROM ciclos ORDER BY nombre ASC";
+    private static final String SQL_SELECT_CICLO_ID_POR_NOMBRE = "SELECT id FROM ciclos WHERE nombre = ?";
+    private static final String SQL_INSERT_CICLO = "INSERT INTO ciclos (nombre) VALUES (?)";
+
     /**
      * Constructor del DAO
      * 
@@ -39,7 +44,7 @@ public class CicloDAO {
         ArrayList<String> devolver = new ArrayList<>();
         try (Connection conexion = dbConnection.getConnection();
                 // Consulta SQL
-                PreparedStatement ps = conexion.prepareStatement("SELECT nombre FROM ciclos ORDER BY nombre ASC");) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_LISTA_CICLOS);) {
             // Ejecutar consulta
             try (ResultSet rs = ps.executeQuery();) {
                 while (rs.next()) {
@@ -62,7 +67,7 @@ public class CicloDAO {
      */
     public int obtenerOCrear(String nombre) {
         try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement("SELECT id FROM ciclos WHERE nombre = ?")) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_CICLO_ID_POR_NOMBRE)) {
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -70,7 +75,7 @@ public class CicloDAO {
                 }
             }
             // Si no existe, insertamos
-            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO ciclos (nombre) VALUES (?)",
+            try (PreparedStatement ins = conexion.prepareStatement(SQL_INSERT_CICLO,
                     Statement.RETURN_GENERATED_KEYS)) {
                 ins.setString(1, nombre);
                 ins.executeUpdate();
@@ -91,14 +96,14 @@ public class CicloDAO {
      * Variante que usa una Connection existente (transacciones)
      */
     public int obtenerOCrear(Connection conexion, String nombre) {
-        try (PreparedStatement ps = conexion.prepareStatement("SELECT id FROM ciclos WHERE nombre = ?")) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_CICLO_ID_POR_NOMBRE)) {
             ps.setString(1, nombre);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("id");
                 }
             }
-            try (PreparedStatement ins = conexion.prepareStatement("INSERT INTO ciclos (nombre) VALUES (?)",
+            try (PreparedStatement ins = conexion.prepareStatement(SQL_INSERT_CICLO,
                     Statement.RETURN_GENERATED_KEYS)) {
                 ins.setString(1, nombre);
                 ins.executeUpdate();

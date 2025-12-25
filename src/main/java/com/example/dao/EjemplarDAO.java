@@ -18,6 +18,17 @@ public class EjemplarDAO {
      */
     private final DBConnection dbConnection;
 
+    // SQL constants 🔧
+    private static final String SQL_LISTA_EJEMPLARES_POR_PUBLICACION = "SELECT e.id, e.num_ejemplar, e.fecha_adquisicion, e.estado AS en_servicio, "
+            + "(SELECT COUNT(*) FROM prestamos p WHERE p.id_ejemplar = e.id AND p.estado = TRUE) AS prestamos_activos "
+            + "FROM ejemplares e WHERE e.id_publicacion = ? ORDER BY e.num_ejemplar ASC";
+    private static final String SQL_SELECT_SIGUIENTE_NUM_EJEMPLAR = "SELECT COALESCE(MAX(num_ejemplar),0) + 1 AS siguiente FROM ejemplares WHERE id_publicacion = ?";
+    private static final String SQL_INSERT_EJEMPLAR = "INSERT INTO ejemplares (id_publicacion, num_ejemplar, fecha_adquisicion, estado) VALUES (?, ?, ?, TRUE)";
+    private static final String SQL_SELECT_EJEMPLAR_POR_ID = "SELECT id, id_publicacion, num_ejemplar, fecha_adquisicion, estado FROM ejemplares WHERE id = ?";
+    private static final String SQL_UPDATE_EJEMPLAR = "UPDATE ejemplares SET fecha_adquisicion = ?, estado = ? WHERE id = ?";
+    private static final String SQL_CNT_PRESTAMOS_POR_EJEMPLAR = "SELECT COUNT(*) AS cnt FROM prestamos WHERE id_ejemplar = ? AND estado = TRUE";
+    private static final String SQL_UPDATE_BAJA_EJEMPLAR = "UPDATE ejemplares SET estado = FALSE WHERE id = ?";
+
     /**
      * Constructor del DAO
      * @param dbConnection
@@ -38,9 +49,7 @@ public class EjemplarDAO {
     public String[][] listaEjemplaresPorPublicacion(int idPublicacion) {
         List<String[]> lista = new ArrayList<>();
         // Consulta SQL: obtenemos también el número de préstamos activos por ejemplar
-        String sql = "SELECT e.id, e.num_ejemplar, e.fecha_adquisicion, e.estado AS en_servicio, "
-                + "(SELECT COUNT(*) FROM prestamos p WHERE p.id_ejemplar = e.id AND p.estado = TRUE) AS prestamos_activos "
-                + "FROM ejemplares e WHERE e.id_publicacion = ? ORDER BY e.num_ejemplar ASC";
+        final String sql = SQL_LISTA_EJEMPLARES_POR_PUBLICACION;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, idPublicacion);
@@ -83,7 +92,7 @@ public class EjemplarDAO {
      */
     public int siguienteNumEjemplar(Connection conexion, int idPublicacion) {
         // Consulta SQL
-        String sql = "SELECT COALESCE(MAX(num_ejemplar),0) + 1 AS siguiente FROM ejemplares WHERE id_publicacion = ?";
+        final String sql = SQL_SELECT_SIGUIENTE_NUM_EJEMPLAR;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setInt(1, idPublicacion);
             // Ejecutar consulta
@@ -111,7 +120,7 @@ public class EjemplarDAO {
      */
     public boolean insertarEjemplar(Connection conexion, int idPublicacion, int numEjemplar, Date fechaAdquisicion) {
         // Consulta SQL
-        String sql = "INSERT INTO ejemplares (id_publicacion, num_ejemplar, fecha_adquisicion, estado) VALUES (?, ?, ?, TRUE)";
+        final String sql = SQL_INSERT_EJEMPLAR;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
             ps.setInt(1, idPublicacion);
@@ -137,7 +146,7 @@ public class EjemplarDAO {
      */
     public String[] obtenerEjemplarPorId(int idEjemplar) {
         // Consulta SQL
-        String sql = "SELECT id, id_publicacion, num_ejemplar, fecha_adquisicion, estado FROM ejemplares WHERE id = ?";
+        final String sql = SQL_SELECT_EJEMPLAR_POR_ID;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
@@ -175,7 +184,7 @@ public class EjemplarDAO {
      */
     public boolean actualizarEjemplar(Connection conexion, int idEjemplar, Date fechaAdquisicion, boolean estado) {
         // Consulta SQL
-        String sql = "UPDATE ejemplares SET fecha_adquisicion = ?, estado = ? WHERE id = ?";
+        final String sql = SQL_UPDATE_EJEMPLAR;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
             ps.setDate(1, fechaAdquisicion);
@@ -200,7 +209,7 @@ public class EjemplarDAO {
      */
     public boolean tienePrestamosActivosEjemplar(int idEjemplar) {
         // Consulta SQL
-        String sql = "SELECT COUNT(*) AS cnt FROM prestamos WHERE id_ejemplar = ? AND estado = TRUE";
+        final String sql = SQL_CNT_PRESTAMOS_POR_EJEMPLAR;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
@@ -226,7 +235,7 @@ public class EjemplarDAO {
      */
     public boolean bajaEjemplar(Connection conexion, int idEjemplar) {
         // Consulta SQL
-        String sql = "UPDATE ejemplares SET estado = FALSE WHERE id = ?";
+        final String sql = SQL_UPDATE_BAJA_EJEMPLAR;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
             ps.setInt(1, idEjemplar);
