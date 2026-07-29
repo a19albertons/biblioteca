@@ -3,11 +3,8 @@ services:
     image: mysql:8.0
     container_name: mysql_db
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: biblioteca
-      MYSQL_USER: biblioteca_user
-      MYSQL_PASSWORD: abc123.
+    env_file:
+      - .env
     ports:
       - "3306:3306"
     volumes:
