@@ -13,7 +13,7 @@ Para compilar el proyecto se puede usar maven, para ello se debe ejecutar el sig
 # Para compilar el proyecto y generar el jar ejecutable
 mvn clean install
 
-# Para ejecutar el proyecto
+# Para ejecutar el ejecutable
 java -jar target/biblioteca-1.0-SNAPSHOT.jar
 ```
 
