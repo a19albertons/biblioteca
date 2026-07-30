@@ -19,7 +19,7 @@ public class PrestamoDAO {
 
     // SQL constants 🔧
     private static final String SQL_PRESTAMOS_HOY = "SELECT COUNT(*) AS total FROM prestamos WHERE DATE(fecha_inicio) = ?";
-    private static final String SQL_PRESTAMOS_PENDIENTES = "SELECT COUNT(*) AS TOTAL FROM prestamos WHERE ? > fecha_fin AND estado = false";
+    private static final String SQL_PRESTAMOS_PENDIENTES = "SELECT COUNT(*) AS TOTAL FROM prestamos WHERE ? > fecha_fin AND estado = TRUE";
     private static final String SQL_ULTIMOS_MOVIMIENTOS = "SELECT p.estado, e.id AS id_ejemplar, pub.titulo FROM prestamos p JOIN ejemplares e ON p.id_ejemplar = e.id JOIN publicaciones pub ON e.id_publicacion = pub.id ORDER BY p.fecha_inicio DESC LIMIT 9";
     private static final String SQL_INSERT_PRESTAMO = "INSERT INTO prestamos (id_usuario, id_ejemplar, fecha_inicio, fecha_fin, estado) VALUES (?, ?, ?, ?, TRUE)";
     private static final String SQL_CNT_PRESTAMO_TIPO = "SELECT COUNT(*) AS cnt FROM prestamos p JOIN ejemplares e ON p.id_ejemplar = e.id JOIN publicaciones pub ON e.id_publicacion = pub.id WHERE p.id_usuario = ? AND p.estado = TRUE AND pub.tipo = ?";
