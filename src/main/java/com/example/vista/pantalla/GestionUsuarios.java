@@ -1,4 +1,4 @@
-package com.example.vista;
+package com.example.vista.pantalla;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -29,6 +29,9 @@ import javax.swing.table.TableCellRenderer;
 import com.example.controlador.Controlador;
 import com.example.utilities.AppResources;
 import com.example.utilities.BackgroundWorker;
+import com.example.vista.dialogo.EditarUsuarioDialog;
+import com.example.vista.dialogo.EliminarUsuarioDialog;
+import com.example.vista.dialogo.NuevoUsuarioDialog;
 
 /**
  * Clase para la vista Gestión de usuarios

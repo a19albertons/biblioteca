@@ -1,4 +1,4 @@
-package com.example.vista;
+package com.example.vista.pantalla;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -28,6 +28,11 @@ import javax.swing.table.TableCellRenderer;
 
 import com.example.controlador.Controlador;
 import com.example.utilities.AppResources;
+import com.example.vista.dialogo.EditarEjemplarDialog;
+import com.example.vista.dialogo.EditarPublicacionDialog;
+import com.example.vista.dialogo.EliminarEjemplarDialog;
+import com.example.vista.dialogo.EliminarPublicacionDialog;
+import com.example.vista.dialogo.NuevoEjemplarDialog;
 
 /**
  * Clase para la vista Ejemplares

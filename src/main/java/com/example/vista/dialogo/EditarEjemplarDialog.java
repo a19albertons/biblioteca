@@ -1,4 +1,4 @@
-package com.example.vista;
+package com.example.vista.dialogo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -17,18 +17,18 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.RootPaneContainer;
-import javax.swing.JOptionPane;
 
 import com.example.controlador.Controlador;
 
 /**
- * Diálogo para crear un nuevo ejemplar asociado a una publicación.
- * Muestra un campo de fecha de adquisición (YYYY-MM-DD) y un botón Añadir.
+ * Diálogo para editar un ejemplar existente.
+ * Muestra número de ejemplar (readonly) y fecha de adquisición.
  */
-public class NuevoEjemplarDialog extends JDialog {
+public class EditarEjemplarDialog extends JDialog {
     /**
      * Controlador de la aplicación
      */
@@ -38,31 +38,32 @@ public class NuevoEjemplarDialog extends JDialog {
      */
     private JFrame parentFrame;
     /**
-     * ID de la publicación a la que se añade el ejemplar
+     * ID del ejemplar a editar
      */
-    private int idPublicacion;
+    private int idEjemplar;
     /**
      * Componente previo del glass pane (para restaurar al cerrar el diálogo)
      */
-    private java.awt.Component previousGlassPane;
+    private Component previousGlassPane;
 
     /**
      * Constructor del diálogo
      * 
      * @param parent
      * @param controlador
-     * @param idPublicacion
+     * @param idEjemplar
      */
-    public NuevoEjemplarDialog(JFrame parent, Controlador controlador, int idPublicacion) {
-        super(parent, "Nuevo Ejemplar", true);
+    public EditarEjemplarDialog(JFrame parent, Controlador controlador, int idEjemplar) {
+        // Mostrar overlay en el frame padre
+        super(parent, "Editar Ejemplar", true);
         this.controlador = controlador;
         this.parentFrame = parent;
-        this.idPublicacion = idPublicacion;
+        this.idEjemplar = idEjemplar;
         initUI();
-        setSize(new Dimension(420, 160));
+        setSize(new Dimension(480, 200));
         setLocationRelativeTo(parent);
 
-        // Cierra el overlay al cerrar el diálogo
+        // Guardar componente previo del glass pane y mostrar overlay
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
@@ -87,21 +88,37 @@ public class NuevoEjemplarDialog extends JDialog {
         content.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
         // Título
-        JLabel title = new JLabel("Nuevo Ejemplar");
+        JLabel title = new JLabel("Editar Ejemplar");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
         content.add(title, BorderLayout.NORTH);
 
-        // Centro con campo de fecha
+        // Centro con campos
         JPanel center = new JPanel(new FlowLayout(FlowLayout.LEFT));
         center.setBackground(Color.white);
         center.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
-        // Campo fecha de adquisición
-        JLabel fechaLabel = new JLabel("Fecha adquisición (YYYY-MM-DD)");
-        center.add(fechaLabel);
-        JTextField fechaField = new JTextField(16);
-        fechaField.setText(LocalDate.now().toString());
+        // Obtener datos actuales
+        String[] datos = controlador.getControladorEditarEjemplarDialog().obtenerDetallesEjemplar(idEjemplar);
+        String num = "";
+        String fecha = LocalDate.now().toString();
+        if (datos != null) {
+            num = datos.length > 2 ? datos[2] : "";
+            fecha = datos.length > 3 ? datos[3] : fecha;
+        }
+
+        // Campos
+        center.add(new JLabel("Número de ejemplar:"));
+        JLabel numLabel = new JLabel(num);
+        center.add(numLabel);
+
+        // Fecha adquisición
+        center.add(new JLabel("Fecha adquisición (YYYY-MM-DD):"));
+        JTextField fechaField = new JTextField(12);
+        fechaField.setText(fecha);
         center.add(fechaField);
+
+        // El estado no puede cambiarse desde aquí; queda para otro diálogo específico.
+        // Mantener el campo de fecha para edición solamente.
 
         content.add(center, BorderLayout.CENTER);
 
@@ -109,38 +126,40 @@ public class NuevoEjemplarDialog extends JDialog {
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         footer.setBackground(Color.white);
 
-        // Botones Añadir y Cancelar
-        JButton add = new JButton("Añadir");
-        add.setBackground(Color.decode("#F4791B"));
-        add.setForeground(Color.white);
-        add.setBorder(null);
-        add.setFocusPainted(false);
-        add.addActionListener(e -> {
-            // Validar fecha
+        // Botones Guardar y Cancelar
+        JButton save = new JButton("Guardar");
+        save.setBackground(Color.decode("#F4791B"));
+        save.setForeground(Color.white);
+        save.setBorder(null);
+        save.setFocusPainted(false);
+        save.addActionListener(e -> {
+            // Validar y guardar
             String fechaStr = fechaField.getText();
-            LocalDate fecha;
+            LocalDate fechaParsed;
+            // Validar fecha
             try {
-                fecha = (fechaStr == null || fechaStr.trim().isEmpty()) ? LocalDate.now()
+                fechaParsed = (fechaStr == null || fechaStr.trim().isEmpty()) ? LocalDate.now()
                         : LocalDate.parse(fechaStr.trim());
             } catch (DateTimeParseException ex) {
                 JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use YYYY-MM-DD", "Error",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            boolean ok = controlador.getControladorNuevoEjemplarDialog().crearEjemplar(idPublicacion, fecha);
+            // Llamar al controlador para actualizar (el controlador conservará el estado actual)
+            boolean ok = controlador.getControladorEditarEjemplarDialog().editarEjemplar(idEjemplar, fechaParsed);
+            // Mostrar resultado
             if (ok) {
-                JOptionPane.showMessageDialog(this, "Ejemplar añadido correctamente", "Éxito",
+                JOptionPane.showMessageDialog(this, "Ejemplar actualizado correctamente", "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
-                // refrescar vista de ejemplares
-                controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(idPublicacion);
+                controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(Integer.parseInt(datos[1]));
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "No se pudo crear el ejemplar (error en BD)", "Error",
+                JOptionPane.showMessageDialog(this, "No se pudo actualizar el ejemplar (error en BD)", "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Boton Cancelar
+        // Cancelar edición
         JButton cancel = new JButton("Cancelar");
         cancel.setBackground(Color.white);
         cancel.setBorder(null);
@@ -148,14 +167,15 @@ public class NuevoEjemplarDialog extends JDialog {
         cancel.addActionListener(e -> dispose());
 
         footer.add(cancel);
-        footer.add(add);
+        footer.add(save);
 
         getContentPane().add(content, BorderLayout.CENTER);
         getContentPane().add(footer, BorderLayout.SOUTH);
     }
 
     /**
-     * Controla la visibilidad del diálogo y el overlay
+     * Muestra u oculta el diálogo, instalando o quitando el overlay en el frame
+     * padre.
      */
     @Override
     public void setVisible(boolean b) {
@@ -172,7 +192,7 @@ public class NuevoEjemplarDialog extends JDialog {
      * Instala un overlay semitransparente en el frame padre
      */
     private void installOverlay() {
-        // Controla si el frame padre es nulo
+        // Comprobar existencia de frame padre
         if (parentFrame == null)
             return;
         try {
@@ -181,14 +201,14 @@ public class NuevoEjemplarDialog extends JDialog {
             Component current = rpc.getRootPane().getGlassPane();
             previousGlassPane = current;
 
-            // Crear panel semitransparente
+            // Crear un panel semitransparente para el overlay
             JPanel overlay = new JPanel();
             overlay.setOpaque(true);
             overlay.setBackground(new Color(217, 217, 217, 153));
             overlay.addMouseListener(new MouseAdapter() {
             });
 
-            // Asignar overlay como glass pane
+            // Asignar el overlay como glass pane
             rpc.getRootPane().setGlassPane(overlay);
             overlay.setVisible(true);
         } catch (Exception e) {
@@ -200,12 +220,13 @@ public class NuevoEjemplarDialog extends JDialog {
      * Quita el overlay del frame padre
      */
     private void removeOverlay() {
-        // Controla si el frame padre es nulo
+        // Comprobar existencia de frame padre
         if (parentFrame == null)
             return;
         try {
             // Restaurar el componente previo del glass pane
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+            // Restaura el componente previo del glass pane
             if (previousGlassPane != null) {
                 rpc.getRootPane().setGlassPane(previousGlassPane);
                 previousGlassPane.setVisible(false);

@@ -1,4 +1,4 @@
-package com.example.vista;
+package com.example.vista.dialogo;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
@@ -28,102 +29,109 @@ import com.example.controlador.Controlador;
 import com.example.utilities.Fonts;
 
 /**
- * Modal para crear una nueva publicación.
- * Implementa un pequeño wizard: paso 1 (datos comunes) → paso 2 (datos por
- * tipo)
+ * Modal para editar una publicación (basado en `NuevaPublicacionDialog`).
+ *
+ * Presenta un pequeño wizard (datos comunes → datos por tipo) y rellena
+ * los campos con los valores actuales de la publicación usando
+ * `ControladorEditarPublicacionDialog`. Al guardar, delega en el controlador
+ * la edición transaccional en la base de datos.
  */
-public class NuevaPublicacionDialog extends JDialog {
+public class EditarPublicacionDialog extends JDialog {
     /**
      * Controlador principal de la aplicación
      */
     private Controlador controlador;
     /**
-     * Referencia al frame padre (para overlay)
+     * Ventana padre (para el modal)
      */
-    private javax.swing.JFrame parentFrame;
+    private JFrame parentFrame;
     /**
-     * Panel de tarjetas para el wizard
+     * Panel con CardLayout para los pasos del wizard
      */
     private JPanel cardPanel;
     /**
-     * Layout de tarjetas
+     * CardLayout para navegar entre pasos
      */
     private CardLayout cardLayout;
-
     /**
-     * Overlay (glass pane) previo, para restaurarlo al cerrar el modal
+     * Componente previo del glass pane (para restaurar al cerrar el diálogo)
      */
     private Component previousGlassPane;
 
     // Step 1 fields
     /**
-     * Campos paso 1 (isbn)
+     * Campos comunes del paso (isbn)
      */
     private JTextField isbnField;
     /**
-     * Campos paso 1 (titulo)
+     * Campos comunes del paso (título)
      */
     private JTextField tituloField;
     /**
-     * Campos paso 1 (idioma)
+     * Campos comunes del paso (idioma)
      */
     private JTextField idiomaField;
     /**
-     * Campos paso 1 (temas)
+     * Campos comunes del paso (temas)
      */
     private JTextField temasField;
     /**
-     * Campos paso 1 (modulos)
+     * Campos comunes del paso (módulos)
      */
     private JTextField modulosField;
     /**
-     * Campos paso 1 (ciclos)
+     * Campos comunes del paso (ciclos)
      */
     private JTextField ciclosField;
     /**
-     * Campos paso 1 (editorial)
+     * Campos comunes del paso (editorial)
      */
     private JTextField editorialField;
     /**
-     * Campos paso 1 (tipo)
+     * Campos comunes del paso (tipo de publicación)
      */
     private JComboBox<String> tipoCombo;
 
     // Step Libro
     /**
-     * Campos paso Libro (número edición)
+     * Campos del paso Libro (número de edición)
      */
     private JTextField numeroEdicionField;
     /**
-     * Campos paso Libro (fecha publicación)
+     * Campos del paso Libro (fecha de publicación)
      */
     private JTextField fechaPublicacionField;
     /**
-     * Campos paso Libro (autores)
+     * Campos del paso Libro (autores)
      */
     private JTextField autoresField;
 
     // Step Revista
     /**
-     * Campos paso Revista (periodicidad)
+     * Campos del paso Revista (periodicidad)
      */
     private JTextField periodicidadField;
+    /**
+     * Id de la publicación a editar
+     */
+    private int idPublicacion;
 
     /**
-     * Constructor
-     * 
-     * @param parent
-     * @param controlador
+     * Crea el diálogo de edición para la publicación indicada.
+     *
+     * @param parent        ventana padre para el modal
+     * @param controlador   controlador principal de la aplicación
+     * @param idPublicacion id de la publicación a editar
      */
-    public NuevaPublicacionDialog(JFrame parent, Controlador controlador) {
-        super(parent, "Nueva Publicación", true);
+    public EditarPublicacionDialog(JFrame parent, Controlador controlador, int idPublicacion) {
+        super(parent, "Editar Publicación", true);
         this.controlador = controlador;
         this.parentFrame = parent;
+        this.idPublicacion = idPublicacion;
         initUI();
         setSize(new Dimension(340, 500));
         setLocationRelativeTo(parent);
 
-        // Asegurar que si el diálogo se cierra por otros medios, el overlay se restaura
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
@@ -135,22 +143,20 @@ public class NuevaPublicacionDialog extends JDialog {
                 removeOverlay();
             }
         });
+
+        // Prefill fields from DB
+        cargarDatos();
     }
 
     /**
-     * Inicializa la interfaz de usuario
+     * Inicializa la interfaz del diálogo
      */
     private void initUI() {
-        cardLayout = new java.awt.CardLayout();
+        cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
-        // Paso 1: datos comunes
         JPanel paso1 = crearPaso1();
-
-        // Paso Libro
         JPanel pasoLibro = crearPasoLibro();
-
-        // Paso Revista
         JPanel pasoRevista = crearPasoRevista();
 
         cardPanel.add(paso1, "paso1");
@@ -162,7 +168,9 @@ public class NuevaPublicacionDialog extends JDialog {
     }
 
     /**
-     * Sobrescribe setVisible para instalar/quitar overlay en el padre.
+     * Configura un campo de texto con los estilos por defecto
+     * 
+     * @param field campo a configurar
      */
     @Override
     public void setVisible(boolean b) {
@@ -176,29 +184,81 @@ public class NuevaPublicacionDialog extends JDialog {
     }
 
     /**
-     * Instala un overlay semi-transparente en el glass pane del padre.
-     * Color: #D9D9D9 con 60% opacidad.
+     * Carga desde la base de datos los detalles de la publicación y rellena los
+     * campos
+     * del formulario. El array devuelto por el DAO tiene el siguiente orden:
+     * tipo, titulo, codigo_isbn, idioma, temasCSV, modulosCSV, ciclosCSV,
+     * editorial,
+     * num_edicion, fecha_publicacion, autoresCSV, periodicidad, id
+     */
+    private void cargarDatos() {
+        try {
+            String[] datos = controlador.getControladorEditarPublicacionDialog()
+                    .obtenerDetallesPublicacion(idPublicacion);
+            if (datos == null)
+                return;
+            // datos: tipo, titulo, codigo_isbn, idioma, temasCSV, modulosCSV, ciclosCSV,
+            // editorial, num_edicion, fecha_publicacion, autoresCSV, periodicidad, id
+            String tipo = datos.length > 0 ? datos[0] : "";
+            String titulo = datos.length > 1 ? datos[1] : "";
+            String isbn = datos.length > 2 ? datos[2] : "";
+            String idioma = datos.length > 3 ? datos[3] : "";
+            String temas = datos.length > 4 ? datos[4] : "";
+            String modulos = datos.length > 5 ? datos[5] : "";
+            String ciclos = datos.length > 6 ? datos[6] : "";
+            String editorial = datos.length > 7 ? datos[7] : "";
+            String numEd = datos.length > 8 ? datos[8] : "";
+            String fecha = datos.length > 9 ? datos[9] : "";
+            String autores = datos.length > 10 ? datos[10] : "";
+            String periodicidad = datos.length > 11 ? datos[11] : "";
+
+            tituloField.setText(titulo);
+            isbnField.setText(isbn);
+            idiomaField.setText(idioma);
+            temasField.setText(temas);
+            modulosField.setText(modulos);
+            ciclosField.setText(ciclos);
+            editorialField.setText(editorial);
+
+            // seleccionar tipo y rellenar campos específicos, pero mantener el
+            // diálogo en el paso 1 para que el usuario vea primero los datos comunes.
+            if ("L".equalsIgnoreCase(tipo)) {
+                tipoCombo.setSelectedItem("Libro");
+                // Rellenar campos de libro (no mostramos la tarjeta aún)
+                numeroEdicionField.setText(numEd == null ? "" : numEd);
+                fechaPublicacionField.setText(fecha == null ? "" : fecha);
+                autoresField.setText(autores == null ? "" : autores);
+            } else {
+                tipoCombo.setSelectedItem("Revista");
+                // Rellenar campos de revista (no mostramos la tarjeta aún)
+                periodicidadField.setText(periodicidad == null ? "" : periodicidad);
+            }
+            // Mostrar paso 1 por defecto al abrir el modal
+            cardLayout.show(cardPanel, "paso1");
+
+        } catch (Exception e) {
+            System.out.println("Error cargando datos: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Instala un overlay semitransparente en la ventana padre para indicar
+     * que está bloqueada mientras el diálogo está abierto.
      */
     private void installOverlay() {
-        // Comprobar que el parentFrame no es nulo
         if (parentFrame == null)
             return;
         try {
-            // Guardar el glass pane previo para restaurarlo después
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
             Component current = rpc.getRootPane().getGlassPane();
             previousGlassPane = current;
 
-            // Crear el overlay
             JPanel overlay = new JPanel();
             overlay.setOpaque(true);
-            // Color D9D9D9 con alpha 60% -> rgba(217,217,217,153)
-            overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
-            // Consumir eventos para que el overlay bloquee interacción con la ventana
-            overlay.addMouseListener(new java.awt.event.MouseAdapter() {
+            overlay.setBackground(new Color(217, 217, 217, 153));
+            overlay.addMouseListener(new MouseAdapter() {
             });
 
-            // Asignar el overlay como glass pane
             rpc.getRootPane().setGlassPane(overlay);
             overlay.setVisible(true);
         } catch (Exception e) {
@@ -207,14 +267,12 @@ public class NuevaPublicacionDialog extends JDialog {
     }
 
     /**
-     * Restaura el glass pane previo del frame padre.
+     * Quita el overlay de la ventana padre al cerrar el diálogo.
      */
     private void removeOverlay() {
-        // Comprobar que el parentFrame no es nulo
         if (parentFrame == null)
             return;
         try {
-            // Restaurar el glass pane previo
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
             if (previousGlassPane != null) {
                 rpc.getRootPane().setGlassPane(previousGlassPane);
@@ -229,114 +287,102 @@ public class NuevaPublicacionDialog extends JDialog {
     }
 
     /**
-     * Crea el panel del paso 1 (datos comunes)
+     * Crea el panel del primer paso del wizard (datos comunes)
      * 
      * @return
      */
     private JPanel crearPaso1() {
-        // Definir panel
+        // Crear panel para paso 1
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.white);
-
-        // Definir constraints
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(8, 12, 8, 12);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.WEST;
 
-        // Titulo
-        JLabel title = new JLabel("Nueva Publicación");
+        // Título
+        JLabel title = new JLabel("Editar Publicación");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 2;
         panel.add(title, c);
 
-        // Campos
-        // ISBN
+        // Campos comunes
+        // isbn
         c.gridwidth = 1;
         c.gridy++;
         panel.add(new JLabel("ISBN"), c);
         isbnField = new JTextField();
         configurarCampo(isbnField);
-        // Formatos aceptados: ISBN clásico o códigos de revista (ej. 978-1-23456-789-0
-        // o RV-2024-001)
-        isbnField.setToolTipText("Formato ISBN o código de revista. Ej: 978-1-23456-789-0 o RV-2024-001");
         c.gridx = 1;
         panel.add(isbnField, c);
 
-        // Titulo
+        // titulo
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Titulo"), c);
         tituloField = new JTextField();
         configurarCampo(tituloField);
-        tituloField.setToolTipText("Título completo de la publicación (obligatorio)");
         c.gridx = 1;
         panel.add(tituloField, c);
 
-        // Idioma
+        // idioma
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Idioma"), c);
         idiomaField = new JTextField();
         configurarCampo(idiomaField);
-        idiomaField.setToolTipText("Idioma de la publicación (ej: Español, Inglés)");
         c.gridx = 1;
         panel.add(idiomaField, c);
 
-        // Temas
+        // temas
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Temas"), c);
         temasField = new JTextField();
         configurarCampo(temasField);
-        temasField.setToolTipText("Lista de temas separados por comas (ej: Programación, Java)");
         c.gridx = 1;
         panel.add(temasField, c);
 
-        // Modulos
+        // modulos
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Modulos"), c);
         modulosField = new JTextField();
         configurarCampo(modulosField);
-        modulosField.setToolTipText("Lista de módulos separados por comas (ej: Programación, Bases de Datos)");
         c.gridx = 1;
         panel.add(modulosField, c);
 
-        // Ciclos
+        // ciclos
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Ciclos"), c);
         ciclosField = new JTextField();
         configurarCampo(ciclosField);
-        ciclosField.setToolTipText("Lista de ciclos separados por comas (ej: DAM, DAW)");
         c.gridx = 1;
         panel.add(ciclosField, c);
 
-        // Editorial
+        // editorial
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Editorial"), c);
         editorialField = new JTextField();
         configurarCampo(editorialField);
-        editorialField.setToolTipText("Editorial de la publicación (obligatorio)");
         c.gridx = 1;
         panel.add(editorialField, c);
 
-        // Tipo
+        // tipo
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Tipo"), c);
         tipoCombo = new JComboBox<>();
         tipoCombo.addItem("Libro");
         tipoCombo.addItem("Revista");
-        tipoCombo.setToolTipText("Seleccione el tipo de publicación (Libro o Revista)");
         c.gridx = 1;
         panel.add(tipoCombo, c);
 
-        // Botón siguiente
+        // Botón Siguiente
         JButton siguiente = new JButton("Siguiente");
         siguiente.setBackground(Color.decode("#F4791B"));
         siguiente.setForeground(Color.white);
@@ -346,7 +392,7 @@ public class NuevaPublicacionDialog extends JDialog {
         c.anchor = GridBagConstraints.EAST;
         panel.add(siguiente, c);
 
-        // Acción botón siguiente
+        // Acción botón Siguiente
         siguiente.addActionListener(e -> {
             String tipo = (String) tipoCombo.getSelectedItem();
             if ("Libro".equals(tipo)) {
@@ -360,44 +406,42 @@ public class NuevaPublicacionDialog extends JDialog {
     }
 
     /**
-     * Crea el panel del paso Libro
+     * Crea el panel del paso Libro del wizard
      * 
      * @return
      */
     private JPanel crearPasoLibro() {
-        // Definir panel
+        // Crear panel para paso Libro
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.white);
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(8, 12, 8, 12);
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        // Titulo
-        JLabel title = new JLabel("Nueva Publicación (Libro)");
+        // Título
+        JLabel title = new JLabel("Editar Publicación (Libro)");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 2;
         panel.add(title, c);
 
-        // Campos específicos
-        // Número edición
+        // Campos específicos de libro
+        // Número de edición
         c.gridwidth = 1;
         c.gridy++;
         panel.add(new JLabel("Numero edición"), c);
         numeroEdicionField = new JTextField();
         configurarCampo(numeroEdicionField);
-        numeroEdicionField.setToolTipText("Número entero mayor que 0");
         c.gridx = 1;
         panel.add(numeroEdicionField, c);
 
-        // Fecha publicación
+        // Fecha de publicación
         c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Fecha publicacion"), c);
         fechaPublicacionField = new JTextField();
         configurarCampo(fechaPublicacionField);
-        fechaPublicacionField.setToolTipText("Formato YYYY-MM-DD (ej: 2023-10-05)");
         c.gridx = 1;
         panel.add(fechaPublicacionField, c);
 
@@ -407,28 +451,28 @@ public class NuevaPublicacionDialog extends JDialog {
         panel.add(new JLabel("Autores"), c);
         autoresField = new JTextField();
         configurarCampo(autoresField);
-        autoresField.setToolTipText("Lista de autores separados por comas (ej: Ana García, Carlos Pérez)");
         c.gridx = 1;
         panel.add(autoresField, c);
 
-        // Botón añadir
-        JButton añadir = new JButton("Añadir");
-        añadir.setBackground(Color.decode("#F4791B"));
-        añadir.setForeground(Color.white);
-        añadir.setBorder(null);
+        // Botones Guardar y Volver
+        JButton guardar = new JButton("Guardar");
+        guardar.setBackground(Color.decode("#F4791B"));
+        guardar.setForeground(Color.white);
+        guardar.setBorder(null);
         c.gridx = 1;
         c.gridy++;
         c.anchor = GridBagConstraints.EAST;
-        panel.add(añadir, c);
+        panel.add(guardar, c);
 
-        // Acción botón añadir
-        añadir.addActionListener(e -> {
-            // Validar campos
+        // Acción botón Guardar
+        guardar.addActionListener(e -> {
+            // Validar y guardar cambios
             if (!validarPasoLibro())
                 return;
             try {
-                // Intentar crear la publicación
-                boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionLibro(
+                // llamar al controlador para actualizar la publicación
+                boolean ok = controlador.getControladorEditarPublicacionDialog().editarPublicacionLibro(
+                        idPublicacion,
                         isbnField.getText().trim(),
                         tituloField.getText().trim(),
                         idiomaField.getText().trim(),
@@ -439,25 +483,27 @@ public class NuevaPublicacionDialog extends JDialog {
                         Integer.parseInt(numeroEdicionField.getText().trim()),
                         LocalDate.parse(fechaPublicacionField.getText().trim()),
                         autoresField.getText().trim());
-                // Mostrar resultado
+                // devuelve true si se actualizó correctamente
                 if (ok) {
-                    JOptionPane.showMessageDialog(this, "Publicación tipo Libro añadida", "Éxito",
+                    JOptionPane.showMessageDialog(this, "Publicación actualizada", "Éxito",
                             JOptionPane.INFORMATION_MESSAGE);
-                    // Refrescar vista de publicaciones y panel de control
                     controlador.getControladorNavegacion().refrescarPublicaciones();
                     controlador.getControladorNavegacion().refrescarPanelControl();
                     dispose();
                 } else {
-                    JOptionPane.showMessageDialog(this, "Error añadiendo la publicación en la base de datos", "Error",
+                    JOptionPane.showMessageDialog(this, "Error actualizando la publicación en la base de datos",
+                            "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
+                // cerrar diálogo
             } catch (Exception ex) {
+                // mostrar error
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Botón volver
+        // Volver
         JButton volver = new JButton("Volver");
         volver.setBackground(Color.white);
         volver.setForeground(Color.decode("#000000"));
@@ -469,55 +515,55 @@ public class NuevaPublicacionDialog extends JDialog {
     }
 
     /**
-     * Crea el panel del paso Revista
+     * Crea el panel del paso Revista del wizard
      * 
      * @return
      */
     private JPanel crearPasoRevista() {
-        // Definir panel
+        // Crear panel para paso Revista
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.white);
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(8, 12, 8, 12);
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        // Titulo
-        JLabel title = new JLabel("Nueva Publicación (Revista)");
+        // Título
+        JLabel title = new JLabel("Editar Publicación (Revista)");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 2;
         panel.add(title, c);
 
-        // Campos específicos
+        // Campos específicos de revista
         // Periodicidad
         c.gridwidth = 1;
         c.gridy++;
         panel.add(new JLabel("Periodicidad"), c);
         periodicidadField = new JTextField();
         configurarCampo(periodicidadField);
-        periodicidadField.setToolTipText("Ej: Mensual, Trimestral, Semestral");
         c.gridx = 1;
         panel.add(periodicidadField, c);
 
-        // Botón añadir
-        JButton añadir = new JButton("Añadir");
-        añadir.setBackground(Color.decode("#F4791B"));
-        añadir.setForeground(Color.white);
-        añadir.setBorder(null);
+        // Botones Guardar y Volver
+        JButton guardar = new JButton("Guardar");
+        guardar.setBackground(Color.decode("#F4791B"));
+        guardar.setForeground(Color.white);
+        guardar.setBorder(null);
         c.gridx = 1;
         c.gridy++;
         c.anchor = GridBagConstraints.EAST;
-        panel.add(añadir, c);
+        panel.add(guardar, c);
 
-        // Acción botón añadir
-        añadir.addActionListener(e -> {
-            // Validar campos
+        // Acción botón Guardar
+        guardar.addActionListener(e -> {
+            // Validar y guardar cambios
             if (!validarPasoRevista())
                 return;
             try {
-                // Intentar crear la publicación
-                boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionRevista(
+                // llamar al controlador para actualizar la publicación
+                boolean ok = controlador.getControladorEditarPublicacionDialog().editarPublicacionRevista(
+                        idPublicacion,
                         isbnField.getText().trim(),
                         tituloField.getText().trim(),
                         idiomaField.getText().trim(),
@@ -526,25 +572,26 @@ public class NuevaPublicacionDialog extends JDialog {
                         ciclosField.getText().trim(),
                         editorialField.getText().trim(),
                         periodicidadField.getText().trim());
-                // Mostrar resultado
+                // devuelve true si se actualizó correctamente
                 if (ok) {
-                    JOptionPane.showMessageDialog(this, "Publicación tipo Revista añadida", "Éxito",
+                    JOptionPane.showMessageDialog(this, "Publicación actualizada", "Éxito",
                             JOptionPane.INFORMATION_MESSAGE);
-                    // Refrescar vista de publicaciones y panel de control
                     controlador.getControladorNavegacion().refrescarPublicaciones();
                     controlador.getControladorNavegacion().refrescarPanelControl();
                     dispose();
                 } else {
-                    JOptionPane.showMessageDialog(this, "Error añadiendo la publicación en la base de datos", "Error",
+                    JOptionPane.showMessageDialog(this, "Error actualizando la publicación en la base de datos",
+                            "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
             } catch (Exception ex) {
+                // mostrar error
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Botón volver
+        // Volver
         JButton volver = new JButton("Volver");
         volver.setBackground(Color.white);
         volver.setForeground(Color.decode("#000000"));
@@ -556,13 +603,12 @@ public class NuevaPublicacionDialog extends JDialog {
     }
 
     /**
-     * Valida los campos comunes del paso 1
+     * Valida los campos comunes (paso 1) usados tanto para creación como para
+     * edición.
      * 
-     * @return
+     * @return true si campos obligatorios están presentes
      */
     private boolean validarPasoComun() {
-        // Campos obligatorios en tabla `publicaciones`: titulo, editorial, codigo_isbn,
-        // idioma, tipo
         if (tituloField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "El título es requerido", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
@@ -595,7 +641,6 @@ public class NuevaPublicacionDialog extends JDialog {
     private boolean validarPasoLibro() {
         if (!validarPasoComun())
             return false;
-        // Campos obligatorios en tabla `libros`: num_edicion, fecha_publicacion
         String numEd = numeroEdicionField.getText().trim();
         if (numEd.isEmpty()) {
             JOptionPane.showMessageDialog(this, "El número de edición es requerido", "Error",
@@ -620,7 +665,6 @@ public class NuevaPublicacionDialog extends JDialog {
             return false;
         }
         try {
-            // Intentar parsear la fecha
             LocalDate.parse(fecha);
         } catch (java.time.format.DateTimeParseException ex) {
             JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use YYYY-MM-DD", "Error",
@@ -638,8 +682,6 @@ public class NuevaPublicacionDialog extends JDialog {
     private boolean validarPasoRevista() {
         if (!validarPasoComun())
             return false;
-        // Campos obligatorios en tabla `revistas`: periodicidad, num_revista
-        // (num_revista can be derived or optional here, but periodicidad is NOT NULL)
         String per = periodicidadField.getText().trim();
         if (per.isEmpty()) {
             JOptionPane.showMessageDialog(this, "La periodicidad es requerida", "Error", JOptionPane.ERROR_MESSAGE);
@@ -649,9 +691,8 @@ public class NuevaPublicacionDialog extends JDialog {
     }
 
     /**
-     * Configura el estilo de un campo de texto
-     * 
-     * @param field
+     * Aplica estilo y fuente a los campos de texto (coincide con el estilo usado
+     * en `NuevaPublicacionDialog` para consistencia visual).
      */
     private void configurarCampo(JTextField field) {
         field.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.decode("#CCCCCC")),

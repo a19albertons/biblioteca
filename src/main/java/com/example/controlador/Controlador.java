@@ -1,6 +1,7 @@
 package com.example.controlador;
 
 import com.example.conexiones.DBConnection;
+import com.example.vista.navegación.ControladorNavegacion;
 
 /**
  * Controlador principal de la aplicación

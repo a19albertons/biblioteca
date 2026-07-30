@@ -1,4 +1,4 @@
-package com.example.vista;
+package com.example.vista.pantalla;
 
 import java.time.LocalDate;
 import java.awt.Color;

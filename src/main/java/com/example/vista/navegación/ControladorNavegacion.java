@@ -1,6 +1,7 @@
-package com.example.controlador;
+package com.example.vista.navegación;
 
 import com.example.conexiones.DBConnection;
+import com.example.controlador.Controlador;
 import com.example.dao.PublicacionDAO;
 import java.awt.CardLayout;
 
@@ -8,16 +9,16 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import com.example.vista.BarraLateral;
-import com.example.vista.CatalogoLibros;
-import com.example.vista.ConcederPrestamo;
-import com.example.vista.DevolverPrestamo;
-import com.example.vista.Ejemplares;
-import com.example.vista.GestionUsuarios;
-import com.example.vista.InicioSesion;
-import com.example.vista.PanelControl;
-import com.example.vista.RecuperarCuenta;
-import com.example.vista.SancionManual;
+import com.example.vista.pantalla.BarraLateral;
+import com.example.vista.pantalla.CatalogoLibros;
+import com.example.vista.pantalla.ConcederPrestamo;
+import com.example.vista.pantalla.DevolverPrestamo;
+import com.example.vista.pantalla.Ejemplares;
+import com.example.vista.pantalla.GestionUsuarios;
+import com.example.vista.pantalla.InicioSesion;
+import com.example.vista.pantalla.PanelControl;
+import com.example.vista.pantalla.RecuperarCuenta;
+import com.example.vista.pantalla.SancionManual;
 
 /**
  * Controlador para la navegación entre vistas

@@ -1,4 +1,4 @@
-package com.example.vista;
+package com.example.vista.dialogo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

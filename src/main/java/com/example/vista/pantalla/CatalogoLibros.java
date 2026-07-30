@@ -1,4 +1,4 @@
-package com.example.vista;
+package com.example.vista.pantalla;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -23,6 +23,7 @@ import javax.swing.ScrollPaneConstants;
 import com.example.controlador.Controlador;
 import com.example.utilities.BackgroundWorker;
 import com.example.utilities.Fonts;
+import com.example.vista.dialogo.NuevaPublicacionDialog;
 
 /**
  * Clase para la vista Publicaciones
