@@ -110,7 +110,8 @@ public class PrestamoDAO {
                 while (rs.next() && index < 9) {
                     movimientos[index][0] = String.valueOf(rs.getInt("id_ejemplar"));
                     movimientos[index][1] = rs.getString("titulo");
-                    movimientos[index][2] = rs.getBoolean("estado") ? "Devuelto" : "Prestado";
+                    //  TRUE=sin devolver, FALSE=devuelto 
+                    movimientos[index][2] = rs.getBoolean("estado") ? "Prestado" : "Devuelto";
 
                     index++;
                 }
