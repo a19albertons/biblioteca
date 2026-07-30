@@ -9,7 +9,7 @@ import com.example.conexiones.MySQLConnection;
  * Hello world!
  *
  */
-public class App 
+public class Biblioteca 
 {
     public static void main( String[] args )
     {
