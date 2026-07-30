@@ -27,6 +27,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import com.example.controlador.Controlador;
+import com.example.utilities.AppResources;
 
 /**
  * Clase para la vista Ejemplares
@@ -169,7 +170,7 @@ public class Ejemplares {
         // Sitúan a la altura del título (y=15) y tamaño 24x24
         btnEditarEjemplar.setBounds(440, 15, 24, 24);
         // Icono escalado a 16x16
-        URL editarIconUrl = getClass().getResource("/editar.png");
+        URL editarIconUrl = AppResources.editarPath();
         if (editarIconUrl != null) {
             Image img = new ImageIcon(editarIconUrl).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
             btnEditarEjemplar.setIcon(new ImageIcon(img));
@@ -215,7 +216,7 @@ public class Ejemplares {
         // Ubicado a la derecha del botón editar (24px + 4px gap)
         btnEliminarEjemplar.setBounds(480, 15, 24, 24);
         // Icono escalado a 16x16
-        URL borrarIconUrl = getClass().getResource("/borrar.png");
+        URL borrarIconUrl = AppResources.eliminarPath();
         if (borrarIconUrl != null) {
             Image img = new ImageIcon(borrarIconUrl).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
             btnEliminarEjemplar.setIcon(new ImageIcon(img));
@@ -342,7 +343,7 @@ public class Ejemplares {
                 panelCell.setLayout(new FlowLayout(FlowLayout.RIGHT, 6, 6));
 
                 // Botón editar con fondo translúcido pintado manualmente
-                java.net.URL editarIconUrl = getClass().getResource("/editar.png");
+                java.net.URL editarIconUrl = AppResources.editarPath();
                 final JButton editBtn = new JButton() {
                     @Override
                     protected void paintComponent(Graphics g) {
@@ -382,7 +383,7 @@ public class Ejemplares {
                 });
 
                 // Botón eliminar con fondo translúcido pintado manualmente
-                URL borrarIconUrl = getClass().getResource("/borrar.png");
+                URL borrarIconUrl = AppResources.eliminarPath();
                 final JButton delBtn = new JButton() {
                     @Override
                     protected void paintComponent(Graphics g) {

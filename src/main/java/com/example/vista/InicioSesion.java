@@ -20,6 +20,7 @@ import javax.swing.JTextField;
 
 import com.example.controlador.Controlador;
 import com.example.modelo.Usuario;
+import com.example.utilities.AppResources;
 
 /**
  * Clase para la vista de inicio de sesión
@@ -63,7 +64,7 @@ public class InicioSesion {
         encabezado.setLayout(new BorderLayout());
         encabezado.setPreferredSize(new Dimension(300, 70));
         encabezado.setBackground(Color.decode("#468DAE"));
-        URL imgUrl = getClass().getResource("/logo.png");
+        URL imgUrl = AppResources.logoPath();
         if (imgUrl != null) {
             ImageIcon icon = new ImageIcon(imgUrl); // escala 1:1
             JLabel lblLogo = new JLabel(icon);

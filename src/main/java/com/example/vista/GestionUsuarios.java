@@ -27,6 +27,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import com.example.controlador.Controlador;
+import com.example.utilities.AppResources;
 import com.example.utilities.BackgroundWorker;
 
 /**
@@ -219,7 +220,7 @@ public class GestionUsuarios {
                 panelCell.setLayout(new FlowLayout(FlowLayout.RIGHT, 6, 6));
 
                 // Edit button (translucent)
-                URL editarIconUrl = getClass().getResource("/editar.png");
+                URL editarIconUrl = AppResources.editarPath();
                 final JButton editBtn = new JButton() {
                     @Override
                     protected void paintComponent(Graphics g) {
@@ -245,7 +246,7 @@ public class GestionUsuarios {
                 editBtn.setMargin(new Insets(0, 0, 0, 0));
 
                 // Delete button (translucent)
-                URL borrarIconUrl = getClass().getResource("/borrar.png");
+                URL borrarIconUrl = AppResources.eliminarPath();
                 final JButton delBtn = new JButton() {
                     @Override
                     protected void paintComponent(Graphics g) {

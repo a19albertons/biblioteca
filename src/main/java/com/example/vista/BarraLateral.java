@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.example.controlador.Controlador;
+import com.example.utilities.AppResources;
 
 /**
  * Clase para la vista Barra lateral
@@ -63,7 +64,7 @@ public class BarraLateral {
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(200, 600));
         panel.setBackground(Color.decode("#468DAE"));
-        URL imgUrl = getClass().getResource("/logo.png");
+        URL imgUrl = AppResources.logoPath();
         if (imgUrl != null) {
             JLabel lblLogo = new JLabel(new ImageIcon(imgUrl));
             lblLogo.setHorizontalAlignment(JLabel.CENTER);
