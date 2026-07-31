@@ -1,6 +1,7 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.EjemplarDAO;
@@ -37,47 +38,52 @@ public class ControladorEliminarEjemplarDialog {
      *         error
      */
     public boolean eliminarEjemplar(int idEjemplar) {
-        EjemplarDAO ejemplarDAO = new EjemplarDAO(this.dbConnection);
-        // Comprobar préstamos activos (solo lectura)
-        if (ejemplarDAO.tienePrestamosActivosEjemplar(idEjemplar)) {
-            return false;
-        }
-
         // Realizar baja dentro de una transacción
-        Connection conexion = this.dbConnection.getConnection();
-        if (conexion == null) {
-            System.out.println("No se puede obtener conexión a BD");
-            return false;
-        }
-
-        // Intentar baja
-        try {
-            conexion.setAutoCommit(false);
-            // Marcar ejemplar como baja dentro de la transacción
-            if (!ejemplarDAO.bajaEjemplar(conexion, idEjemplar)) {
-                conexion.rollback();
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
                 return false;
             }
-            conexion.commit();
-            return true;
-        } catch (Exception e) {
-            // Si hay error, rollback
-            try {
-                conexion.rollback();
-            } catch (Exception ex) {
-                System.out.println("Error al hacer rollback: " + ex.getMessage());
+
+            EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
+            // Comprobar préstamos activos (solo lectura)
+            if (ejemplarDAO.tienePrestamosActivosEjemplar(idEjemplar)) {
+                return false;
             }
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
+
+            // Intentar baja
+            try {
+                conexion.setAutoCommit(false);
+                // Marcar ejemplar como baja dentro de la transacción
+                if (!ejemplarDAO.bajaEjemplar(conexion, idEjemplar)) {
+                    conexion.rollback();
+                    return false;
+                }
+                conexion.commit();
+                return true;
+            } catch (Exception e) {
+                // Si hay error, rollback
+                try {
+                    conexion.rollback();
+                } catch (Exception ex) {
+                    System.out.println("Error al hacer rollback: " + ex.getMessage());
+                }
+                System.out.println(e.getMessage());
+                System.out.println(e.getCause());
+                return false;
+            } finally {
+                try {
+                    // Restaurar auto-commit y cerrar conexión
+                    conexion.setAutoCommit(true);
+                    conexion.close();
+                } catch (Exception ex) {
+                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                }
+            }
+        } catch (SQLException e1) {
+            System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
-        } finally {
-            try {
-                // Restaurar auto-commit y cerrar conexión
-                conexion.setAutoCommit(true);
-                conexion.close();
-            } catch (Exception ex) {
-                System.out.println("Error cerrando conexión: " + ex.getMessage());
-            }
         }
+
     }
 }

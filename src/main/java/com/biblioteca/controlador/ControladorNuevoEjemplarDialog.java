@@ -2,6 +2,7 @@ package com.biblioteca.controlador;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 import com.biblioteca.conexiones.DBConnection;
@@ -19,7 +20,7 @@ public class ControladorNuevoEjemplarDialog {
     private final DBConnection dbConnection;
 
     /**
-    
+     * 
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
      */
@@ -41,60 +42,66 @@ public class ControladorNuevoEjemplarDialog {
      * @return true si la inserción fue satisfactoria
      */
     public boolean crearEjemplar(int idPublicacion, LocalDate fechaAdquisicion) {
-        EjemplarDAO ejemplarDAO = new EjemplarDAO(this.dbConnection);
-        // Convertir la fecha proporcionada (LocalDate) a java.sql.Date
-        // Si no se proporciona fecha, usar la fecha actual
-        Date fechaSql = (fechaAdquisicion != null) ? Date.valueOf(fechaAdquisicion)
-                : new Date(System.currentTimeMillis());
 
         // Obtener conexión a la base de datos
-        Connection conexion = this.dbConnection.getConnection();
-        // Comprobación básica de disponibilidad de conexión
-        if (conexion == null) {
-            System.out.println("No se puede obtener conexión a BD");
-            return false;
-        }
-        try {
-            // Iniciar transacción (desactivar auto-commit)
-            conexion.setAutoCommit(false);
-
-            // Calcular el siguiente número de ejemplar para la publicación
-            int siguiente = ejemplarDAO.siguienteNumEjemplar(conexion, idPublicacion);
-            if (siguiente == -1) {
-                // Error al calcular siguiente número -> rollback y fallo
-                conexion.rollback();
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            // Comprobación básica de disponibilidad de conexión
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
                 return false;
             }
 
-            // Intentar insertar el nuevo ejemplar con el número calculado
-            boolean ok = ejemplarDAO.insertarEjemplar(conexion, idPublicacion, siguiente, fechaSql);
-            if (!ok) {
-                // Inserción fallida -> rollback
-                conexion.rollback();
-                return false;
-            }
+            EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
+            // Convertir la fecha proporcionada (LocalDate) a java.sql.Date
+            // Si no se proporciona fecha, usar la fecha actual
+            Date fechaSql = (fechaAdquisicion != null) ? Date.valueOf(fechaAdquisicion)
+                    : new Date(System.currentTimeMillis());
 
-            // Commit de la transacción si todo fue correcto
-            conexion.commit();
-            return true;
-        } catch (Exception e) {
-            // En caso de excepción, intentar rollback y reportar el error
             try {
-                conexion.rollback();
-            } catch (Exception ex) {
-                System.out.println("Error al hacer rollback: " + ex.getMessage());
+                // Iniciar transacción (desactivar auto-commit)
+                conexion.setAutoCommit(false);
+
+                // Calcular el siguiente número de ejemplar para la publicación
+                int siguiente = ejemplarDAO.siguienteNumEjemplar(conexion, idPublicacion);
+                if (siguiente == -1) {
+                    // Error al calcular siguiente número -> rollback y fallo
+                    conexion.rollback();
+                    return false;
+                }
+
+                // Intentar insertar el nuevo ejemplar con el número calculado
+                boolean ok = ejemplarDAO.insertarEjemplar(conexion, idPublicacion, siguiente, fechaSql);
+                if (!ok) {
+                    // Inserción fallida -> rollback
+                    conexion.rollback();
+                    return false;
+                }
+
+                // Commit de la transacción si todo fue correcto
+                conexion.commit();
+                return true;
+            } catch (Exception e) {
+                // En caso de excepción, intentar rollback y reportar el error
+                try {
+                    conexion.rollback();
+                } catch (Exception ex) {
+                    System.out.println("Error al hacer rollback: " + ex.getMessage());
+                }
+                System.out.println(e.getMessage());
+                System.out.println(e.getCause());
+                return false;
+            } finally {
+                // Restaurar auto-commit y cerrar conexión
+                try {
+                    conexion.setAutoCommit(true);
+                    conexion.close();
+                } catch (Exception ex) {
+                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                }
             }
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
+        } catch (SQLException e1) {
+            System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
-        } finally {
-            // Restaurar auto-commit y cerrar conexión
-            try {
-                conexion.setAutoCommit(true);
-                conexion.close();
-            } catch (Exception ex) {
-                System.out.println("Error cerrando conexión: " + ex.getMessage());
-            }
         }
     }
 }

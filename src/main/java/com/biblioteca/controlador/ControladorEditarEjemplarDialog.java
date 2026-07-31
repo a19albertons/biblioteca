@@ -2,6 +2,7 @@ package com.biblioteca.controlador;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 import com.biblioteca.conexiones.DBConnection;
@@ -35,8 +36,17 @@ public class ControladorEditarEjemplarDialog {
      * estado}
      */
     public String[] obtenerDetallesEjemplar(int idEjemplar) {
-        EjemplarDAO dao = new EjemplarDAO(this.dbConnection);
-        return dao.obtenerEjemplarPorId(idEjemplar);
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return null;
+            }
+            EjemplarDAO dao = new EjemplarDAO(conexion);
+            return dao.obtenerEjemplarPorId(idEjemplar);
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -49,52 +59,57 @@ public class ControladorEditarEjemplarDialog {
      * @return true si actualización exitosa
      */
     public boolean editarEjemplar(int idEjemplar, LocalDate fechaAdquisicion) {
-        EjemplarDAO dao = new EjemplarDAO(this.dbConnection);
-        Connection conexion = this.dbConnection.getConnection();
-        // Comprobación básica de disponibilidad de conexión
-        if (conexion == null) {
-            System.out.println("No se puede obtener conexión a BD");
-            return false;
-        }
-        try {
-            // Inicia la transacción
-            conexion.setAutoCommit(false);
-
-            // Recuperar estado actual del ejemplar para preservarlo
-            String[] detalles = dao.obtenerEjemplarPorId(idEjemplar);
-            boolean estadoActual = true; // Por defecto activo
-            if (detalles != null && detalles.length > 4) {
-                estadoActual = "DISPONIBLE".equals(detalles[4]);
-            }
-
-            Date fechaSql = (fechaAdquisicion != null) ? Date.valueOf(fechaAdquisicion)
-                    : new Date(System.currentTimeMillis());
-            // Actualiza el ejemplar preservando el estado
-            if (!dao.actualizarEjemplar(conexion, idEjemplar, fechaSql, estadoActual)) {
-                conexion.rollback();
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
                 return false;
             }
-            // Confirma la transacción
-            conexion.commit();
-            return true;
-        } catch (Exception e) {
-            // En caso de error, revierte la transacción
+
+            EjemplarDAO dao = new EjemplarDAO(conexion);
             try {
-                conexion.rollback();
-            } catch (Exception ex) {
-                System.out.println("Error al hacer rollback: " + ex.getMessage());
+                // Inicia la transacción
+                conexion.setAutoCommit(false);
+
+                // Recuperar estado actual del ejemplar para preservarlo
+                String[] detalles = dao.obtenerEjemplarPorId(idEjemplar);
+                boolean estadoActual = true; // Por defecto activo
+                if (detalles != null && detalles.length > 4) {
+                    estadoActual = "DISPONIBLE".equals(detalles[4]);
+                }
+
+                Date fechaSql = (fechaAdquisicion != null) ? Date.valueOf(fechaAdquisicion)
+                        : new Date(System.currentTimeMillis());
+                // Actualiza el ejemplar preservando el estado
+                if (!dao.actualizarEjemplar(conexion, idEjemplar, fechaSql, estadoActual)) {
+                    conexion.rollback();
+                    return false;
+                }
+                // Confirma la transacción
+                conexion.commit();
+                return true;
+            } catch (Exception e) {
+                // En caso de error, revierte la transacción
+                try {
+                    conexion.rollback();
+                } catch (Exception ex) {
+                    System.out.println("Error al hacer rollback: " + ex.getMessage());
+                }
+                System.out.println(e.getMessage());
+                System.out.println(e.getCause());
+                return false;
+            } finally {
+                try {
+                    // Restaura el modo auto-commit y cierra la conexión
+                    conexion.setAutoCommit(true);
+                    conexion.close();
+                } catch (Exception ex) {
+                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                }
             }
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
+        } catch (SQLException e1) {
+            System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
-        } finally {
-            try {
-                // Restaura el modo auto-commit y cierra la conexión
-                conexion.setAutoCommit(true);
-                conexion.close();
-            } catch (Exception ex) {
-                System.out.println("Error cerrando conexión: " + ex.getMessage());
-            }
         }
+
     }
 }

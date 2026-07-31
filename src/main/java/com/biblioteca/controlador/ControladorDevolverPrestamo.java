@@ -16,6 +16,7 @@ import com.biblioteca.dto.UsuarioTipoDTO;
 import com.biblioteca.modelo.TipoPublicacion;
 import com.biblioteca.modelo.TipoUsuario;
 
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
 
@@ -80,24 +81,35 @@ public class ControladorDevolverPrestamo {
      * numEdicion, tipoPublicacion
      */
     public String[] detectarEjemplar(int idEjemplar) {
-        EjemplarDAO ejemplarDAO = new EjemplarDAO(this.dbConnection);
-        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
-        // obtener info ejemplar
-        String[] ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
-        if (ejemplar == null) {
+        String[] resultado = null;
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return null;
+            }
+            EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
+            PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+            // obtener info ejemplar
+            String[] ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
+            if (ejemplar == null) {
+                return null;
+            }
+
+            int idPublicacion = Integer.parseInt(ejemplar[1]);
+            String[] detallesPub = publicacionDAO.obtenerPublicacionDetallesPorId(idPublicacion);
+            if (detallesPub == null) {
+                return null;
+            }
+            String tipo = detallesPub[0];
+            String titulo = detallesPub[1];
+            String numEdicion = detallesPub[8];
+            resultado = new String[] { ejemplar[0], ejemplar[1], ejemplar[2], ejemplar[4], titulo,
+                    (numEdicion == null ? "" : numEdicion), (tipo == null ? "" : tipo) };
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }
 
-        int idPublicacion = Integer.parseInt(ejemplar[1]);
-        String[] detallesPub = publicacionDAO.obtenerPublicacionDetallesPorId(idPublicacion);
-        if (detallesPub == null) {
-            return null;
-        }
-        String tipo = detallesPub[0];
-        String titulo = detallesPub[1];
-        String numEdicion = detallesPub[8];
-        String[] resultado = new String[] { ejemplar[0], ejemplar[1], ejemplar[2], ejemplar[4], titulo,
-                (numEdicion == null ? "" : numEdicion), (tipo == null ? "" : tipo) };
         return resultado;
     }
 
@@ -123,7 +135,7 @@ public class ControladorDevolverPrestamo {
      * @return null si éxito o mensaje de error si fallo
      */
     public String devolverPrestamo(int idUsuario, int idEjemplar) {
-        try {
+        try (Connection conexion = this.dbConnection.getConnection()) {
             // 1. Comprobar si existe un préstamo activo entre el usuario y el ejemplar
             Boolean existe = this.existePrestamoActivoUsuarioEjemplar(idUsuario, idEjemplar);
             if (!existe) {
@@ -132,7 +144,7 @@ public class ControladorDevolverPrestamo {
 
             // Cambiar tipo de conextión a manual para controlar la transacción
             try {
-                this.dbConnection.getConnection().setAutoCommit(false);
+                conexion.setAutoCommit(false);
             } catch (SQLException e) {
                 e.printStackTrace();
                 return "Error al iniciar la transacción de la base de datos: " + e.getMessage();
@@ -175,7 +187,7 @@ public class ControladorDevolverPrestamo {
                 // 4.2 valida si hay retraso en la devolución
                 // Comprobamos si hay algun dia de retraso para activar la sanción automática
                 if (diasRetraso > 0) {
-                    EjemplarDAO ejemplarDAO = new EjemplarDAO(this.dbConnection);
+                    EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
                     EjemplarTipoPublicacionDTO ejemplarTipoPublicacionDTO = ejemplarDAO
                             .obtenerEjemplarPublicacionDTO(idEjemplar);
 
@@ -286,6 +298,9 @@ public class ControladorDevolverPrestamo {
                 e.printStackTrace();
                 return "Error al finalizar la transacción de la base de datos: " + e.getMessage();
             }
+        } catch (SQLException e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
         } finally {
             // Restaurar el modo de auto-commit y hacer rollack no debería hacer nada si
             // todo fue exitoso

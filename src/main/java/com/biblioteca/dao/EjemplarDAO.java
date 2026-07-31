@@ -1,13 +1,12 @@
 package com.biblioteca.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dto.EjemplarTipoPublicacionDTO;
 import com.biblioteca.modelo.TipoPublicacion;
 
@@ -16,9 +15,9 @@ import com.biblioteca.modelo.TipoPublicacion;
  */
 public class EjemplarDAO {
     /**
-     * DBConnection para la base de datos
+     * Conexion para la base de datos
      */
-    private final DBConnection dbConnection;
+    private final Connection conexion;
 
     // SQL constants 🔧
     private static final String SQL_LISTA_EJEMPLARES_POR_PUBLICACION = "SELECT e.id, e.num_ejemplar, e.fecha_adquisicion, e.estado AS en_servicio, "
@@ -35,13 +34,13 @@ public class EjemplarDAO {
     /**
      * Constructor del DAO
      * 
-     * @param dbConnection
+     * @param conexion
      */
-    public EjemplarDAO(DBConnection dbConnection) {
-        if (dbConnection == null) {
+    public EjemplarDAO(Connection conexion) {
+        if (conexion == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
-        this.dbConnection = dbConnection;
+        this.conexion = conexion;
     }
 
     /**
@@ -54,7 +53,7 @@ public class EjemplarDAO {
         List<String[]> lista = new ArrayList<>();
         // Consulta SQL: obtenemos también el número de préstamos activos por ejemplar
         final String sql = SQL_LISTA_EJEMPLARES_POR_PUBLICACION;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetro
             ps.setInt(1, idPublicacion);
@@ -153,7 +152,7 @@ public class EjemplarDAO {
     public String[] obtenerEjemplarPorId(int idEjemplar) {
         // Consulta SQL
         final String sql = SQL_SELECT_EJEMPLAR_POR_ID;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
             ps.setInt(1, idEjemplar);
@@ -216,7 +215,7 @@ public class EjemplarDAO {
     public boolean tienePrestamosActivosEjemplar(int idEjemplar) {
         // Consulta SQL
         final String sql = SQL_CNT_PRESTAMOS_POR_EJEMPLAR;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
             ps.setInt(1, idEjemplar);
@@ -258,8 +257,8 @@ public class EjemplarDAO {
     public EjemplarTipoPublicacionDTO obtenerEjemplarPublicacionDTO(int idEjemplar) {
         EjemplarTipoPublicacionDTO dto = null;
         // Consulta SQL
-        try (Connection conexion = dbConnection.getConnection();
-        // PreparedStatement para obtener el DTO
+        try (
+                // PreparedStatement para obtener el DTO
                 PreparedStatement ps = conexion.prepareStatement(SQL_OBTENER_EJEMPLAR_TIPO_PUBLICACION_DTO)) {
             // Asignar parámetro
             ps.setInt(1, idEjemplar);
@@ -271,8 +270,7 @@ public class EjemplarDAO {
                     TipoPublicacion tipoPublicacion = TipoPublicacion.valueOf(tipoPublicacionStr);
                     dto = new EjemplarTipoPublicacionDTO(numEjemplar, tipoPublicacion);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("Error obteniendo EjemplarTipoPublicacionDTO: " + e.getMessage());
                 System.out.println(e.getCause());
                 dto = null;
