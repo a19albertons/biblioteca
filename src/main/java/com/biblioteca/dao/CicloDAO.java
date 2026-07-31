@@ -6,16 +6,14 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import com.biblioteca.conexiones.DBConnection;
-
 /**
  * DAO para Ciclo
  */
 public class CicloDAO {
     /**
-     * DBConnection para conexiones a la base de datos
+     * Conexión a la base de datos
      */
-    private final DBConnection dbConnection;
+    private final Connection conexion;
 
     // SQL constants 🔧
     private static final String SQL_LISTA_CICLOS = "SELECT nombre FROM ciclos ORDER BY nombre ASC";
@@ -25,13 +23,13 @@ public class CicloDAO {
     /**
      * Constructor del DAO
      * 
-     * @param dbConnection
+     * @param conexion conexión a la base de datos (no puede ser null)
      */
-    public CicloDAO(DBConnection dbConnection) {
-        if (dbConnection == null) {
+    public CicloDAO(Connection conexion) {
+        if (conexion == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
-        this.dbConnection = dbConnection;
+        this.conexion = conexion;
     }
 
     /**
@@ -42,8 +40,7 @@ public class CicloDAO {
     public String[] listaCiclos() {
         // Listado de ciclos
         ArrayList<String> devolver = new ArrayList<>();
-        try (Connection conexion = dbConnection.getConnection();
-                // Consulta SQL
+        try ( // Consulta SQL
                 PreparedStatement ps = conexion.prepareStatement(SQL_LISTA_CICLOS);) {
             // Ejecutar consulta
             try (ResultSet rs = ps.executeQuery();) {
@@ -66,39 +63,8 @@ public class CicloDAO {
      * @return id del ciclo o -1 en caso de error
      */
     public int obtenerOCrear(String nombre) {
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_CICLO_ID_POR_NOMBRE)) {
-            // establecer parámetro
-            ps.setString(1, nombre);
-            // ejecutar consulta
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("id");
-                }
-            }
-            // Si no existe, insertamos
-            try (PreparedStatement ins = conexion.prepareStatement(SQL_INSERT_CICLO,
-                    Statement.RETURN_GENERATED_KEYS)) {
-                ins.setString(1, nombre);
-                ins.executeUpdate();
-                try (ResultSet rs2 = ins.getGeneratedKeys()) {
-                    if (rs2.next()) {
-                        return rs2.getInt(1);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
-        }
-        return -1;
-    }
-
-    /**
-     * Variante que usa una Connection existente (transacciones)
-     */
-    public int obtenerOCrear(Connection conexion, String nombre) {
-        try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_CICLO_ID_POR_NOMBRE)) {
             // establecer parámetro
             ps.setString(1, nombre);
             // ejecutar consulta

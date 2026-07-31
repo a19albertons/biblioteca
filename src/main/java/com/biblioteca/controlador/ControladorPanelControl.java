@@ -1,5 +1,7 @@
 package com.biblioteca.controlador;
 
+import java.sql.Connection;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.CicloDAO;
 import com.biblioteca.dao.PrestamoDAO;
@@ -74,8 +76,14 @@ public class ControladorPanelControl {
      * @return
      */
     public String[] listaCiclos() {
-        CicloDAO cicloDAO = new CicloDAO(this.dbConnection);
-        String[] listaCiclos = cicloDAO.listaCiclos();
+        String[] listaCiclos = new String[0];
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            CicloDAO cicloDAO = new CicloDAO(conexion);
+            listaCiclos = cicloDAO.listaCiclos();
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            listaCiclos = new String[0];
+        }
         return listaCiclos;
     }
 

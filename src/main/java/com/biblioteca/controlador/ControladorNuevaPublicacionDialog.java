@@ -66,11 +66,12 @@ public class ControladorNuevaPublicacionDialog {
                 return false;
             }
 
+            // Creación de DAOs para gestionar una transacción completa
             PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
             AutorDAO autorDAO = new AutorDAO(conexion);
             ModuloDAO moduloDAO = new ModuloDAO(this.dbConnection);
             TemaDAO temaDAO = new TemaDAO(this.dbConnection);
-            CicloDAO cicloDAO = new CicloDAO(this.dbConnection);
+            CicloDAO cicloDAO = new CicloDAO(conexion);
 
             try {
                 conexion.setAutoCommit(false);
@@ -133,7 +134,7 @@ public class ControladorNuevaPublicacionDialog {
                         String nombre = cc.trim();
                         if (nombre.isEmpty())
                             continue;
-                        int idCiclo = cicloDAO.obtenerOCrear(conexion, nombre);
+                        int idCiclo = cicloDAO.obtenerOCrear(nombre);
                         if (idCiclo == -1) {
                             conexion.rollback();
                             return false;
@@ -207,106 +208,113 @@ public class ControladorNuevaPublicacionDialog {
      */
     public boolean crearPublicacionRevista(String isbn, String titulo, String idioma, String temasCsv,
             String modulosCsv, String ciclosCsv, String editorial, String periodicidad) {
-        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
-        ModuloDAO moduloDAO = new ModuloDAO(this.dbConnection);
-        TemaDAO temaDAO = new TemaDAO(this.dbConnection);
-        CicloDAO cicloDAO = new CicloDAO(this.dbConnection);
+        try (Connection conexion = this.dbConnection.getConnection();) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return false;
+            }
 
-        Connection conexion = this.dbConnection.getConnection();
-        if (conexion == null) {
-            System.out.println("No se puede obtener conexión a BD");
-            return false;
+            // Creación de DAOs para gestionar una transacción completa
+            PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+            ModuloDAO moduloDAO = new ModuloDAO(this.dbConnection);
+            TemaDAO temaDAO = new TemaDAO(this.dbConnection);
+            CicloDAO cicloDAO = new CicloDAO(conexion);
+
+            try {
+                conexion.setAutoCommit(false);
+
+                int idPub = publicacionDAO.insertarPublicacion(conexion, titulo, editorial, isbn, idioma, 'R');
+                if (idPub == -1) {
+                    conexion.rollback();
+                    return false;
+                }
+
+                int numRev = publicacionDAO.siguienteNumRevista(conexion);
+                if (!publicacionDAO.insertarRevista(conexion, idPub, periodicidad, numRev)) {
+                    conexion.rollback();
+                    return false;
+                }
+
+                // Procesar modulos
+                if (modulosCsv != null && !modulosCsv.trim().isEmpty()) {
+                    String[] modulos = modulosCsv.split(",");
+                    for (String m : modulos) {
+                        String nombre = m.trim();
+                        if (nombre.isEmpty())
+                            continue;
+                        int idModulo = moduloDAO.obtenerOCrear(conexion, nombre);
+                        if (idModulo == -1) {
+                            conexion.rollback();
+                            return false;
+                        }
+                        if (!publicacionDAO.insertarPublicacionModulo(conexion, idPub, idModulo)) {
+                            conexion.rollback();
+                            return false;
+                        }
+                    }
+                }
+
+                // Procesar ciclos
+                if (ciclosCsv != null && !ciclosCsv.trim().isEmpty()) {
+                    String[] ciclos = ciclosCsv.split(",");
+                    for (String cc : ciclos) {
+                        String nombre = cc.trim();
+                        if (nombre.isEmpty())
+                            continue;
+                        int idCiclo = cicloDAO.obtenerOCrear(nombre);
+                        if (idCiclo == -1) {
+                            conexion.rollback();
+                            return false;
+                        }
+                        if (!publicacionDAO.insertarPublicacionCiclo(conexion, idPub, idCiclo)) {
+                            conexion.rollback();
+                            return false;
+                        }
+                    }
+                }
+
+                // Procesar temas
+                if (temasCsv != null && !temasCsv.trim().isEmpty()) {
+                    String[] temas = temasCsv.split(",");
+                    for (String t : temas) {
+                        String nombre = t.trim();
+                        if (nombre.isEmpty())
+                            continue;
+                        int idTema = temaDAO.obtenerOCrear(conexion, nombre);
+                        if (idTema == -1) {
+                            conexion.rollback();
+                            return false;
+                        }
+                        if (!publicacionDAO.insertarPublicacionTema(conexion, idPub, idTema)) {
+                            conexion.rollback();
+                            return false;
+                        }
+                    }
+                }
+
+                conexion.commit();
+                return true;
+            } catch (Exception e) {
+                try {
+                    conexion.rollback();
+                } catch (Exception ex) {
+                    System.out.println("Error al hacer rollback: " + ex.getMessage());
+                }
+                System.out.println(e.getMessage());
+                System.out.println(e.getCause());
+                return false;
+            } finally {
+                try {
+                    conexion.setAutoCommit(true);
+                    conexion.close();
+                } catch (Exception ex) {
+                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                }
+            }
         }
-        try {
-            conexion.setAutoCommit(false);
-
-            int idPub = publicacionDAO.insertarPublicacion(conexion, titulo, editorial, isbn, idioma, 'R');
-            if (idPub == -1) {
-                conexion.rollback();
-                return false;
-            }
-
-            int numRev = publicacionDAO.siguienteNumRevista(conexion);
-            if (!publicacionDAO.insertarRevista(conexion, idPub, periodicidad, numRev)) {
-                conexion.rollback();
-                return false;
-            }
-
-            // Procesar modulos
-            if (modulosCsv != null && !modulosCsv.trim().isEmpty()) {
-                String[] modulos = modulosCsv.split(",");
-                for (String m : modulos) {
-                    String nombre = m.trim();
-                    if (nombre.isEmpty())
-                        continue;
-                    int idModulo = moduloDAO.obtenerOCrear(conexion, nombre);
-                    if (idModulo == -1) {
-                        conexion.rollback();
-                        return false;
-                    }
-                    if (!publicacionDAO.insertarPublicacionModulo(conexion, idPub, idModulo)) {
-                        conexion.rollback();
-                        return false;
-                    }
-                }
-            }
-
-            // Procesar ciclos
-            if (ciclosCsv != null && !ciclosCsv.trim().isEmpty()) {
-                String[] ciclos = ciclosCsv.split(",");
-                for (String cc : ciclos) {
-                    String nombre = cc.trim();
-                    if (nombre.isEmpty())
-                        continue;
-                    int idCiclo = cicloDAO.obtenerOCrear(conexion, nombre);
-                    if (idCiclo == -1) {
-                        conexion.rollback();
-                        return false;
-                    }
-                    if (!publicacionDAO.insertarPublicacionCiclo(conexion, idPub, idCiclo)) {
-                        conexion.rollback();
-                        return false;
-                    }
-                }
-            }
-
-            // Procesar temas
-            if (temasCsv != null && !temasCsv.trim().isEmpty()) {
-                String[] temas = temasCsv.split(",");
-                for (String t : temas) {
-                    String nombre = t.trim();
-                    if (nombre.isEmpty())
-                        continue;
-                    int idTema = temaDAO.obtenerOCrear(conexion, nombre);
-                    if (idTema == -1) {
-                        conexion.rollback();
-                        return false;
-                    }
-                    if (!publicacionDAO.insertarPublicacionTema(conexion, idPub, idTema)) {
-                        conexion.rollback();
-                        return false;
-                    }
-                }
-            }
-
-            conexion.commit();
-            return true;
-        } catch (Exception e) {
-            try {
-                conexion.rollback();
-            } catch (Exception ex) {
-                System.out.println("Error al hacer rollback: " + ex.getMessage());
-            }
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
+        catch (Exception e1) {
+            System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
-        } finally {
-            try {
-                conexion.setAutoCommit(true);
-                conexion.close();
-            } catch (Exception ex) {
-                System.out.println("Error cerrando conexión: " + ex.getMessage());
-            }
         }
     }
 
