@@ -1,6 +1,7 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
@@ -41,53 +42,62 @@ public class ControladorNuevoUsuarioDialog {
      * @return true si la creación y commit fue satisfactoria
      */
     public boolean crearUsuario(String dni, String nombre, String apellidos, String email, String tipoCode) {
-        UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
-        // Validaciones básicas
-        if (dni == null || dni.trim().isEmpty() || nombre == null || nombre.trim().isEmpty()) {
-            return false;
-        }
-        // Preparar datos
-        String apellido1 = (apellidos != null) ? apellidos.trim() : "";
-        String apellido2 = ""; // dejamos el campo apellido2 vacío por simplicidad
-        String contrasena = dni.trim(); // la contraseña inicial es el DNI
-
-        Connection conexion = this.dbConnection.getConnection();
-        // Comprobar conexión
-        if (conexion == null) {
-            System.out.println("No se puede obtener conexión a BD");
-            return false;
-        }
-        try {
-            // Iniciar transacción
-            conexion.setAutoCommit(false);
-            boolean ok = usuarioDAO.insertarUsuario(conexion, dni.trim(), nombre.trim(), apellido1, apellido2, email,
-                    contrasena, tipoCode, true);
-            // Si no se pudo insertar, hacer rollback y devolver false
-            if (!ok) {
-                conexion.rollback();
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            // Comprobar conexión
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
                 return false;
             }
-            // Confirmar transacción
-            conexion.commit();
-            return true;
-        } catch (Exception e) {
-            try {
-                // Hacer rollback en caso de error
-                conexion.rollback();
-            } catch (Exception ex) {
-                System.out.println("Error al hacer rollback: " + ex.getMessage());
+
+            // Crear DAO de usuario
+            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
+
+            // Validaciones básicas
+            if (dni == null || dni.trim().isEmpty() || nombre == null || nombre.trim().isEmpty()) {
+                return false;
             }
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
+            // Preparar datos
+            String apellido1 = (apellidos != null) ? apellidos.trim() : "";
+            String apellido2 = ""; // dejamos el campo apellido2 vacío por simplicidad
+            String contrasena = dni.trim(); // la contraseña inicial es el DNI
+
+            try {
+                // Iniciar transacción
+                conexion.setAutoCommit(false);
+                boolean ok = usuarioDAO.insertarUsuario(conexion, dni.trim(), nombre.trim(), apellido1, apellido2,
+                        email,
+                        contrasena, tipoCode, true);
+                // Si no se pudo insertar, hacer rollback y devolver false
+                if (!ok) {
+                    conexion.rollback();
+                    return false;
+                }
+                // Confirmar transacción
+                conexion.commit();
+                return true;
+            } catch (Exception e) {
+                try {
+                    // Hacer rollback en caso de error
+                    conexion.rollback();
+                } catch (Exception ex) {
+                    System.out.println("Error al hacer rollback: " + ex.getMessage());
+                }
+                System.out.println(e.getMessage());
+                System.out.println(e.getCause());
+                return false;
+            } finally {
+                try {
+                    // Restaurar auto-commit y cerrar conexión
+                    conexion.setAutoCommit(true);
+                    conexion.close();
+                } catch (Exception ex) {
+                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                }
+            }
+        } catch (SQLException e1) {
+            System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
-        } finally {
-            try {
-                // Restaurar auto-commit y cerrar conexión
-                conexion.setAutoCommit(true);
-                conexion.close();
-            } catch (Exception ex) {
-                System.out.println("Error cerrando conexión: " + ex.getMessage());
-            }
         }
+
     }
 }

@@ -1,5 +1,7 @@
 package com.biblioteca.controlador;
 
+import java.sql.Connection;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
 import com.biblioteca.modelo.Usuario;
@@ -33,8 +35,17 @@ public class ControladorInicioSesion {
      * @return
      */
     public Usuario iniciarSesion(String usuario, String contrasena) {
-        UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
-        return usuarioDAO.consultaInicioSesion(usuario, contrasena);
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return null;
+            }
+            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
+            return usuarioDAO.consultaInicioSesion(usuario, contrasena);
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
+        }
     }
 
 }

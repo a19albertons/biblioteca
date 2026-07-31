@@ -1,5 +1,7 @@
 package com.biblioteca.controlador;
 
+import java.sql.Connection;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
 
@@ -7,11 +9,6 @@ import com.biblioteca.dao.UsuarioDAO;
  * Controlador para el diálogo de eliminación (desactivar) de usuarios
  */
 public class ControladorEliminarUsuario {
-    /**
-     * DAO de usuarios
-     */
-    private UsuarioDAO usuarioDAO;
-
     /**
      * DBConnection para conexiones a la base de datos
      */
@@ -30,7 +27,6 @@ public class ControladorEliminarUsuario {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
         this.dbConnection = dbConnection;
-        this.usuarioDAO = new UsuarioDAO(this.dbConnection);
     }
 
     /**
@@ -38,10 +34,20 @@ public class ControladorEliminarUsuario {
      * lo marca como inactivo.
      */
     public boolean eliminarUsuario(int idUsuario) {
-        // Comprobar préstamos activos
-        if (usuarioDAO.tienePrestamosActivosUsuario(idUsuario)) {
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return false;
+            }
+            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
+            // Comprobar préstamos activos
+            if (usuarioDAO.tienePrestamosActivosUsuario(idUsuario)) {
+                return false;
+            }
+            return usuarioDAO.bajaUsuario(idUsuario);
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
             return false;
         }
-        return usuarioDAO.bajaUsuario(idUsuario);
     }
 }

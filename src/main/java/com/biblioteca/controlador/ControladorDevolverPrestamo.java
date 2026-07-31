@@ -63,10 +63,15 @@ public class ControladorDevolverPrestamo {
      * sancion_activa (SANCIONADO/ACTIVO/BAJA), tipo_desc
      */
     public String[] buscarUsuarioPorDniOId(String dniOrId) {
-        try {
-            UsuarioDAO dao = new UsuarioDAO(this.dbConnection);
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            UsuarioDAO dao = new UsuarioDAO(conexion);
             return dao.obtenerUsuarioYEstadoPorDniOId(dniOrId == null ? "" : dniOrId.trim());
-        } catch (Throwable t) {
+        } 
+        catch (SQLException e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
+        } 
+        catch (Throwable t) {
             // Evitar que errores de compilación/Classpath propaguen una excepción no
             // controlada
             System.out.println("Error buscando usuario por DNI/ID: " + t.getMessage());
@@ -180,7 +185,7 @@ public class ControladorDevolverPrestamo {
             }
 
             // 4. Aplicar sanción automática si corresponde
-            UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
+            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
             UsuarioTipoDTO usuario = usuarioDAO.obtenerUSuarioTipoDTO(idUsuario);
 
             if (usuario == null) {

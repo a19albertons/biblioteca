@@ -32,8 +32,18 @@ public class ControladorRecuperarCuenta {
      * @return
      */
     public Usuario recuperarCuenta(String trim) {
-        UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
-        return usuarioDAO.consultaRecuperarCuenta(trim);
+        try (var conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return null;
+            }
+            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
+            return usuarioDAO.consultaRecuperarCuenta(trim);
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
+        }
+
     }
 
 }

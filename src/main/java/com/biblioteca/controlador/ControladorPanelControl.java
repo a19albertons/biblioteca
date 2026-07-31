@@ -76,8 +76,19 @@ public class ControladorPanelControl {
      * @return
      */
     public String obtenerTotalSociosActivos() {
-        UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
-        return usuarioDAO.totalSociosActivos();
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return "error";
+            }
+            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
+            return usuarioDAO.totalSociosActivos();
+        } catch (Exception e) {
+            // En caso de error, devolver "error" y loguear el error
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return "error";
+        }
+
     }
 
     /**
@@ -120,7 +131,7 @@ public class ControladorPanelControl {
     /**
      * Obtiene la lista de editoriales
      * 
-     * @return 
+     * @return
      */
     public String[] listaEditoriales() {
         try (Connection conexion = this.dbConnection.getConnection()) {

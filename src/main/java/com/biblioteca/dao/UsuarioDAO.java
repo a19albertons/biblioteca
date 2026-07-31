@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dto.UsuarioTipoDTO;
 import com.biblioteca.modelo.TipoUsuario;
 import com.biblioteca.modelo.Usuario;
@@ -14,9 +13,9 @@ import com.biblioteca.modelo.Usuario;
  */
 public class UsuarioDAO {
     /**
-     * DBConnection para la base de datos
+     * Conexión para la base de datos
      */
-    private final DBConnection dbConnection;
+    private final Connection conexion;
 
     // SQL constants 🔧
     private static final String SQL_CONSULTA_INICIO_SESION = "SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?";
@@ -46,13 +45,13 @@ public class UsuarioDAO {
     /**
      * Constructor de UsuarioDAO
      * 
-     * @param dbConnection
+     * @param conexion
      */
-    public UsuarioDAO(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
+    public UsuarioDAO(Connection conexion) {
+        if (conexion == null) {
+            throw new IllegalArgumentException("Connection cannot be null");
         }
-        this.dbConnection = dbConnection;
+        this.conexion = conexion;
     }
 
     /**
@@ -64,9 +63,9 @@ public class UsuarioDAO {
      */
     public Usuario consultaInicioSesion(String usuario, String contrasena) {
         Usuario devolver = null;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_CONSULTA_INICIO_SESION)) {
-                    // establecer parámetros
+            // establecer parámetros
             ps.setString(1, usuario);
             ps.setString(2, contrasena);
             // ejecutar consulta
@@ -112,9 +111,9 @@ public class UsuarioDAO {
      */
     public Usuario consultaRecuperarCuenta(String trim) {
         Usuario devolver = null;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_CONSULTA_RECUPERAR_CUENTA)) {
-                    // establecer parámetros
+            // establecer parámetros
             ps.setString(1, trim);
             ps.setString(2, trim);
             // ejecutar consulta
@@ -160,9 +159,9 @@ public class UsuarioDAO {
     public String totalSociosActivos() {
         String totalSocios = "-1";
         // Consulta SQL para contar los socios activos
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_TOTAL_SOCIOS_ACTIVOS)) {
-                    // ejecutar consulta
+            // ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     totalSocios = rs.getString("TOTAL");
@@ -188,7 +187,7 @@ public class UsuarioDAO {
     public String[][] listaUsuariosYEstadoSancionActiva() {
         // Listado de usuarios
         String[][] devolver = new String[0][0];
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 // Consulta SQL
                 PreparedStatement ps = conexion.prepareStatement(SQL_LISTA_USUARIOS_ESTADO);) { // Ejecutar consulta
             try (ResultSet rs = ps.executeQuery();) {
@@ -275,7 +274,7 @@ public class UsuarioDAO {
      */
     public String[] obtenerDetallesUsuario(int idUsuario) {
         String[] devolver = null;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 // Consulta SQL
                 PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_USUARIO_POR_ID)) {
             // Asignar parámetro
@@ -314,7 +313,7 @@ public class UsuarioDAO {
     public String[] obtenerUsuarioYEstadoPorDniOId(String dniOrId) {
         // Listado de usuarios
         String[] devolver = null;
-        try (Connection conexion = dbConnection.getConnection()) {
+        try {
             // Consulta SQL dependiendo si es número (id) o texto (dni)
             boolean esNumero = dniOrId != null && dniOrId.matches("^\\d+$");
             final String sql = SQL_USUARIO_Y_ESTADO_BASE + (esNumero ? " WHERE u.id = ?" : " WHERE u.dni = ?");
@@ -368,7 +367,7 @@ public class UsuarioDAO {
             String email, String tipo) {
         // Consulta SQL
         final String sql = SQL_UPDATE_USUARIO;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
             ps.setString(1, dni);
@@ -397,7 +396,7 @@ public class UsuarioDAO {
     public boolean bajaUsuario(int idUsuario) {
         // Consulta SQL
         final String sql = SQL_BAJA_USUARIO;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
             ps.setInt(1, idUsuario);
@@ -422,7 +421,7 @@ public class UsuarioDAO {
         // Consulta SQL
         final String sql = SQL_CUENTA_PRESTAMOS_ACTIVOS_POR_USUARIO;
 
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
             ps.setInt(1, idUsuario);
@@ -448,7 +447,7 @@ public class UsuarioDAO {
         // Consulta SQL
         final String sql = SQL_USUARIOS_SANCIONABLES;
         java.util.List<String[]> rows = new java.util.ArrayList<>();
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql);
                 // Ejecutar consulta
                 ResultSet rs = ps.executeQuery()) {
@@ -470,36 +469,34 @@ public class UsuarioDAO {
 
     /**
      * Obtiene un UsuarioTipoDTO por id de usuario
+     * 
      * @param idUsuario id del usuario
      * @return UsuarioTipoDTO con idUsuario y tipoUsuario, o null si no encontrado
      */
-	public UsuarioTipoDTO obtenerUSuarioTipoDTO(int idUsuario) {
-		UsuarioTipoDTO usuarioTipoDTO = null;
-        try (Connection conexion = dbConnection.getConnection();
-            PreparedStatement consulta = conexion.prepareStatement(SQL_OBTENER_USUARIO_TIPO_DTO)) {
-                consulta.setInt(1, idUsuario);
-                // Ejecutamos la consulta
-                try (ResultSet resultado = consulta.executeQuery()) {
-                    if (resultado.next()) {
-                        usuarioTipoDTO = new UsuarioTipoDTO(
+    public UsuarioTipoDTO obtenerUSuarioTipoDTO(int idUsuario) {
+        UsuarioTipoDTO usuarioTipoDTO = null;
+        try (
+                PreparedStatement consulta = conexion.prepareStatement(SQL_OBTENER_USUARIO_TIPO_DTO)) {
+            consulta.setInt(1, idUsuario);
+            // Ejecutamos la consulta
+            try (ResultSet resultado = consulta.executeQuery()) {
+                if (resultado.next()) {
+                    usuarioTipoDTO = new UsuarioTipoDTO(
                             resultado.getInt("id"),
-                            TipoUsuario.valueOf(resultado.getString("tipo"))
-                        );
-                    }
+                            TipoUsuario.valueOf(resultado.getString("tipo")));
                 }
-                catch (Exception e) {
-                    // Manejo de excepciones. Se ve en consola
-                    System.out.println("Error obteniendo UsuarioTipoDTO: "+e.getMessage());
-                    System.out.println(e.getCause());
-                    usuarioTipoDTO = null;
-                }
+            } catch (Exception e) {
+                // Manejo de excepciones. Se ve en consola
+                System.out.println("Error obteniendo UsuarioTipoDTO: " + e.getMessage());
+                System.out.println(e.getCause());
+                usuarioTipoDTO = null;
             }
-        catch (Exception e) {
+        } catch (Exception e) {
             // Manejo de excepciones. Se ve en consola
-            System.out.println("Ha surgido un error inesperado: "+e.getMessage());
+            System.out.println("Ha surgido un error inesperado: " + e.getMessage());
             System.out.println(e.getCause());
             usuarioTipoDTO = null;
         }
         return usuarioTipoDTO;
-	}
+    }
 }

@@ -1,5 +1,7 @@
 package com.biblioteca.controlador;
 
+import java.sql.Connection;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
 
@@ -31,8 +33,18 @@ public class ControladorGestionUsuarios {
      * @return String[][] con columnas: id, nombre, sancion_activa
      */
     public String[][] obtenerUsuariosYEstadoSancionActiva() {
-        UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
-        return usuarioDAO.listaUsuariosYEstadoSancionActiva();
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return null;
+            }
+            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
+            return usuarioDAO.listaUsuariosYEstadoSancionActiva();
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
+        }
+
     }
 
     /**
@@ -41,7 +53,16 @@ public class ControladorGestionUsuarios {
      * @return String[][] con columnas: id, dni, nombre_completo, tipo
      */
     public String[][] obtenerUsuariosSancionables() {
-        UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
-        return usuarioDAO.obtenerUsuariosSancionables();
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return null;
+            }
+            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
+            return usuarioDAO.obtenerUsuariosSancionables();
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.biblioteca.controlador;
 
+import java.sql.Connection;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
 
@@ -7,10 +9,6 @@ import com.biblioteca.dao.UsuarioDAO;
  * Controlador para el diálogo de edición de usuario
  */
 public class ControladorEditarUsuarioDialog {
-    /**
-     * DAO de usuarios
-     */
-    private UsuarioDAO usuarioDAO;
     /**
      * DBConnection para conexiones a la base de datos
      */
@@ -27,7 +25,6 @@ public class ControladorEditarUsuarioDialog {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
         this.dbConnection = dbConnection;
-        this.usuarioDAO = new UsuarioDAO(this.dbConnection);
     }
 
     /**
@@ -35,7 +32,17 @@ public class ControladorEditarUsuarioDialog {
      * Devuelve un array con: dni, nombre, apellido1, apellido2, email, tipo, id
      */
     public String[] obtenerDetallesUsuario(int idUsuario) {
-        return usuarioDAO.obtenerDetallesUsuario(idUsuario);
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return null;
+            }
+            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
+            return usuarioDAO.obtenerDetallesUsuario(idUsuario);
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -43,6 +50,16 @@ public class ControladorEditarUsuarioDialog {
      */
     public boolean editarUsuario(int idUsuario, String dni, String nombre, String apellido1, String apellido2,
             String email, String tipo) {
-        return usuarioDAO.actualizarUsuario(idUsuario, dni, nombre, apellido1, apellido2, email, tipo);
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return false;
+            }
+            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
+            return usuarioDAO.actualizarUsuario(idUsuario, dni, nombre, apellido1, apellido2, email, tipo);
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return false;
+        }
     }
 }

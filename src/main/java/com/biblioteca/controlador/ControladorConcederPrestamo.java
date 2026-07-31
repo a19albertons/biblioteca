@@ -34,8 +34,17 @@ public class ControladorConcederPrestamo {
      * sancion_activa (SANCIONADO/ACTIVO/BAJA), tipo_desc
      */
     public String[] buscarUsuarioPorDniOId(String dniOrId) {
-        UsuarioDAO dao = new UsuarioDAO(this.dbConnection);
-        return dao.obtenerUsuarioYEstadoPorDniOId(dniOrId == null ? "" : dniOrId.trim());
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return null;
+            }
+            UsuarioDAO dao = new UsuarioDAO(conexion);
+            return dao.obtenerUsuarioYEstadoPorDniOId(dniOrId == null ? "" : dniOrId.trim());
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -86,7 +95,7 @@ public class ControladorConcederPrestamo {
             }
 
             // Validaciones
-            UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
+            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
             String[] usuario = usuarioDAO.obtenerUsuarioYEstadoPorDniOId(String.valueOf(idUsuario));
             // comprobar usuario válido
             if (usuario == null) {
