@@ -73,23 +73,15 @@ public class ModuloDAO {
         return -1;
     }
 
-    /**
-     * Obtiene o crea un módulo
-     * 
-     * @param nombre
-     * @return
-     */
-    public int obtenerOCrear(String nombre) {
-        int id = obtenerIdPorNombre(nombre);
-        if (id != -1)
-            return id;
-        return crearModulo(nombre);
-    }
+
 
     /**
-     * Variante que usa una Connection existente
+     * Obtiene o crea un módulo por nombre y devuelve su id
+     * 
+     * @param nombre nombre del módulo
+     * @return id del módulo o -1 en caso de error
      */
-    public int obtenerOCrear(Connection conexion, String nombre) {
+    public int obtenerOCrear(String nombre) {
         int id = -1;
         try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_MODULO_ID_POR_NOMBRE)) {
             // establecer parámetro

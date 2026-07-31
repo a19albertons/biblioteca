@@ -156,7 +156,7 @@ public class ControladorEditarPublicacionDialog {
                         String nombre = m.trim();
                         if (nombre.isEmpty())
                             continue;
-                        int idModulo = moduloDAO.obtenerOCrear(conexion, nombre);
+                        int idModulo = moduloDAO.obtenerOCrear(nombre);
                         if (idModulo == -1) {
                             conexion.rollback();
                             return false;
@@ -300,7 +300,7 @@ public class ControladorEditarPublicacionDialog {
                         String nombre = m.trim();
                         if (nombre.isEmpty())
                             continue;
-                        int idModulo = moduloDAO.obtenerOCrear(conexion, nombre);
+                        int idModulo = moduloDAO.obtenerOCrear(nombre);
                         if (idModulo == -1) {
                             conexion.rollback();
                             return false;

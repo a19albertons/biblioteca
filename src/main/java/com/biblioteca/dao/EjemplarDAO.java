@@ -91,11 +91,10 @@ public class EjemplarDAO {
     /**
      * Devuelve el siguiente número de ejemplar para una publicación dada (1..n).
      *
-     * @param conexion
      * @param idPublicacion
      * @return siguiente num_ejemplar o -1 en caso de error
      */
-    public int siguienteNumEjemplar(Connection conexion, int idPublicacion) {
+    public int siguienteNumEjemplar(int idPublicacion) {
         // Consulta SQL
         final String sql = SQL_SELECT_SIGUIENTE_NUM_EJEMPLAR;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -117,13 +116,12 @@ public class EjemplarDAO {
      * Inserta un nuevo ejemplar para una publicación (usa la Connection
      * proporcionada).
      *
-     * @param conexion
      * @param idPublicacion
      * @param numEjemplar
      * @param fechaAdquisicion (java.sql.Date)
      * @return true si la inserción fue exitosa
      */
-    public boolean insertarEjemplar(Connection conexion, int idPublicacion, int numEjemplar, Date fechaAdquisicion) {
+    public boolean insertarEjemplar(int idPublicacion, int numEjemplar, Date fechaAdquisicion) {
         // Consulta SQL
         final String sql = SQL_INSERT_EJEMPLAR;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -181,13 +179,12 @@ public class EjemplarDAO {
      * Actualiza los campos editables de un ejemplar (fecha_adquisicion y estado)
      * usando la Connection proporcionada.
      *
-     * @param conexion
      * @param idEjemplar
      * @param fechaAdquisicion (java.sql.Date)
      * @param estado           estado (true = activo/en servicio, false = baja)
      * @return true si la actualización afectó exactamente una fila
      */
-    public boolean actualizarEjemplar(Connection conexion, int idEjemplar, Date fechaAdquisicion, boolean estado) {
+    public boolean actualizarEjemplar(int idEjemplar, Date fechaAdquisicion, boolean estado) {
         // Consulta SQL
         final String sql = SQL_UPDATE_EJEMPLAR;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -234,11 +231,10 @@ public class EjemplarDAO {
     /**
      * Marca un ejemplar como baja (estado = FALSE) dentro de la transacción.
      *
-     * @param conexion
      * @param idEjemplar
      * @return true si la actualización afectó exactamente una fila
      */
-    public boolean bajaEjemplar(Connection conexion, int idEjemplar) {
+    public boolean bajaEjemplar(int idEjemplar) {
         // Consulta SQLSQL_OBTENER_EJEMPLAR_PUBLICACION_DTO
         final String sql = SQL_UPDATE_BAJA_EJEMPLAR;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {

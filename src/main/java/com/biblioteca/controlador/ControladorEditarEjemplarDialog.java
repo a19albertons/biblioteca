@@ -80,7 +80,7 @@ public class ControladorEditarEjemplarDialog {
                 Date fechaSql = (fechaAdquisicion != null) ? Date.valueOf(fechaAdquisicion)
                         : new Date(System.currentTimeMillis());
                 // Actualiza el ejemplar preservando el estado
-                if (!dao.actualizarEjemplar(conexion, idEjemplar, fechaSql, estadoActual)) {
+                if (!dao.actualizarEjemplar(idEjemplar, fechaSql, estadoActual)) {
                     conexion.rollback();
                     return false;
                 }

@@ -62,7 +62,7 @@ public class ControladorNuevoEjemplarDialog {
                 conexion.setAutoCommit(false);
 
                 // Calcular el siguiente número de ejemplar para la publicación
-                int siguiente = ejemplarDAO.siguienteNumEjemplar(conexion, idPublicacion);
+                int siguiente = ejemplarDAO.siguienteNumEjemplar(idPublicacion);
                 if (siguiente == -1) {
                     // Error al calcular siguiente número -> rollback y fallo
                     conexion.rollback();
@@ -70,7 +70,7 @@ public class ControladorNuevoEjemplarDialog {
                 }
 
                 // Intentar insertar el nuevo ejemplar con el número calculado
-                boolean ok = ejemplarDAO.insertarEjemplar(conexion, idPublicacion, siguiente, fechaSql);
+                boolean ok = ejemplarDAO.insertarEjemplar(idPublicacion, siguiente, fechaSql);
                 if (!ok) {
                     // Inserción fallida -> rollback
                     conexion.rollback();

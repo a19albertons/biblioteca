@@ -55,7 +55,7 @@ public class ControladorEliminarEjemplarDialog {
             try {
                 conexion.setAutoCommit(false);
                 // Marcar ejemplar como baja dentro de la transacción
-                if (!ejemplarDAO.bajaEjemplar(conexion, idEjemplar)) {
+                if (!ejemplarDAO.bajaEjemplar(idEjemplar)) {
                     conexion.rollback();
                     return false;
                 }
