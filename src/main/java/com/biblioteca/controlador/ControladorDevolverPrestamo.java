@@ -88,7 +88,7 @@ public class ControladorDevolverPrestamo {
                 return null;
             }
             EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
-            PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
             // obtener info ejemplar
             String[] ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
             if (ejemplar == null) {

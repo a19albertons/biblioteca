@@ -1,6 +1,7 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.PublicacionDAO;
@@ -38,45 +39,54 @@ public class ControladorEliminarPublicacion {
      *         error
      */
     public boolean eliminarPublicacion(int idPublicacion) {
-        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
-        Connection conexion = this.dbConnection.getConnection();
-        if (conexion == null) {
-            System.out.println("No se puede obtener conexión a BD");
-            return false;
-        }
-
-        // Comprobar préstamos activos (no transaccional, solo lectura)
-        if (publicacionDAO.tienePrestamosActivos(idPublicacion)) {
-            return false;
-        }
-
-        try {
-            conexion.setAutoCommit(false);
-
-            // Marcar ejemplares y publicación como baja dentro de la transacción
-            if (!publicacionDAO.bajaPublicacion(conexion, idPublicacion)) {
-                conexion.rollback();
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
                 return false;
             }
 
-            conexion.commit();
-            return true;
-        } catch (Exception e) {
-            try {
-                conexion.rollback();
-            } catch (Exception ex) {
-                System.out.println("Error al hacer rollback: " + ex.getMessage());
+            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
+
+            // Comprobar préstamos activos (no transaccional, solo lectura)
+            if (publicacionDAO.tienePrestamosActivos(idPublicacion)) {
+                return false;
             }
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
+
+            try {
+                conexion.setAutoCommit(false);
+
+                // Marcar ejemplares y publicación como baja dentro de la transacción
+                if (!publicacionDAO.bajaPublicacion(idPublicacion)) {
+                    conexion.rollback();
+                    return false;
+                }
+
+                // Commit de la transacción si todo fue bien
+                conexion.commit();
+                return true;
+            } catch (Exception e) {
+                try {
+                    // Si hay error, rollback
+                    conexion.rollback();
+                } catch (Exception ex) {
+                    System.out.println("Error al hacer rollback: " + ex.getMessage());
+                }
+                System.out.println(e.getMessage());
+                System.out.println(e.getCause());
+                return false;
+            } finally {
+                try {
+                    // Revierte los cambios inicales
+                    conexion.setAutoCommit(true);
+                    conexion.close();
+                } catch (Exception ex) {
+                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                }
+            }
+        } catch (SQLException e1) {
+            System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
-        } finally {
-            try {
-                conexion.setAutoCommit(true);
-                conexion.close();
-            } catch (Exception ex) {
-                System.out.println("Error cerrando conexión: " + ex.getMessage());
-            }
         }
+
     }
 }

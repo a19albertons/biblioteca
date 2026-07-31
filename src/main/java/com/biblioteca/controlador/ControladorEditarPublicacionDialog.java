@@ -50,8 +50,17 @@ public class ControladorEditarPublicacionDialog {
      *         autoresCSV, periodicidad, id — o null si no se encuentra
      */
     public String[] obtenerDetallesPublicacion(int id) {
-        PublicacionDAO dao = new PublicacionDAO(this.dbConnection);
-        return dao.obtenerPublicacionDetallesPorId(id);
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return null;
+            }
+            PublicacionDAO dao = new PublicacionDAO(conexion);
+            return dao.obtenerPublicacionDetallesPorId(id);
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -82,7 +91,7 @@ public class ControladorEditarPublicacionDialog {
             }
 
             // Creación de DAOs para gestionar una transacción completa
-            PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
             AutorDAO autorDAO = new AutorDAO(conexion);
             ModuloDAO moduloDAO = new ModuloDAO(conexion);
             TemaDAO temaDAO = new TemaDAO(this.dbConnection);
@@ -93,14 +102,14 @@ public class ControladorEditarPublicacionDialog {
                 conexion.setAutoCommit(false);
 
                 // Actualizar tabla publicaciones
-                if (!publicacionDAO.actualizarPublicacion(conexion, idPublicacion, titulo, editorial, isbn, idioma,
+                if (!publicacionDAO.actualizarPublicacion(idPublicacion, titulo, editorial, isbn, idioma,
                         'L')) {
                     conexion.rollback();
                     return false;
                 }
 
                 // Actualizar o insertar fila libros
-                if (!publicacionDAO.actualizarLibro(conexion, idPublicacion, numEdicion, Date.valueOf(fechaPublic))) {
+                if (!publicacionDAO.actualizarLibro(idPublicacion, numEdicion, Date.valueOf(fechaPublic))) {
                     conexion.rollback();
                     return false;
                 }
@@ -116,7 +125,7 @@ public class ControladorEditarPublicacionDialog {
                 }
 
                 // Eliminar relaciones previas
-                if (!publicacionDAO.eliminarRelacionesPublicacion(conexion, idPublicacion)) {
+                if (!publicacionDAO.eliminarRelacionesPublicacion(idPublicacion)) {
                     conexion.rollback();
                     return false;
                 }
@@ -133,7 +142,7 @@ public class ControladorEditarPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarLibroAutor(conexion, idPublicacion, idAutor)) {
+                        if (!publicacionDAO.insertarLibroAutor(idPublicacion, idAutor)) {
                             conexion.rollback();
                             return false;
                         }
@@ -152,7 +161,7 @@ public class ControladorEditarPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarPublicacionModulo(conexion, idPublicacion, idModulo)) {
+                        if (!publicacionDAO.insertarPublicacionModulo(idPublicacion, idModulo)) {
                             conexion.rollback();
                             return false;
                         }
@@ -171,7 +180,7 @@ public class ControladorEditarPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarPublicacionCiclo(conexion, idPublicacion, idCiclo)) {
+                        if (!publicacionDAO.insertarPublicacionCiclo(idPublicacion, idCiclo)) {
                             conexion.rollback();
                             return false;
                         }
@@ -190,7 +199,7 @@ public class ControladorEditarPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarPublicacionTema(conexion, idPublicacion, idTema)) {
+                        if (!publicacionDAO.insertarPublicacionTema(idPublicacion, idTema)) {
                             conexion.rollback();
                             return false;
                         }
@@ -247,7 +256,7 @@ public class ControladorEditarPublicacionDialog {
             }
 
             // Creación de DAOs para gestionar una transacción completa
-            PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
             ModuloDAO moduloDAO = new ModuloDAO(conexion);
             TemaDAO temaDAO = new TemaDAO(this.dbConnection);
             CicloDAO cicloDAO = new CicloDAO(conexion);
@@ -257,14 +266,14 @@ public class ControladorEditarPublicacionDialog {
                 conexion.setAutoCommit(false);
 
                 // Actualizar tabla publicaciones
-                if (!publicacionDAO.actualizarPublicacion(conexion, idPublicacion, titulo, editorial, isbn, idioma,
+                if (!publicacionDAO.actualizarPublicacion(idPublicacion, titulo, editorial, isbn, idioma,
                         'R')) {
                     conexion.rollback();
                     return false;
                 }
 
                 // Actualizar o insertar fila revistas
-                if (!publicacionDAO.actualizarRevista(conexion, idPublicacion, periodicidad)) {
+                if (!publicacionDAO.actualizarRevista(idPublicacion, periodicidad)) {
                     conexion.rollback();
                     return false;
                 }
@@ -279,7 +288,7 @@ public class ControladorEditarPublicacionDialog {
                 }
 
                 // Eliminar relaciones previas
-                if (!publicacionDAO.eliminarRelacionesPublicacion(conexion, idPublicacion)) {
+                if (!publicacionDAO.eliminarRelacionesPublicacion(idPublicacion)) {
                     conexion.rollback();
                     return false;
                 }
@@ -296,7 +305,7 @@ public class ControladorEditarPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarPublicacionModulo(conexion, idPublicacion, idModulo)) {
+                        if (!publicacionDAO.insertarPublicacionModulo(idPublicacion, idModulo)) {
                             conexion.rollback();
                             return false;
                         }
@@ -315,7 +324,7 @@ public class ControladorEditarPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarPublicacionCiclo(conexion, idPublicacion, idCiclo)) {
+                        if (!publicacionDAO.insertarPublicacionCiclo(idPublicacion, idCiclo)) {
                             conexion.rollback();
                             return false;
                         }
@@ -334,7 +343,7 @@ public class ControladorEditarPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarPublicacionTema(conexion, idPublicacion, idTema)) {
+                        if (!publicacionDAO.insertarPublicacionTema(idPublicacion, idTema)) {
                             conexion.rollback();
                             return false;
                         }

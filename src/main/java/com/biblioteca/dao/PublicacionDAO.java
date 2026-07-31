@@ -8,8 +8,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.biblioteca.conexiones.DBConnection;
-
 /**
  * DAO para Publicacion
  */
@@ -17,7 +15,7 @@ public class PublicacionDAO {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final DBConnection dbConnection;
+    private final Connection conexion;
 
     // SQL constants 🔧
     private static final String SQL_LISTA_EDITORIALES = "SELECT editorial FROM publicaciones GROUP BY editorial ORDER BY editorial ASC";
@@ -89,14 +87,14 @@ public class PublicacionDAO {
     /**
      * Constructor del DAO
      * 
-     * @param dbConnection
+     * @param conexion
      */
-    public PublicacionDAO(DBConnection dbConnection) {
+    public PublicacionDAO(Connection conexion) {
 
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
+        if (conexion == null) {
+            throw new IllegalArgumentException("conexion cannot be null");
         }
-        this.dbConnection = dbConnection;
+        this.conexion = conexion;
     }
 
     /**
@@ -107,7 +105,7 @@ public class PublicacionDAO {
     public String[] listaEditoriales() {
         // Listado de editoriales
         ArrayList<String> devolver = new ArrayList<>();
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 // Consulta SQL
                 PreparedStatement ps = conexion.prepareStatement(SQL_LISTA_EDITORIALES);) {
             // Ejecutar consulta
@@ -136,7 +134,7 @@ public class PublicacionDAO {
      * @return id generado o -1 en caso de error
      */
     public int insertarPublicacion(String titulo, String editorial, String codigoIsbn, String idioma, char tipo) {
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION,
                         Statement.RETURN_GENERATED_KEYS)) {
             // establecer parámetros
@@ -162,35 +160,6 @@ public class PublicacionDAO {
     }
 
     /**
-     * Variante que utiliza una Connection existente para que pueda formar parte de
-     * una transacción
-     */
-    public int insertarPublicacion(Connection conexion, String titulo, String editorial, String codigoIsbn,
-            String idioma, char tipo) {
-        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION,
-                Statement.RETURN_GENERATED_KEYS)) {
-            // establecer parámetros
-            ps.setString(1, titulo);
-            ps.setString(2, editorial);
-            ps.setString(3, codigoIsbn);
-            ps.setString(4, idioma);
-            ps.setString(5, String.valueOf(Character.toUpperCase(tipo)));
-            // ejecutar
-            ps.executeUpdate();
-            // obtener id generado
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
-        }
-        return -1;
-    }
-
-    /**
      * Inserta los datos de libros (tabla libros)
      *
      * @param idPublicacion
@@ -199,28 +168,8 @@ public class PublicacionDAO {
      * @return true si ok
      */
     public boolean insertarLibro(int idPublicacion, int numEdicion, Date fechaPublicacion) {
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_LIBRO)) {
-            // establecer parámetros
-            ps.setInt(1, idPublicacion);
-            ps.setInt(2, numEdicion);
-            ps.setDate(3, fechaPublicacion);
-            // ejecutar
-            ps.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            // debug
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
-            return false;
-        }
-    }
-
-    /**
-     * Variante que utiliza una Connection existente (transacción)
-     */
-    public boolean insertarLibro(Connection conexion, int idPublicacion, int numEdicion, Date fechaPublicacion) {
-        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_LIBRO)) {
             // establecer parámetros
             ps.setInt(1, idPublicacion);
             ps.setInt(2, numEdicion);
@@ -245,28 +194,8 @@ public class PublicacionDAO {
      * @return true si ok
      */
     public boolean insertarRevista(int idPublicacion, String periodicidad, int numRevista) {
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_REVISTA)) {
-            // establecer parámetros
-            ps.setInt(1, idPublicacion);
-            ps.setString(2, periodicidad);
-            ps.setInt(3, numRevista);
-            // ejecutar
-            ps.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            // debug
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
-            return false;
-        }
-    }
-
-    /**
-     * Variante que utiliza una Connection existente (transaccional)
-     */
-    public boolean insertarRevista(Connection conexion, int idPublicacion, String periodicidad, int numRevista) {
-        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_REVISTA)) {
             // establecer parámetros
             ps.setInt(1, idPublicacion);
             ps.setString(2, periodicidad);
@@ -286,27 +215,8 @@ public class PublicacionDAO {
      * Inserta relación publicacion <-> modulo
      */
     public boolean insertarPublicacionModulo(int idPublicacion, int idModulo) {
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_MODULO)) {
-            // establecer parámetros
-            ps.setInt(1, idPublicacion);
-            ps.setInt(2, idModulo);
-            // ejecutar
-            ps.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            // debug
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
-            return false;
-        }
-    }
-
-    /**
-     * Variante transaccional que usa una Connection existente
-     */
-    public boolean insertarPublicacionModulo(Connection conexion, int idPublicacion, int idModulo) {
-        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_MODULO)) {
             // establecer parámetros
             ps.setInt(1, idPublicacion);
             ps.setInt(2, idModulo);
@@ -325,27 +235,8 @@ public class PublicacionDAO {
      * Inserta relación publicacion <-> ciclo
      */
     public boolean insertarPublicacionCiclo(int idPublicacion, int idCiclo) {
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_CICLO)) {
-            // establecer parámetros
-            ps.setInt(1, idPublicacion);
-            ps.setInt(2, idCiclo);
-            // ejecutar
-            ps.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            // debug
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
-            return false;
-        }
-    }
-
-    /**
-     * Variante transaccional que usa una Connection existente
-     */
-    public boolean insertarPublicacionCiclo(Connection conexion, int idPublicacion, int idCiclo) {
-        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_CICLO)) {
             // establecer parámetros
             ps.setInt(1, idPublicacion);
             ps.setInt(2, idCiclo);
@@ -364,27 +255,8 @@ public class PublicacionDAO {
      * Inserta relación publicacion <-> tema
      */
     public boolean insertarPublicacionTema(int idPublicacion, int idTema) {
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_TEMA)) {
-            // establecer parámetros
-            ps.setInt(1, idPublicacion);
-            ps.setInt(2, idTema);
-            // ejecutar
-            ps.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            // debug
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
-            return false;
-        }
-    }
-
-    /**
-     * Variante transaccional que usa una Connection existente
-     */
-    public boolean insertarPublicacionTema(Connection conexion, int idPublicacion, int idTema) {
-        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_TEMA)) {
             // establecer parámetros
             ps.setInt(1, idPublicacion);
             ps.setInt(2, idTema);
@@ -403,27 +275,8 @@ public class PublicacionDAO {
      * Inserta relación libro <-> autor
      */
     public boolean insertarLibroAutor(int idLibro, int idAutor) {
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_LIBRO_AUTOR)) {
-            // establecer parámetros
-            ps.setInt(1, idLibro);
-            ps.setInt(2, idAutor);
-            // ejecutar
-            ps.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            // debug
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
-            return false;
-        }
-    }
-
-    /**
-     * Variante transaccional que usa una Connection existente
-     */
-    public boolean insertarLibroAutor(Connection conexion, int idLibro, int idAutor) {
-        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_LIBRO_AUTOR)) {
             // establecer parámetros
             ps.setInt(1, idLibro);
             ps.setInt(2, idAutor);
@@ -444,27 +297,8 @@ public class PublicacionDAO {
      * @return siguiente num_revista (>=1) o 1 en caso de error
      */
     public int siguienteNumRevista() {
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_MAX_NUM_REVISTA)) {
-            // ejecutar consulta
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("m") + 1;
-                }
-            }
-        } catch (Exception e) {
-            // debug
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
-        }
-        return 1;
-    }
-
-    /**
-     * Variante transaccional que usa una Connection existente
-     */
-    public int siguienteNumRevista(Connection conexion) {
-        try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_MAX_NUM_REVISTA)) {
             // ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -490,7 +324,7 @@ public class PublicacionDAO {
         List<String[]> lista = new ArrayList<>();
         final String sql = SQL_LISTA_PUBLICACIONES_RESUMEN;
 
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
@@ -543,7 +377,7 @@ public class PublicacionDAO {
     public String[] obtenerResumenPublicacionPorId(int id) {
         final String sql = SQL_OBTENER_PUBLICACION_RESUMEN_POR_ID;
 
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetro
             ps.setInt(1, id);
@@ -588,7 +422,7 @@ public class PublicacionDAO {
     public String[] obtenerPublicacionDetallesPorId(int id) {
         final String sql = SQL_PUBLICACION_DETALLES_POR_ID;
 
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetro
             ps.setInt(1, id);
@@ -630,7 +464,6 @@ public class PublicacionDAO {
     /**
      * Actualiza los campos base de la tabla `publicaciones`.
      *
-     * @param conexion   Connection en contexto transaccional
      * @param id         id de la publicación a actualizar
      * @param titulo     nuevo título
      * @param editorial  nueva editorial
@@ -640,7 +473,7 @@ public class PublicacionDAO {
      * @return true si la actualización tuvo éxito (o no hubo cambios), false en
      *         caso de error
      */
-    public boolean actualizarPublicacion(Connection conexion, int id, String titulo, String editorial,
+    public boolean actualizarPublicacion(int id, String titulo, String editorial,
             String codigoIsbn, String idioma, char tipo) {
         try (PreparedStatement ps = conexion.prepareStatement(SQL_UPDATE_PUBLICACION)) {
             // establecer parámetros
@@ -663,8 +496,14 @@ public class PublicacionDAO {
 
     /**
      * Actualiza o inserta la fila en `libros` para la publicación dada.
+     * 
+     * @param idPublicacion    id de la publicación
+     * @param numEdicion       nuevo número de edición
+     * @param fechaPublicacion nueva fecha de publicación (java.sql.Date)
+     * @return true si la actualización o inserción tuvo éxito, false en caso de
+     *         error
      */
-    public boolean actualizarLibro(Connection conexion, int idPublicacion, int numEdicion, Date fechaPublicacion) {
+    public boolean actualizarLibro(int idPublicacion, int numEdicion, Date fechaPublicacion) {
         try (PreparedStatement ps = conexion.prepareStatement(SQL_UPDATE_LIBROS)) {
             // establecer parámetros
             ps.setInt(1, numEdicion);
@@ -674,7 +513,7 @@ public class PublicacionDAO {
             int updated = ps.executeUpdate();
             if (updated == 0) {
                 // No existe, insertar
-                return insertarLibro(conexion, idPublicacion, numEdicion, fechaPublicacion);
+                return insertarLibro(idPublicacion, numEdicion, fechaPublicacion);
             }
             return true;
         } catch (Exception e) {
@@ -686,8 +525,13 @@ public class PublicacionDAO {
 
     /**
      * Actualiza o inserta la fila en `revistas` para la publicación dada.
+     * 
+     * @param idPublicacion id de la publicación
+     * @param periodicidad  nueva periodicidad
+     * @return true si la actualización o inserción tuvo éxito, false en caso de
+     *         error
      */
-    public boolean actualizarRevista(Connection conexion, int idPublicacion, String periodicidad) {
+    public boolean actualizarRevista(int idPublicacion, String periodicidad) {
         try (PreparedStatement ps = conexion.prepareStatement(SQL_UPDATE_REVISTAS)) {
             // establecer parámetros
             ps.setString(1, periodicidad);
@@ -696,8 +540,8 @@ public class PublicacionDAO {
             int updated = ps.executeUpdate();
             if (updated == 0) {
                 // necesitar asignar num_revista; usar siguienteNumRevista
-                int numRev = siguienteNumRevista(conexion);
-                return insertarRevista(conexion, idPublicacion, periodicidad, numRev);
+                int numRev = siguienteNumRevista();
+                return insertarRevista(idPublicacion, periodicidad, numRev);
             }
             return true;
         } catch (Exception e) {
@@ -712,12 +556,11 @@ public class PublicacionDAO {
      * Elimina relaciones multivaluadas (módulos, ciclos, temas, autores) para una
      * publicación dada. Usar en contexto transaccional (no hace commit/rollback).
      *
-     * @param conexion      Connection en uso
      * @param idPublicacion id de la publicación
      * @return true si las eliminaciones se realizaron correctamente, false en caso
      *         de error
      */
-    public boolean eliminarRelacionesPublicacion(Connection conexion, int idPublicacion) {
+    public boolean eliminarRelacionesPublicacion(int idPublicacion) {
         try (PreparedStatement ps1 = conexion.prepareStatement(SQL_DELETE_PUBLICACION_MODULO);
                 PreparedStatement ps2 = conexion.prepareStatement(SQL_DELETE_PUBLICACION_CICLO);
                 PreparedStatement ps3 = conexion.prepareStatement(SQL_DELETE_PUBLICACION_TEMA);
@@ -749,7 +592,7 @@ public class PublicacionDAO {
      */
     public boolean tienePrestamosActivos(int idPublicacion) {
         final String sql = SQL_TIENEPRESTAMOS_ACTIVOS;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetro
             ps.setInt(1, idPublicacion);
@@ -771,11 +614,10 @@ public class PublicacionDAO {
      * En el contexto de una transacción, marca la publicación y sus ejemplares
      * como "baja" (estado = FALSE).
      *
-     * @param conexion      connection transaccional
      * @param idPublicacion id publicación
      * @return true si OK
      */
-    public boolean bajaPublicacion(Connection conexion, int idPublicacion) {
+    public boolean bajaPublicacion(int idPublicacion) {
         try (PreparedStatement ps1 = conexion.prepareStatement(SQL_BAJA_EJEMPLARES);
                 PreparedStatement ps2 = conexion.prepareStatement(SQL_BAJA_PUBLICACION)) {
             // establecer parámetros y ejecutar

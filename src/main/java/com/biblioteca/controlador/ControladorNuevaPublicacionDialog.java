@@ -67,7 +67,7 @@ public class ControladorNuevaPublicacionDialog {
             }
 
             // Creación de DAOs para gestionar una transacción completa
-            PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
             AutorDAO autorDAO = new AutorDAO(conexion);
             ModuloDAO moduloDAO = new ModuloDAO(conexion);
             TemaDAO temaDAO = new TemaDAO(this.dbConnection);
@@ -76,14 +76,14 @@ public class ControladorNuevaPublicacionDialog {
             try {
                 conexion.setAutoCommit(false);
 
-                int idPub = publicacionDAO.insertarPublicacion(conexion, titulo, editorial, isbn, idioma, 'L');
+                int idPub = publicacionDAO.insertarPublicacion(titulo, editorial, isbn, idioma, 'L');
                 if (idPub == -1) {
                     conexion.rollback();
                     return false;
                 }
 
                 // Insertar libro
-                boolean okLib = publicacionDAO.insertarLibro(conexion, idPub, numEdicion, Date.valueOf(fechaPublic));
+                boolean okLib = publicacionDAO.insertarLibro(idPub, numEdicion, Date.valueOf(fechaPublic));
                 if (!okLib) {
                     conexion.rollback();
                     return false;
@@ -101,7 +101,7 @@ public class ControladorNuevaPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarLibroAutor(conexion, idPub, idAutor)) {
+                        if (!publicacionDAO.insertarLibroAutor(idPub, idAutor)) {
                             conexion.rollback();
                             return false;
                         }
@@ -120,7 +120,7 @@ public class ControladorNuevaPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarPublicacionModulo(conexion, idPub, idModulo)) {
+                        if (!publicacionDAO.insertarPublicacionModulo(idPub, idModulo)) {
                             conexion.rollback();
                             return false;
                         }
@@ -139,7 +139,7 @@ public class ControladorNuevaPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarPublicacionCiclo(conexion, idPub, idCiclo)) {
+                        if (!publicacionDAO.insertarPublicacionCiclo(idPub, idCiclo)) {
                             conexion.rollback();
                             return false;
                         }
@@ -158,7 +158,7 @@ public class ControladorNuevaPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarPublicacionTema(conexion, idPub, idTema)) {
+                        if (!publicacionDAO.insertarPublicacionTema(idPub, idTema)) {
                             conexion.rollback();
                             return false;
                         }
@@ -215,7 +215,7 @@ public class ControladorNuevaPublicacionDialog {
             }
 
             // Creación de DAOs para gestionar una transacción completa
-            PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
             ModuloDAO moduloDAO = new ModuloDAO(conexion);
             TemaDAO temaDAO = new TemaDAO(this.dbConnection);
             CicloDAO cicloDAO = new CicloDAO(conexion);
@@ -223,14 +223,14 @@ public class ControladorNuevaPublicacionDialog {
             try {
                 conexion.setAutoCommit(false);
 
-                int idPub = publicacionDAO.insertarPublicacion(conexion, titulo, editorial, isbn, idioma, 'R');
+                int idPub = publicacionDAO.insertarPublicacion(titulo, editorial, isbn, idioma, 'R');
                 if (idPub == -1) {
                     conexion.rollback();
                     return false;
                 }
 
-                int numRev = publicacionDAO.siguienteNumRevista(conexion);
-                if (!publicacionDAO.insertarRevista(conexion, idPub, periodicidad, numRev)) {
+                int numRev = publicacionDAO.siguienteNumRevista();
+                if (!publicacionDAO.insertarRevista(idPub, periodicidad, numRev)) {
                     conexion.rollback();
                     return false;
                 }
@@ -247,7 +247,7 @@ public class ControladorNuevaPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarPublicacionModulo(conexion, idPub, idModulo)) {
+                        if (!publicacionDAO.insertarPublicacionModulo(idPub, idModulo)) {
                             conexion.rollback();
                             return false;
                         }
@@ -266,7 +266,7 @@ public class ControladorNuevaPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarPublicacionCiclo(conexion, idPub, idCiclo)) {
+                        if (!publicacionDAO.insertarPublicacionCiclo(idPub, idCiclo)) {
                             conexion.rollback();
                             return false;
                         }
@@ -285,7 +285,7 @@ public class ControladorNuevaPublicacionDialog {
                             conexion.rollback();
                             return false;
                         }
-                        if (!publicacionDAO.insertarPublicacionTema(conexion, idPub, idTema)) {
+                        if (!publicacionDAO.insertarPublicacionTema(idPub, idTema)) {
                             conexion.rollback();
                             return false;
                         }

@@ -47,7 +47,7 @@ public class ControladorConcederPrestamo {
         String[] resultado = null;
         try (Connection conexion = this.dbConnection.getConnection()) {
             EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
-            PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
 
             // obtener info ejemplar
             String[] ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
@@ -112,7 +112,7 @@ public class ControladorConcederPrestamo {
 
             // Obtiene detalles de la publicación
             int idPublicacion = Integer.parseInt(ejemplar[1]);
-            PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
+            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
             String[] detallesPub = publicacionDAO.obtenerPublicacionDetallesPorId(idPublicacion);
             if (detallesPub == null) {
                 return "Publicación no encontrada";

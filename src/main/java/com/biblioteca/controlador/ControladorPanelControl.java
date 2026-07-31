@@ -120,12 +120,21 @@ public class ControladorPanelControl {
     /**
      * Obtiene la lista de editoriales
      * 
-     * @return
+     * @return 
      */
     public String[] listaEditoriales() {
-        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
-        String[] listaEditoriales = publicacionDAO.listaEditoriales();
-        return listaEditoriales;
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return new String[0];
+            }
+            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
+            String[] listaEditoriales = publicacionDAO.listaEditoriales();
+            return listaEditoriales;
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return new String[0];
+        }
     }
 
     /**
@@ -135,9 +144,19 @@ public class ControladorPanelControl {
      *         disponibles, id
      */
     public String[][] listaPublicacionesResumen() {
-        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
-        String[][] resumen = publicacionDAO.listaPublicacionesResumen();
-        return resumen;
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return new String[0][0];
+            }
+            // Recupera la string con el resumen de publicaciones
+            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
+            String[][] resumen = publicacionDAO.listaPublicacionesResumen();
+            return resumen;
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return new String[0][0];
+        }
     }
 
     /*
