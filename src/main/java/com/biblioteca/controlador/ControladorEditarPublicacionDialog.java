@@ -84,7 +84,7 @@ public class ControladorEditarPublicacionDialog {
             // Creación de DAOs para gestionar una transacción completa
             PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
             AutorDAO autorDAO = new AutorDAO(conexion);
-            ModuloDAO moduloDAO = new ModuloDAO(this.dbConnection);
+            ModuloDAO moduloDAO = new ModuloDAO(conexion);
             TemaDAO temaDAO = new TemaDAO(this.dbConnection);
             CicloDAO cicloDAO = new CicloDAO(conexion);
 
@@ -248,7 +248,7 @@ public class ControladorEditarPublicacionDialog {
 
             // Creación de DAOs para gestionar una transacción completa
             PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
-            ModuloDAO moduloDAO = new ModuloDAO(this.dbConnection);
+            ModuloDAO moduloDAO = new ModuloDAO(conexion);
             TemaDAO temaDAO = new TemaDAO(this.dbConnection);
             CicloDAO cicloDAO = new CicloDAO(conexion);
 

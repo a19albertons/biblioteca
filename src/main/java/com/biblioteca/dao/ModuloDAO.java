@@ -14,7 +14,7 @@ public class ModuloDAO {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final DBConnection dbConnection;
+    private final Connection conexion;
 
     // SQL constants 🔧
     private static final String SQL_SELECT_MODULO_ID_POR_NOMBRE = "SELECT id FROM modulo WHERE nombre = ?";
@@ -23,13 +23,13 @@ public class ModuloDAO {
     /**
      * Constructor del DAO
      * 
-     * @param dbConnection
+     * @param conexion
      */
-    public ModuloDAO(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
+    public ModuloDAO(Connection conexion) {
+        if (conexion == null) {
+            throw new IllegalArgumentException("conexion cannot be null");
         }
-        this.dbConnection = dbConnection;
+        this.conexion = conexion;
     }
 
     /**
@@ -39,8 +39,7 @@ public class ModuloDAO {
      * @return id o -1
      */
     public int obtenerIdPorNombre(String nombre) {
-        try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_MODULO_ID_POR_NOMBRE)) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_MODULO_ID_POR_NOMBRE)) {
             // establecer parámetro
             ps.setString(1, nombre);
             // ejecutar consulta
@@ -59,8 +58,7 @@ public class ModuloDAO {
      * Crea un módulo si no existe y devuelve su id
      */
     public int crearModulo(String nombre) {
-        try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_MODULO, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_MODULO, Statement.RETURN_GENERATED_KEYS)) {
             // establecer parámetro
             ps.setString(1, nombre);
             // ejecutar
