@@ -5,8 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import com.biblioteca.conexiones.DBConnection;
-
 /**
  * DAO para la tabla `temas`.
  */
@@ -14,7 +12,7 @@ public class TemaDAO {
     /**
      * DBConnection para conexiones a la base de datos
      */
-    private final DBConnection dbConnection;
+    private final Connection conexion;
 
     // SQL constants 🔧
     private static final String SQL_SELECT_TEMA_ID_POR_NOMBRE = "SELECT id FROM temas WHERE nombre = ?";
@@ -23,13 +21,13 @@ public class TemaDAO {
     /**
      * Constructor del DAO
      * 
-     * @param dbConnection
+     * @param conexion
      */
-    public TemaDAO(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
+    public TemaDAO(Connection conexion) {
+        if (conexion == null) {
+            throw new IllegalArgumentException("Connection cannot be null");
         }
-        this.dbConnection = dbConnection;
+        this.conexion = conexion;
     }
 
     /**
@@ -39,7 +37,7 @@ public class TemaDAO {
      * @return
      */
     public int obtenerIdPorNombre(String nombre) {
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_TEMA_ID_POR_NOMBRE)) {
             // establecer parámetro
             ps.setString(1, nombre);
@@ -63,7 +61,7 @@ public class TemaDAO {
      * @return
      */
     public int crearTema(String nombre) {
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_TEMA,
                         Statement.RETURN_GENERATED_KEYS)) {
             // establecer parámetro
