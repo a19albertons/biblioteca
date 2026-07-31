@@ -35,8 +35,18 @@ public class ControladorSancionManual {
      * @return arreglo con {id_prestamo, id_usuario, fecha_inicio, fecha_fin} o null
      */
     public String[] obtenerUltimoPrestamoPorEjemplar(int idEjemplar) {
-        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
-        return prestamoDAO.obtenerUltimoPrestamoPorEjemplar(idEjemplar);
+        try (var conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return null;
+            }
+            PrestamoDAO prestamoDAO = new PrestamoDAO(conexion);
+            return prestamoDAO.obtenerUltimoPrestamoPorEjemplar(idEjemplar);
+        } catch (Exception e) {
+            // En caso de error, devolver null y loguear el error
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
+        }
     }
 
     /**

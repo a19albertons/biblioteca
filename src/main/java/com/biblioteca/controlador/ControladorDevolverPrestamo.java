@@ -121,8 +121,17 @@ public class ControladorDevolverPrestamo {
      * @return true si existe un préstamo activo, false en caso contrario
      */
     private boolean existePrestamoActivoUsuarioEjemplar(int idUsuario, int idEjemplar) {
-        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
-        return prestamoDAO.existePrestamoActivoUsuarioEjemplar(idUsuario, idEjemplar);
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return false;
+            }
+            PrestamoDAO prestamoDAO = new PrestamoDAO(conexion);
+            return prestamoDAO.existePrestamoActivoUsuarioEjemplar(idUsuario, idEjemplar);
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return false;
+        }
     }
 
     /**
@@ -152,7 +161,7 @@ public class ControladorDevolverPrestamo {
             ;
 
             // 2. Registrar la devolución
-            PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
+            PrestamoDAO prestamoDAO = new PrestamoDAO(conexion);
             RegistroDevolucionDTO resultado = prestamoDAO.obtenerPrestamoActivoPorUsuarioEjemplar(idUsuario,
                     idEjemplar);
 

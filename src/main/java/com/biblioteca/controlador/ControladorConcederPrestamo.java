@@ -122,7 +122,7 @@ public class ControladorConcederPrestamo {
             // Ver reglas: libros -> 7 días para todos. Revistas -> solo 1 concedida (por
             // usuario) y durante el propio día,
             // pero si eres profesor son 7 días
-            PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
+            PrestamoDAO prestamoDAO = new PrestamoDAO(conexion);
             // comprobar revista activa por usuario
             if ("R".equalsIgnoreCase(tipoPub)) {
                 // comprobar si ya tiene revista en préstamo activo

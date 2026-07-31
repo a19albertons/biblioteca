@@ -35,8 +35,18 @@ public class ControladorPanelControl {
      * @return
      */
     public String obtenerPrestamosHoy() {
-        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
-        return prestamoDAO.prestamosHoy();
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return "error";
+            }
+            PrestamoDAO prestamoDAO = new PrestamoDAO(conexion);
+            return prestamoDAO.prestamosHoy();
+        } catch (Exception e) {
+            // En caso de error, devolver "error" y loguear el error
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return "error";
+        }
 
     }
 
@@ -46,8 +56,18 @@ public class ControladorPanelControl {
      * @return
      */
     public String obtenerPrestamosPendientes() {
-        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
-        return prestamoDAO.prestamosPendientes();
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return "error";
+            }
+            PrestamoDAO prestamoDAO = new PrestamoDAO(conexion);
+            return prestamoDAO.prestamosPendientes();
+        } catch (Exception e) {
+            // En caso de error, devolver "error" y loguear el error
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return "error";
+        }
     }
 
     /**
@@ -66,8 +86,17 @@ public class ControladorPanelControl {
      * @return
      */
     public String[][] obtenerUltimosMovimientos() {
-        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
-        return prestamoDAO.ultimosMovimientos();
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return new String[0][0];
+            }
+            PrestamoDAO prestamoDAO = new PrestamoDAO(conexion);
+            return prestamoDAO.ultimosMovimientos();
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return new String[0][0];
+        }
     }
 
     /**
@@ -81,6 +110,7 @@ public class ControladorPanelControl {
             CicloDAO cicloDAO = new CicloDAO(conexion);
             listaCiclos = cicloDAO.listaCiclos();
         } catch (Exception e) {
+            // En caso de error, devolver lista vacía y loguear el error
             System.out.println("Error al obtener conexión: " + e.getMessage());
             listaCiclos = new String[0];
         }

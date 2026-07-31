@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 
-import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dto.RegistroDevolucionDTO;
 
 /**
@@ -14,9 +13,9 @@ import com.biblioteca.dto.RegistroDevolucionDTO;
  */
 public class PrestamoDAO {
     /**
-     * DBConnection para la base de datos
+     * conexion para la base de datos
      */
-    private final DBConnection dbConnection;
+    private final Connection conexion;
 
     // SQL constants 🔧
     private static final String SQL_PRESTAMOS_HOY = "SELECT COUNT(*) AS total FROM prestamos WHERE DATE(fecha_inicio) = ?";
@@ -32,13 +31,13 @@ public class PrestamoDAO {
     /**
      * Constructor con DBConnection (inyección)
      * 
-     * @param dbConnection
+     * @param conexion
      */
-    public PrestamoDAO(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
+    public PrestamoDAO(Connection conexion) {
+        if (conexion == null) {
+            throw new IllegalArgumentException("Connection cannot be null");
         }
-        this.dbConnection = dbConnection;
+        this.conexion = conexion;
     }
 
     /**
@@ -51,8 +50,8 @@ public class PrestamoDAO {
         LocalDate hoy = LocalDate.now();
         String totalPrestamos = "-1";
         // Consulta SQL para contar los préstamos de hoy
-        try (Connection connection = dbConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(SQL_PRESTAMOS_HOY)) {
+        try (
+                PreparedStatement ps = conexion.prepareStatement(SQL_PRESTAMOS_HOY)) {
             ps.setDate(1, Date.valueOf(hoy));
             // Obtiene el resultado y cierra el result set
             try (ResultSet rs = ps.executeQuery()) {
@@ -78,8 +77,8 @@ public class PrestamoDAO {
         LocalDate hoy = LocalDate.now();
         String totalPendientes = "-1";
         // Consulta SQL para contar los préstamos pendientes
-        try (Connection connection = dbConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(SQL_PRESTAMOS_PENDIENTES)) {
+        try (
+                PreparedStatement ps = conexion.prepareStatement(SQL_PRESTAMOS_PENDIENTES)) {
             ps.setDate(1, Date.valueOf(hoy));
             // Obtiene el resultado y cierra el result set
             try (ResultSet rs = ps.executeQuery()) {
@@ -98,20 +97,21 @@ public class PrestamoDAO {
 
     /**
      * Obtiene los últimos 9 movimientos de préstamos
+     * 
      * @return
      */
     public String[][] ultimosMovimientos() {
         String[][] movimientos = new String[9][3];
         // Consulta SQL para obtener los últimos 9 movimientos de préstamos
-        try (Connection connection = dbConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(SQL_ULTIMOS_MOVIMIENTOS)) {
+        try (
+                PreparedStatement ps = conexion.prepareStatement(SQL_ULTIMOS_MOVIMIENTOS)) {
             // Obtiene el resultado y cierra el result set
             try (ResultSet rs = ps.executeQuery()) {
                 int index = 0;
                 while (rs.next() && index < 9) {
                     movimientos[index][0] = String.valueOf(rs.getInt("id_ejemplar"));
                     movimientos[index][1] = rs.getString("titulo");
-                    //  TRUE=sin devolver, FALSE=devuelto 
+                    // TRUE=sin devolver, FALSE=devuelto
                     movimientos[index][2] = rs.getBoolean("estado") ? "Prestado" : "Devuelto";
 
                     index++;
@@ -138,7 +138,7 @@ public class PrestamoDAO {
     public boolean insertarPrestamo(int idUsuario, int idEjemplar, Date fechaInicio, Date fechaFin) {
         // Consulta SQL para insertar el préstamo
         final String sql = SQL_INSERT_PRESTAMO;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
             ps.setInt(1, idUsuario);
@@ -168,7 +168,7 @@ public class PrestamoDAO {
     public boolean tienePrestamoActivoTipo(int idUsuario, char tipoPublicacion) {
         // Consulta SQL para comprobar préstamos activos por tipo
         final String sql = SQL_CNT_PRESTAMO_TIPO;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
             ps.setInt(1, idUsuario);
@@ -197,7 +197,7 @@ public class PrestamoDAO {
     public boolean existePrestamoActivoUsuarioEjemplar(int idUsuario, int idEjemplar) {
         // Consulta SQL para comprobar préstamo activo entre usuario y ejemplar
         final String sql = SQL_CNT_PRESTAMO_USUARIO_EJEMPLAR;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
             ps.setInt(1, idUsuario);
@@ -227,7 +227,7 @@ public class PrestamoDAO {
     public boolean devolverPrestamoUsuarioEjemplar(int idUsuario, int idEjemplar) {
         // Consulta SQL para actualizar el estado del préstamo
         final String sql = SQL_UPDATE_DEVOLVER;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
             ps.setInt(1, idUsuario);
@@ -250,7 +250,7 @@ public class PrestamoDAO {
     public RegistroDevolucionDTO obtenerPrestamoActivoPorUsuarioEjemplar(int idUsuario, int idEjemplar) {
         // Consulta SQL para obtener el préstamo activo
         final String sql = SQL_SELECT_PRESTAMO_ACTIVO_POR_USUARIO_EJEMPLAR;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
             ps.setInt(1, idUsuario);
@@ -281,7 +281,7 @@ public class PrestamoDAO {
     public String[] obtenerUltimoPrestamoPorEjemplar(int idEjemplar) {
         // Consulta SQL para obtener el último préstamo por ejemplar
         final String sql = SQL_SELECT_ULTIMO_PRESTAMO_POR_EJEMPLAR;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
             ps.setInt(1, idEjemplar);
