@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import com.biblioteca.conexiones.DBConnection;
+import com.biblioteca.dto.UsuarioTipoDTO;
 import com.biblioteca.modelo.TipoUsuario;
 import com.biblioteca.modelo.Usuario;
 
@@ -40,6 +41,7 @@ public class UsuarioDAO {
     private static final String SQL_CUENTA_PRESTAMOS_ACTIVOS_POR_USUARIO = "SELECT COUNT(*) AS total FROM prestamos WHERE id_usuario = ? AND estado = TRUE";
     private static final String SQL_USUARIOS_SANCIONABLES = "SELECT u.id, u.dni, CONCAT(u.apellido1, ', ', u.nombre) AS nombre_completo, u.tipo "
             + "FROM usuarios u WHERE u.tipo = 'E' AND u.estado = TRUE ORDER BY u.apellido1, u.nombre";
+    private static final String SQL_OBTENER_USUARIO_TIPO_DTO = "SELECT id, tipo FROM usuarios WHERE id = ?";
 
     /**
      * Constructor de UsuarioDAO
@@ -465,4 +467,39 @@ public class UsuarioDAO {
         }
         return rows.toArray(new String[0][0]);
     }
+
+    /**
+     * Obtiene un UsuarioTipoDTO por id de usuario
+     * @param idUsuario id del usuario
+     * @return UsuarioTipoDTO con idUsuario y tipoUsuario, o null si no encontrado
+     */
+	public UsuarioTipoDTO obtenerUSuarioTipoDTO(int idUsuario) {
+		UsuarioTipoDTO usuarioTipoDTO = null;
+        try (Connection conexion = dbConnection.getConnection();
+            PreparedStatement consulta = conexion.prepareStatement(SQL_OBTENER_USUARIO_TIPO_DTO)) {
+                consulta.setInt(1, idUsuario);
+                // Ejecutamos la consulta
+                try (ResultSet resultado = consulta.executeQuery()) {
+                    if (resultado.next()) {
+                        usuarioTipoDTO = new UsuarioTipoDTO(
+                            resultado.getInt("id"),
+                            TipoUsuario.valueOf(resultado.getString("tipo"))
+                        );
+                    }
+                }
+                catch (Exception e) {
+                    // Manejo de excepciones. Se ve en consola
+                    System.out.println("Error obteniendo UsuarioTipoDTO: "+e.getMessage());
+                    System.out.println(e.getCause());
+                    usuarioTipoDTO = null;
+                }
+            }
+        catch (Exception e) {
+            // Manejo de excepciones. Se ve en consola
+            System.out.println("Ha surgido un error inesperado: "+e.getMessage());
+            System.out.println(e.getCause());
+            usuarioTipoDTO = null;
+        }
+        return usuarioTipoDTO;
+	}
 }

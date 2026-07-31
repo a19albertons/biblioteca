@@ -9,8 +9,15 @@ import com.biblioteca.dao.PrestamoDAO;
 import com.biblioteca.dao.PublicacionDAO;
 import com.biblioteca.dao.SancionDAO;
 import com.biblioteca.dao.UsuarioDAO;
+import com.biblioteca.dto.EjemplarTipoPublicacionDTO;
+import com.biblioteca.dto.RegistroDevolucionDTO;
+import com.biblioteca.dto.UsuarioFinSancionDTO;
+import com.biblioteca.dto.UsuarioTipoDTO;
+import com.biblioteca.modelo.TipoPublicacion;
+import com.biblioteca.modelo.TipoUsuario;
 
 import java.sql.Date;
+import java.sql.SQLException;
 
 /**
  * Controlador para la lógica de devolución de préstamos
@@ -22,7 +29,8 @@ public class ControladorDevolverPrestamo {
     private final DBConnection dbConnection;
 
     /**
-     * Mensaje informativo sobre sanción (si se creó/actualizó una sanción durante la operación)
+     * Mensaje informativo sobre sanción (si se creó/actualizó una sanción durante
+     * la operación)
      */
     private String ultimaNotificacionSancion = null;
 
@@ -95,140 +103,201 @@ public class ControladorDevolverPrestamo {
 
     /**
      * Comprueba si existe un préstamo activo entre un usuario y un ejemplar
+     * 
+     * @param idUsuario  ID del usuario
+     * @param idEjemplar ID del ejemplar
+     * @return true si existe un préstamo activo, false en caso contrario
      */
-    public boolean existePrestamoActivoUsuarioEjemplar(int idUsuario, int idEjemplar) {
+    private boolean existePrestamoActivoUsuarioEjemplar(int idUsuario, int idEjemplar) {
         PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
         return prestamoDAO.existePrestamoActivoUsuarioEjemplar(idUsuario, idEjemplar);
     }
 
     /**
-     * Registra la devolución (marca estado = FALSE). Devuelve null si éxito o
-     * mensaje de error si fallo.
+     * Valida si un prestamo esta activo, marca la devolución, calcula si existe
+     * alguna sanción a aplicar y la aplica. Además gestiona la transacción de la
+     * base de datos. Devuelve null si éxito o mensaje de error si fallo.
+     * 
+     * @param idUsuario  Usuario que devuelve el ejemplar
+     * @param idEjemplar codigo del ejemplar que se devuelve
+     * @return null si éxito o mensaje de error si fallo
      */
-    public String registrarDevolucion(int idUsuario, int idEjemplar) {
-        // Validar usuario
-        UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
-        String[] usuario = usuarioDAO.obtenerUsuarioYEstadoPorDniOId(String.valueOf(idUsuario));
-        // Si no existe el usuario, devolver error
-        if (usuario == null) {
-            return "Usuario no encontrado";
-        }
-        // comprobar que exista préstamo activo
-        PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
-        String[] prestamo = prestamoDAO.obtenerPrestamoActivoPorUsuarioEjemplar(idUsuario, idEjemplar);
-        // Si no existe préstamo activo, devolver error
-        if (prestamo == null) {
-            return "No existe un préstamo activo entre este usuario y el ejemplar";
-        }
-        // antes de marcar devolución, obtener detalles necesarios para sanción
-        int idPrestamo = Integer.parseInt(prestamo[0]);
-        LocalDate fechaFin = prestamo[2] == null || prestamo[2].isEmpty() ? null
-                : LocalDate.parse(prestamo[2]);
+    public String devolverPrestamo(int idUsuario, int idEjemplar) {
+        try {
+            // 1. Comprobar si existe un préstamo activo entre el usuario y el ejemplar
+            Boolean existe = this.existePrestamoActivoUsuarioEjemplar(idUsuario, idEjemplar);
+            if (!existe) {
+                return "No se ha encontrado un préstamo activo para el usuario y ejemplar proporcionados.";
+            }
 
-        // ejecutar devolución
-        boolean ok = prestamoDAO.devolverPrestamoUsuarioEjemplar(idUsuario, idEjemplar);
-        if (!ok) {
-            return "Error al marcar la devolución en la base de datos";
-        }
+            // Cambiar tipo de conextión a manual para controlar la transacción
+            try {
+                this.dbConnection.getConnection().setAutoCommit(false);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return "Error al iniciar la transacción de la base de datos: " + e.getMessage();
+            }
+            ;
 
-        // aplicar sanción automática si corresponde
-        // Solo a estudiantes
-        String[] detUsuario = usuarioDAO.obtenerDetallesUsuario(idUsuario);
-        String tipoCode = detUsuario != null ? detUsuario[5] : null; // E,P,...
-        // Si es estudiante y hay fecha fin de préstamo
-        if ("E".equalsIgnoreCase(tipoCode) && fechaFin != null) {
-            LocalDate hoy = LocalDate.now();
-            long diasRetraso = ChronoUnit.DAYS.between(fechaFin, hoy);
-            // Si hay días de retraso
-            if (diasRetraso > 0) {
-                // obtener tipo de publicacion para el ejemplar
-                EjemplarDAO ejemplarDAO = new EjemplarDAO(this.dbConnection);
-                String[] ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
-                String tipoPub = null;
-                if (ejemplar != null) {
-                    int idPublicacion = Integer.parseInt(ejemplar[1]);
-                    PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
-                    String[] detalles = publicacionDAO.obtenerPublicacionDetallesPorId(idPublicacion);
-                    tipoPub = detalles != null ? detalles[0] : null;
-                }
-                int diasSancion = 0;
-                // calcular días sanción según tipo publicación
-                if ("L".equalsIgnoreCase(tipoPub)) {
-                    diasSancion = (int) (2 * diasRetraso);
-                } else if ("R".equalsIgnoreCase(tipoPub)) {
-                    diasSancion = 10;
-                }
-                // aplicar sanción si hay días a sancionar
-                if (diasSancion > 0) {
-                    LocalDate inicioSancion = hoy;
+            // 2. Registrar la devolución
+            PrestamoDAO prestamoDAO = new PrestamoDAO(this.dbConnection);
+            RegistroDevolucionDTO resultado = prestamoDAO.obtenerPrestamoActivoPorUsuarioEjemplar(idUsuario,
+                    idEjemplar);
+
+            // Comprobacińo respuesta consulta
+            if (resultado == null) {
+                return "No se ha encontrado un préstamo activo para el usuario y ejemplar proporcionados.";
+            }
+
+            // 3. Registrar la devolución
+            int idPrestamo = resultado.getIdPrestamo();
+            LocalDate fechaFin = resultado.getFechaFin();
+
+            boolean devolver = prestamoDAO.devolverPrestamoUsuarioEjemplar(idUsuario, idEjemplar);
+            if (!devolver) {
+                return "Error al marcar la devolución en la base de datos.";
+            }
+
+            // 4. Aplicar sanción automática si corresponde
+            UsuarioDAO usuarioDAO = new UsuarioDAO(this.dbConnection);
+            UsuarioTipoDTO usuario = usuarioDAO.obtenerUSuarioTipoDTO(idUsuario);
+
+            if (usuario == null) {
+                return "Error al obtener información del usuario para aplicar sanción automática.";
+            }
+
+            // 4.1 Valida el tipo de usuario
+            // Solo se hace la sanción al estudiante (TipoUsuario.E)
+            if (usuario.getTipoUsuario() == TipoUsuario.E) {
+                LocalDate hoy = LocalDate.now();
+                long diasRetraso = ChronoUnit.DAYS.between(fechaFin, hoy);
+
+                // 4.2 valida si hay retraso en la devolución
+                // Comprobamos si hay algun dia de retraso para activar la sanción automática
+                if (diasRetraso > 0) {
+                    EjemplarDAO ejemplarDAO = new EjemplarDAO(this.dbConnection);
+                    EjemplarTipoPublicacionDTO ejemplarTipoPublicacionDTO = ejemplarDAO
+                            .obtenerEjemplarPublicacionDTO(idEjemplar);
+
+                    // Verificamos que se haya obtenido correctamente la información del ejemplar y
+                    // su tipo de publicación
+                    if (ejemplarTipoPublicacionDTO == null) {
+                        return "Error al obtener información del ejemplar para aplicar sanción automática.";
+                    }
+
+                    // 4.3 Calcula los días de sanción según el tipo de publicación
+                    int diasSancion = 0;
+                    // Calcular dias de sanción según tipo de publicación
+                    // Si el tipo de publicación es Libro (L), la sanción es 2 días por cada día de
+                    // retraso, mientras que revista es 10 días fijos
+                    if (ejemplarTipoPublicacionDTO.getTipoPublicacion() == TipoPublicacion.L) {
+                        diasSancion = (int) (2 * diasRetraso);
+                    } else if (ejemplarTipoPublicacionDTO.getTipoPublicacion() == TipoPublicacion.R) {
+                        diasSancion = 10;
+                    }
+
+                    // 5. Aplicar sanción
                     SancionDAO sancionDAO = new SancionDAO(this.dbConnection);
-                    // Comprobar si ya existe una sanción activa para este usuario
-                    String[] sancionActiva = sancionDAO.obtenerSancionActivaPorUsuario(idUsuario);
+                    UsuarioFinSancionDTO sancionActiva = sancionDAO.obtenerSancionActivaPorUsuario(idUsuario);
+
                     LocalDate finSancion;
                     String descripcionBase = "Retraso en devolución " + diasRetraso + " días";
                     String descripcion = descripcionBase;
                     boolean previaDesactivada = false;
                     // Si ya hay sanción activa, acumular días y desactivar la previa
-                    if (sancionActiva != null && sancionActiva[1] != null && !sancionActiva[1].isEmpty()) {
+
+                    if (sancionActiva != null && sancionActiva.getFinSancion() != null
+                            && !sancionActiva.getFinSancion().isEmpty()) {
                         try {
-                            LocalDate finAct = LocalDate.parse(sancionActiva[1]);
-                            // Extender la fecha final acumulando los días nuevos
+                            LocalDate finAct = LocalDate.parse(sancionActiva.getFinSancion());
+
+                            // Incrementar la fecha final acumulando los días nuevos
                             finSancion = finAct.plusDays(diasSancion);
+
                             descripcion = descripcionBase + " (Acumulativa: sanción activa hasta " + finAct
                                     + "; se añaden " + diasSancion + " días)";
-                            // intentar desactivar la sanción previa
+
                             try {
-                                int idPrev = Integer.parseInt(sancionActiva[0]);
+                                int idPrev = sancionActiva.getIdSancion();
                                 previaDesactivada = sancionDAO.desactivarSancionPorId(idPrev);
+
+                                if (!previaDesactivada) {
+                                    return "Error al desactivar la sanción previa para aplicar la sanción acumulativa.";
+                                }
                             } catch (Exception ex2) {
                                 // registrar el error al intentar desactivar la sanción previa
-                                System.out.println("Error desactivando sanción previa (id=" + sancionActiva[0] + "): " + ex2.getMessage());
+                                System.out
+                                        .println("Error desactivando sanción previa (id=" + sancionActiva.getIdSancion()
+                                                + "): " + ex2.getMessage());
                                 ex2.printStackTrace();
+                                return "Error al desactivar la sanción previa para aplicar la sanción acumulativa.";
                             }
-                        } catch (Exception ex) {
-                            // si no se puede parsear la fecha anterior, fallback a hoy + dias
-                            System.out.println("Error parsing previous sanction end date: " + ex.getMessage());
-                            ex.printStackTrace();
-                            finSancion = hoy.plusDays(diasSancion);
-                            descripcion = descripcionBase + " (Acumulativa: fallo leyendo sanción previa; se añaden "
-                                    + diasSancion + " días)";
+
+                        } catch (Exception e) {
+                            // control de errores de conversion.
+                            System.out
+                                    .println("Error al sumar la nueva sanción a la sanción activa: " + e.getMessage());
+                            e.printStackTrace();
+                            return "Error al calcular la fecha de fin de sanción acumulativa.";
                         }
+                        // Calculo para cuando no hay sancion previa
                     } else {
                         finSancion = hoy.plusDays(diasSancion);
                     }
-                    // insertar sanción
-                    boolean ins = sancionDAO.insertarSancion(idUsuario, idPrestamo,
-                            Date.valueOf(inicioSancion),
-                            Date.valueOf(finSancion), descripcion);
-                    if (!ins) {
-                        return "Devolución registrada, pero error aplicando sanción automática";
+
+                    // Insertar la nueva sanción en la base de datos
+                    Boolean crearSancon = sancionDAO.insertarSancion(
+                            idUsuario,
+                            idPrestamo,
+                            Date.valueOf(hoy),
+                            Date.valueOf(finSancion),
+                            descripcion);
+
+                    if (!crearSancon) {
+                        return "Error al insertar la sanción automática en la base de datos.";
                     }
-                    // Preparar notificación para la UI
+
                     try {
-                        // analizar sanción activa previa para el mensaje
-                        String finActStr = sancionActiva != null ? (sancionActiva[1] == null ? "" : sancionActiva[1]) : null;
-                        // construir mensaje adecuado
-                        if (finActStr != null && !finActStr.isEmpty()) {
-                            LocalDate finAct = LocalDate.parse(finActStr);
+                        String finOriginal = sancionActiva.getFinSancion();
+                        if (finOriginal != null && !finOriginal.isEmpty()) {
+                            LocalDate finAct = LocalDate.parse(finOriginal);
                             LocalDate finNuevo = finSancion;
-                            // comparar fechas
                             if (finNuevo.isAfter(finAct)) {
-                                ultimaNotificacionSancion = "Se ha aplicado una sanción acumulativa: anterior fin " + finAct + 
-                                        ", nuevo fin " + finNuevo + "." + (previaDesactivada ? " La sanción previa ha sido desactivada." : "");
+                                ultimaNotificacionSancion = "La nueva fecha de sanción ha sido actualizada a "
+                                        + finNuevo;
                             } else {
-                                ultimaNotificacionSancion = "Se ha aplicado una sanción (acumulativa): anterior fin " + finAct + 
-                                        ", no se añadió plazo adicional." + (previaDesactivada ? " La sanción previa ha sido desactivada." : "");
+                                ultimaNotificacionSancion = "La sanción permanece sin cambios a " + finAct;
                             }
                         } else {
-                            ultimaNotificacionSancion = "Se ha aplicado una sanción: fin " + finSancion + "." + (previaDesactivada ? " La sanción previa ha sido desactivada." : "");
+                            ultimaNotificacionSancion = "Se ha aplicado una nueva sanción hasta " + finSancion;
                         }
                     } catch (Exception e) {
                         System.out.println("Error preparando notificación de sanción automática: " + e.getMessage());
                         e.printStackTrace();
-                        ultimaNotificacionSancion = "Se ha aplicado una sanción." + (previaDesactivada ? " La sanción previa ha sido desactivada." : "");
-                    }                }
+                        ultimaNotificacionSancion = "Se ha aplicado una sanción automática.";
+                    }
+                }
+            }
+
+            // 6. Commit de la transacción
+            try {
+                this.dbConnection.getConnection().commit();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return "Error al finalizar la transacción de la base de datos: " + e.getMessage();
+            }
+        } finally {
+            // Restaurar el modo de auto-commit y hacer rollack no debería hacer nada si
+            // todo fue exitoso
+            try {
+                this.dbConnection.getConnection().rollback();
+                this.dbConnection.getConnection().setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return "Error al restaurar el modo de auto-commit de la base de datos: " + e.getMessage();
             }
         }
-        return null;
+
+        return null; // éxito
     }
 }

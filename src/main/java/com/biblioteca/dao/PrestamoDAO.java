@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.time.LocalDate;
 
 import com.biblioteca.conexiones.DBConnection;
+import com.biblioteca.dto.RegistroDevolucionDTO;
 
 /**
  * DAO para la gestión de préstamos
@@ -246,7 +247,7 @@ public class PrestamoDAO {
      * Obtiene el préstamo activo (estado = TRUE) entre un usuario y un ejemplar
      * Devuelve arreglo {idPrestamo, fecha_inicio, fecha_fin} o null
      */
-    public String[] obtenerPrestamoActivoPorUsuarioEjemplar(int idUsuario, int idEjemplar) {
+    public RegistroDevolucionDTO obtenerPrestamoActivoPorUsuarioEjemplar(int idUsuario, int idEjemplar) {
         // Consulta SQL para obtener el préstamo activo
         final String sql = SQL_SELECT_PRESTAMO_ACTIVO_POR_USUARIO_EJEMPLAR;
         try (Connection conexion = dbConnection.getConnection();
@@ -257,13 +258,11 @@ public class PrestamoDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 // Ejecutar consulta
                 if (rs.next()) {
-                    // Construir y devolver el arreglo con los datos del préstamo
-                    String idPrestamo = String.valueOf(rs.getInt("id"));
-                    java.sql.Date fechaInicio = rs.getDate("fecha_inicio");
-                    java.sql.Date fechaFin = rs.getDate("fecha_fin");
-                    String fechaInicioStr = fechaInicio != null ? fechaInicio.toString() : "";
-                    String fechaFinStr = fechaFin != null ? fechaFin.toString() : "";
-                    return new String[] { idPrestamo, fechaInicioStr, fechaFinStr };
+                    // Construir y devolver el DTO con los datos del préstamo
+                    int idPrestamo = rs.getInt("id");
+                    LocalDate fechaInicio = rs.getDate("fecha_inicio").toLocalDate();
+                    LocalDate fechaFin = rs.getDate("fecha_fin").toLocalDate();
+                    return new RegistroDevolucionDTO(idPrestamo, fechaInicio, fechaFin);
                 }
             }
         } catch (Exception e) {

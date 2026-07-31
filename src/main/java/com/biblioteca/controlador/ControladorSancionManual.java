@@ -3,6 +3,7 @@ package com.biblioteca.controlador;
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.PrestamoDAO;
 import com.biblioteca.dao.SancionDAO;
+import com.biblioteca.dto.UsuarioFinSancionDTO;
 
 /**
  * Controlador dedicado a operaciones relacionadas con sanciones manuales y
@@ -44,7 +45,7 @@ public class ControladorSancionManual {
      * @param idUsuario
      * @return arreglo {id, fin_sancion} o null
      */
-    public String[] obtenerSancionActivaPorUsuario(int idUsuario) {
+    public UsuarioFinSancionDTO obtenerSancionActivaPorUsuario(int idUsuario) {
         SancionDAO sancionDAO = new SancionDAO(this.dbConnection);
         return sancionDAO.obtenerSancionActivaPorUsuario(idUsuario);
     }

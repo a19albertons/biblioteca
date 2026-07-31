@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.biblioteca.conexiones.DBConnection;
+import com.biblioteca.dto.EjemplarTipoPublicacionDTO;
+import com.biblioteca.modelo.TipoPublicacion;
 
 /**
  * DAO para la tabla ejemplares
@@ -28,6 +30,7 @@ public class EjemplarDAO {
     private static final String SQL_UPDATE_EJEMPLAR = "UPDATE ejemplares SET fecha_adquisicion = ?, estado = ? WHERE id = ?";
     private static final String SQL_CNT_PRESTAMOS_POR_EJEMPLAR = "SELECT COUNT(*) AS cnt FROM prestamos WHERE id_ejemplar = ? AND estado = TRUE";
     private static final String SQL_UPDATE_BAJA_EJEMPLAR = "UPDATE ejemplares SET estado = FALSE WHERE id = ?";
+    private static final String SQL_OBTENER_EJEMPLAR_TIPO_PUBLICACION_DTO = "SELECT e.num_ejemplar, p.tipo FROM ejemplares e JOIN publicaciones p ON e.id_publicacion = p.id WHERE e.id = ?";
 
     /**
      * Constructor del DAO
@@ -237,7 +240,7 @@ public class EjemplarDAO {
      * @return true si la actualización afectó exactamente una fila
      */
     public boolean bajaEjemplar(Connection conexion, int idEjemplar) {
-        // Consulta SQL
+        // Consulta SQLSQL_OBTENER_EJEMPLAR_PUBLICACION_DTO
         final String sql = SQL_UPDATE_BAJA_EJEMPLAR;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetro
@@ -250,5 +253,35 @@ public class EjemplarDAO {
             System.out.println(e.getCause());
             return false;
         }
+    }
+
+    public EjemplarTipoPublicacionDTO obtenerEjemplarPublicacionDTO(int idEjemplar) {
+        EjemplarTipoPublicacionDTO dto = null;
+        // Consulta SQL
+        try (Connection conexion = dbConnection.getConnection();
+        // PreparedStatement para obtener el DTO
+                PreparedStatement ps = conexion.prepareStatement(SQL_OBTENER_EJEMPLAR_TIPO_PUBLICACION_DTO)) {
+            // Asignar parámetro
+            ps.setInt(1, idEjemplar);
+            try (ResultSet rs = ps.executeQuery()) {
+                // Si hay resultado, crear el DTO
+                if (rs.next()) {
+                    int numEjemplar = rs.getInt("num_ejemplar");
+                    String tipoPublicacionStr = rs.getString("tipo");
+                    TipoPublicacion tipoPublicacion = TipoPublicacion.valueOf(tipoPublicacionStr);
+                    dto = new EjemplarTipoPublicacionDTO(numEjemplar, tipoPublicacion);
+                }
+            }
+            catch (Exception e) {
+                System.out.println("Error obteniendo EjemplarTipoPublicacionDTO: " + e.getMessage());
+                System.out.println(e.getCause());
+                dto = null;
+            }
+        } catch (Exception e) {
+            System.out.println("Error obteniendo EjemplarTipoPublicacionDTO: " + e.getMessage());
+            System.out.println(e.getCause());
+            dto = null;
+        }
+        return dto;
     }
 }

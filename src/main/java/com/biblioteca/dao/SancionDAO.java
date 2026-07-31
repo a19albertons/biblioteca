@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 
 import com.biblioteca.conexiones.DBConnection;
+import com.biblioteca.dto.UsuarioFinSancionDTO;
 
 /**
  * DAO para la tabla sanciones
@@ -68,11 +69,12 @@ public class SancionDAO {
      * {id, fin_sancion} o null
      *
      * @param idUsuario
-     * @return String[] con id y fin_sancion
+     * @return UsuarioFinSancionDTO con id y fin_sancion
      */
-    public String[] obtenerSancionActivaPorUsuario(int idUsuario) {
+    public UsuarioFinSancionDTO obtenerSancionActivaPorUsuario(int idUsuario) {
         // obtener sanción activa
         final String sql = SQL_SELECT_SANCION_ACTIVA_POR_USUARIO;
+        UsuarioFinSancionDTO dto = null;
         try (Connection conexion = dbConnection.getConnection();
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetro
@@ -81,19 +83,25 @@ public class SancionDAO {
                 // procesar resultado
                 if (rs.next()) {
                     // obtener datos
-                    String id = String.valueOf(rs.getInt("id"));
-                    java.sql.Date fin = rs.getDate("fin_sancion");
-                    String finStr = fin != null ? fin.toString() : "";
-                    return new String[] { id, finStr };
+                    dto = new UsuarioFinSancionDTO(
+                        rs.getInt("id"),
+                        rs.getString("fin_sancion")
+                    );
                 }
             }
-        } catch (Throwable t) {
+            catch (Exception e) {
+                System.out.println("Error obteniendo sanción activa: " + e.getMessage());
+                System.out.println(e.getCause());
+                dto = null;
+            }
+        } catch (Exception e) {
             // Evitar que errores de compilación/Classpath propaguen una excepción no
             // controlada
-            System.out.println("Error obteniendo sanción activa: " + t.getMessage());
-            t.printStackTrace();
+            System.out.println("Error obteniendo sanción activa: " + e.getMessage());
+            e.printStackTrace();
+            dto = null;
         }
-        return null;
+        return dto;
     }
 
     /**

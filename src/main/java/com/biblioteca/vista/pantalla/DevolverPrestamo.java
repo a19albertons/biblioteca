@@ -276,17 +276,11 @@ public class DevolverPrestamo {
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            // comprobar que exista préstamo activo entre usuario y ejemplar
-            boolean existe = controlador.getControladorDevolverPrestamo()
-                    .existePrestamoActivoUsuarioEjemplar(usuarioSeleccionado[0], idEj);
-            if (!existe) {
-                JOptionPane.showMessageDialog(null,
-                        "No existe un préstamo activo entre este usuario y el ejemplar", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+
+            String err = controlador.getControladorDevolverPrestamo().devolverPrestamo(usuarioSeleccionado[0], idEj);
+
             // ejecutar devolución
-            String err = controlador.getControladorDevolverPrestamo().registrarDevolucion(usuarioSeleccionado[0],
+            controlador.getControladorDevolverPrestamo().devolverPrestamo(usuarioSeleccionado[0],
                     idEj);
             if (err == null) {
                 JOptionPane.showMessageDialog(null, "Devolución registrada correctamente", "Éxito",

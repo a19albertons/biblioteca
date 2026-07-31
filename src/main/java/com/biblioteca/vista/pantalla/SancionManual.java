@@ -18,6 +18,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 import com.biblioteca.controlador.Controlador;
+import com.biblioteca.dto.UsuarioFinSancionDTO;
 
 /**
  * Clase para la vista Sanción manual
@@ -286,11 +287,11 @@ public class SancionManual {
             String descAd = txtDescripcion.getText().trim();
             String descripcionBase = motivo + " - " + (descAd.isEmpty() ? "" : descAd);
             // comprobar sancion activa y acumulacion (usar controlador)
-            String[] sancionActiva = controlador.getControladorSancionManual().obtenerSancionActivaPorUsuario(usuarioSeleccionado[0]);
+            UsuarioFinSancionDTO sancionActiva = controlador.getControladorSancionManual().obtenerSancionActivaPorUsuario(usuarioSeleccionado[0]);
             String descripcion = descripcionBase;
-            if (sancionActiva != null && sancionActiva[1] != null && !sancionActiva[1].isEmpty()) {
+            if (sancionActiva != null && sancionActiva.getFinSancion() != null && !sancionActiva.getFinSancion().isEmpty()) {
                 try {
-                    LocalDate finAct = LocalDate.parse(sancionActiva[1]);
+                    LocalDate finAct = LocalDate.parse(sancionActiva.getFinSancion());
                     // días restantes de la sanción activa desde hoy (si es negativa, 0)
                     long diasRestantes = ChronoUnit.DAYS.between(hoy, finAct);
                     if (diasRestantes > 0) {
@@ -316,10 +317,10 @@ public class SancionManual {
             String notificacion = "Sanción aplicada: fin " + fin.toString();
             boolean previaDesactivada = false;
             // notificar acumulación si aplica
-            if (sancionActiva != null && sancionActiva[1] != null && !sancionActiva[1].isEmpty()) {
+            if (sancionActiva != null && sancionActiva.getFinSancion() != null && !sancionActiva.getFinSancion().isEmpty()) {
                 try {
                     // analizar sanción activa previa para el mensaje
-                    LocalDate finAct = LocalDate.parse(sancionActiva[1]);
+                    LocalDate finAct = LocalDate.parse(sancionActiva.getFinSancion());
                     long diasRestantes = ChronoUnit.DAYS.between(hoy, finAct);
                     // construir mensaje adecuado
                     if (diasRestantes > 0) {
@@ -332,7 +333,7 @@ public class SancionManual {
                     }
                     // intentar desactivar la sanción previa
                     try {
-                        int idPrev = Integer.parseInt(sancionActiva[0]);
+                        int idPrev = sancionActiva.getIdSancion();
                         previaDesactivada = controlador.getControladorSancionManual().desactivarSancionPorId(idPrev);
                         if (previaDesactivada) {
                             notificacion += " La sanción previa ha sido desactivada.";
@@ -340,7 +341,7 @@ public class SancionManual {
                     } catch (Exception ex2) {
                         // registrar el error al intentar desactivar la sanción previa
                         System.out.println(
-                                "Error desactivando sanción previa (id=" + sancionActiva[0] + "): " + ex2.getMessage());
+                                "Error desactivando sanción previa (id=" + sancionActiva.getIdSancion() + "): " + ex2.getMessage());
                         ex2.printStackTrace();
                     }
                 } catch (Exception ex) {
