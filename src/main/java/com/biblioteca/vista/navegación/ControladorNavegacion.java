@@ -1,6 +1,8 @@
 package com.biblioteca.vista.navegación;
 
 import java.awt.CardLayout;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -205,17 +207,24 @@ public class ControladorNavegacion {
      * @param idPublicacion id de la publicación a mostrar
      */
     public void mostrarEjemplaresParaPublicacion(int idPublicacion) {
-        // obtener resumen de la publicación usando la conexión compartida
-        PublicacionDAO publicacionDAO = new PublicacionDAO(this.dbConnection);
-        String[] resumen = publicacionDAO.obtenerResumenPublicacionPorId(idPublicacion);
-        if (resumen != null) {
-            // cargar datos en la vista ejemplares
-            if (this.ejemplares != null) {
-                this.ejemplares.cargarPublicacionResumen(resumen);
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            // obtener resumen de la publicación usando la conexión compartida
+            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
+            String[] resumen = publicacionDAO.obtenerResumenPublicacionPorId(idPublicacion);
+            if (resumen != null) {
+                // cargar datos en la vista ejemplares
+                if (this.ejemplares != null) {
+                    this.ejemplares.cargarPublicacionResumen(resumen);
+                }
             }
+            // mostrar pantalla de ejemplares
+            cambiarPantallaHijo("ejemplares");
+        } catch (SQLException e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error inesperado: " + e.getMessage());
         }
-        // mostrar pantalla de ejemplares
-        cambiarPantallaHijo("ejemplares");
+
     }
 
     /**
