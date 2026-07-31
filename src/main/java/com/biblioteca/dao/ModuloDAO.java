@@ -5,8 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import com.biblioteca.conexiones.DBConnection;
-
 /**
  * DAO para la tabla `modulo` (módulos).
  */
