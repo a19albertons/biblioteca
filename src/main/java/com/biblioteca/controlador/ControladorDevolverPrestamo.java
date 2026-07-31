@@ -218,7 +218,7 @@ public class ControladorDevolverPrestamo {
                     }
 
                     // 5. Aplicar sanción
-                    SancionDAO sancionDAO = new SancionDAO(this.dbConnection);
+                    SancionDAO sancionDAO = new SancionDAO(conexion);
                     UsuarioFinSancionDTO sancionActiva = sancionDAO.obtenerSancionActivaPorUsuario(idUsuario);
 
                     LocalDate finSancion;

@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 
-import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dto.UsuarioFinSancionDTO;
 
 /**
@@ -12,9 +11,9 @@ import com.biblioteca.dto.UsuarioFinSancionDTO;
  */
 public class SancionDAO {
     /**
-     * DBConnection para la base de datos
+     * Conexión para la base de datos
      */
-    private final DBConnection dbConnection;
+    private final Connection conexion;
 
     // SQL constants 🔧
     private static final String SQL_INSERT_SANCION = "INSERT INTO sanciones (id_usuario, id_prestamo, inicio_sancion, fin_sancion, descripcion, estado) VALUES (?, ?, ?, ?, ?, TRUE)";
@@ -24,13 +23,13 @@ public class SancionDAO {
     /**
      * Constructor del DAO
      * 
-     * @param dbConnection
+     * @param conexion
      */
-    public SancionDAO(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
+    public SancionDAO(Connection conexion) {
+        if (conexion == null) {
+            throw new IllegalArgumentException("Connection cannot be null");
         }
-        this.dbConnection = dbConnection;
+        this.conexion = conexion;
     }
 
     /**
@@ -46,7 +45,7 @@ public class SancionDAO {
     public boolean insertarSancion(int idUsuario, int idPrestamo, Date inicio, Date fin, String descripcion) {
         // insertar sanción
         final String sql = SQL_INSERT_SANCION;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetros
             ps.setInt(1, idUsuario);
@@ -75,7 +74,7 @@ public class SancionDAO {
         // obtener sanción activa
         final String sql = SQL_SELECT_SANCION_ACTIVA_POR_USUARIO;
         UsuarioFinSancionDTO dto = null;
-        try (Connection conexion = dbConnection.getConnection();
+        try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetro
             ps.setInt(1, idUsuario);
@@ -84,12 +83,10 @@ public class SancionDAO {
                 if (rs.next()) {
                     // obtener datos
                     dto = new UsuarioFinSancionDTO(
-                        rs.getInt("id"),
-                        rs.getString("fin_sancion")
-                    );
+                            rs.getInt("id"),
+                            rs.getString("fin_sancion"));
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("Error obteniendo sanción activa: " + e.getMessage());
                 System.out.println(e.getCause());
                 dto = null;
@@ -113,8 +110,7 @@ public class SancionDAO {
     public boolean desactivarSancionPorId(int idSancion) {
         // consulta SQL para desactivar sanción
         final String sql = SQL_UPDATE_DESACTIVAR_SANCION;
-        try (Connection conexion = dbConnection.getConnection();
-                PreparedStatement ps = conexion.prepareStatement(sql)) {
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             // establecer parámetro
             ps.setInt(1, idSancion);
             // ejecutar

@@ -1,5 +1,9 @@
 package com.biblioteca.controlador;
 
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.SQLException;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.PrestamoDAO;
 import com.biblioteca.dao.SancionDAO;
@@ -56,8 +60,20 @@ public class ControladorSancionManual {
      * @return arreglo {id, fin_sancion} o null
      */
     public UsuarioFinSancionDTO obtenerSancionActivaPorUsuario(int idUsuario) {
-        SancionDAO sancionDAO = new SancionDAO(this.dbConnection);
-        return sancionDAO.obtenerSancionActivaPorUsuario(idUsuario);
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return null;
+            }
+            SancionDAO sancionDAO = new SancionDAO(conexion);
+            return sancionDAO.obtenerSancionActivaPorUsuario(idUsuario);
+        } catch (SQLException e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -67,8 +83,20 @@ public class ControladorSancionManual {
      * @return true si desactivó la sanción
      */
     public boolean desactivarSancionPorId(int idSancion) {
-        SancionDAO sancionDAO = new SancionDAO(this.dbConnection);
-        return sancionDAO.desactivarSancionPorId(idSancion);
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return false;
+            }
+            SancionDAO sancionDAO = new SancionDAO(conexion);
+            return sancionDAO.desactivarSancionPorId(idSancion);
+        } catch (SQLException e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return false;
+        }
     }
 
     /**
@@ -81,10 +109,22 @@ public class ControladorSancionManual {
      * @param descripcion
      * @return true si la inserción fue correcta
      */
-    public boolean insertarSancion(int idUsuario, int idPrestamo, java.sql.Date inicio, java.sql.Date fin,
+    public boolean insertarSancion(int idUsuario, int idPrestamo, Date inicio, Date fin,
             String descripcion) {
-        SancionDAO sancionDAO = new SancionDAO(this.dbConnection);
-        return sancionDAO.insertarSancion(idUsuario, idPrestamo, inicio, fin, descripcion);
+        try (Connection conexion = this.dbConnection.getConnection()) {
+            if (conexion == null) {
+                System.out.println("No se puede obtener conexión a BD");
+                return false;
+            }
+            SancionDAO sancionDAO = new SancionDAO(conexion);
+            return sancionDAO.insertarSancion(idUsuario, idPrestamo, inicio, fin, descripcion);
+        } catch (SQLException e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return false;
+        }
     }
 
 }
