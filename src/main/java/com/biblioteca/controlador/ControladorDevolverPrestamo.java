@@ -9,10 +9,14 @@ import com.biblioteca.dao.PrestamoDAO;
 import com.biblioteca.dao.PublicacionDAO;
 import com.biblioteca.dao.SancionDAO;
 import com.biblioteca.dao.UsuarioDAO;
+import com.biblioteca.dto.EjemplarConTituloDTO;
 import com.biblioteca.dto.EjemplarTipoPublicacionDTO;
 import com.biblioteca.dto.RegistroDevolucionDTO;
+import com.biblioteca.dto.UsuarioEstadoPorDNIOID;
 import com.biblioteca.dto.UsuarioFinSancionDTO;
 import com.biblioteca.dto.UsuarioTipoDTO;
+import com.biblioteca.dto.EstadoEjemplarDTO;
+import com.biblioteca.dto.ObtenerPublicacionDetallesPorIdDTO;
 import com.biblioteca.modelo.TipoPublicacion;
 import com.biblioteca.modelo.TipoUsuario;
 
@@ -62,16 +66,14 @@ public class ControladorDevolverPrestamo {
      * Busca el usuario por DNI o ID y devuelve arreglo: id, dni, nombre_completo,
      * sancion_activa (SANCIONADO/ACTIVO/BAJA), tipo_desc
      */
-    public String[] buscarUsuarioPorDniOId(String dniOrId) {
+    public UsuarioEstadoPorDNIOID buscarUsuarioPorDniOId(String dniOrId) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             UsuarioDAO dao = new UsuarioDAO(conexion);
             return dao.obtenerUsuarioYEstadoPorDniOId(dniOrId == null ? "" : dniOrId.trim());
-        } 
-        catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
-        } 
-        catch (Throwable t) {
+        } catch (Throwable t) {
             // Evitar que errores de compilación/Classpath propaguen una excepción no
             // controlada
             System.out.println("Error buscando usuario por DNI/ID: " + t.getMessage());
@@ -85,8 +87,8 @@ public class ControladorDevolverPrestamo {
      * Retorna: idEjemplar, idPublicacion, numEjemplar, estadoEjemplar, titulo,
      * numEdicion, tipoPublicacion
      */
-    public String[] detectarEjemplar(int idEjemplar) {
-        String[] resultado = null;
+    public EjemplarConTituloDTO detectarEjemplar(int idEjemplar) {
+        EjemplarConTituloDTO resultado = null;
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -95,21 +97,27 @@ public class ControladorDevolverPrestamo {
             EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
             PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
             // obtener info ejemplar
-            String[] ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
+            EstadoEjemplarDTO ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
             if (ejemplar == null) {
                 return null;
             }
 
-            int idPublicacion = Integer.parseInt(ejemplar[1]);
-            String[] detallesPub = publicacionDAO.obtenerPublicacionDetallesPorId(idPublicacion);
+            int idPublicacion = ejemplar.getIdPublicacion();
+            ObtenerPublicacionDetallesPorIdDTO detallesPub = publicacionDAO.obtenerPublicacionDetallesPorId(idPublicacion);
             if (detallesPub == null) {
                 return null;
             }
-            String tipo = detallesPub[0];
-            String titulo = detallesPub[1];
-            String numEdicion = detallesPub[8];
-            resultado = new String[] { ejemplar[0], ejemplar[1], ejemplar[2], ejemplar[4], titulo,
-                    (numEdicion == null ? "" : numEdicion), (tipo == null ? "" : tipo) };
+            String tipo = detallesPub.getTipoPublicacion().name();
+            String titulo = detallesPub.getTitulo();
+            String numEdicion = detallesPub.getNumEdicion();
+            resultado = new EjemplarConTituloDTO(
+                    ejemplar.getId(),
+                    ejemplar.getIdPublicacion(),
+                    ejemplar.getNumEjemplar(),
+                    ejemplar.getEstado(),
+                    titulo,
+                    Integer.parseInt(numEdicion),
+                    TipoPublicacion.valueOf(tipo));
         } catch (Exception e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;

@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.RootPaneContainer;
 
 import com.biblioteca.controlador.Controlador;
+import com.biblioteca.dto.EstadoEjemplarDTO;
 
 /**
  * Diálogo para editar un ejemplar existente.
@@ -98,12 +99,12 @@ public class EditarEjemplarDialog extends JDialog {
         center.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
         // Obtener datos actuales
-        String[] datos = controlador.getControladorEditarEjemplarDialog().obtenerDetallesEjemplar(idEjemplar);
+        EstadoEjemplarDTO datos = controlador.getControladorEditarEjemplarDialog().obtenerDetallesEjemplar(idEjemplar);
         String num = "";
         String fecha = LocalDate.now().toString();
         if (datos != null) {
-            num = datos.length > 2 ? datos[2] : "";
-            fecha = datos.length > 3 ? datos[3] : fecha;
+            num = String.valueOf(datos.getNumEjemplar());
+            fecha = datos.getFechaAdquisicion() != null ? datos.getFechaAdquisicion().toString() : fecha;
         }
 
         // Campos
@@ -151,7 +152,7 @@ public class EditarEjemplarDialog extends JDialog {
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Ejemplar actualizado correctamente", "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
-                controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(Integer.parseInt(datos[1]));
+                controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(datos.getIdPublicacion());
                 dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "No se pudo actualizar el ejemplar (error en BD)", "Error",

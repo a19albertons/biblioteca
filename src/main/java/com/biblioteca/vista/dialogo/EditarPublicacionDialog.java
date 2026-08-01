@@ -26,6 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.RootPaneContainer;
 
 import com.biblioteca.controlador.Controlador;
+import com.biblioteca.dto.ObtenerPublicacionDetallesPorIdDTO;
 import com.biblioteca.utilities.Fonts;
 
 /**
@@ -193,24 +194,24 @@ public class EditarPublicacionDialog extends JDialog {
      */
     private void cargarDatos() {
         try {
-            String[] datos = controlador.getControladorEditarPublicacionDialog()
+            ObtenerPublicacionDetallesPorIdDTO datos = controlador.getControladorEditarPublicacionDialog()
                     .obtenerDetallesPublicacion(idPublicacion);
             if (datos == null)
                 return;
             // datos: tipo, titulo, codigo_isbn, idioma, temasCSV, modulosCSV, ciclosCSV,
             // editorial, num_edicion, fecha_publicacion, autoresCSV, periodicidad, id
-            String tipo = datos.length > 0 ? datos[0] : "";
-            String titulo = datos.length > 1 ? datos[1] : "";
-            String isbn = datos.length > 2 ? datos[2] : "";
-            String idioma = datos.length > 3 ? datos[3] : "";
-            String temas = datos.length > 4 ? datos[4] : "";
-            String modulos = datos.length > 5 ? datos[5] : "";
-            String ciclos = datos.length > 6 ? datos[6] : "";
-            String editorial = datos.length > 7 ? datos[7] : "";
-            String numEd = datos.length > 8 ? datos[8] : "";
-            String fecha = datos.length > 9 ? datos[9] : "";
-            String autores = datos.length > 10 ? datos[10] : "";
-            String periodicidad = datos.length > 11 ? datos[11] : "";
+            String tipo = datos.getTipoPublicacion() != null ? datos.getTipoPublicacion().name() : "";
+            String titulo = datos.getTitulo() != null ? datos.getTitulo() : "";
+            String isbn = datos.getCodigoISBN() != null ? datos.getCodigoISBN() : "";
+            String idioma = datos.getIdioma() != null ? datos.getIdioma() : "";
+            String temas = datos.getTemas() != null ? datos.getTemas() : "";
+            String modulos = datos.getModulos() != null ? datos.getModulos() : "";
+            String ciclos = datos.getCiclos() != null ? datos.getCiclos() : "";
+            String editorial = datos.getEditorial() != null ? datos.getEditorial() : "";
+            String numEd = datos.getNumEdicion() != null ? datos.getNumEdicion() : "";
+            String fecha = datos.getFechaPublicacion() != null ? datos.getFechaPublicacion() : "";
+            String autores = datos.getAutores() != null ? datos.getAutores() : "";
+            String periodicidad = datos.getPeriodicidad() != null ? datos.getPeriodicidad() : "";
 
             tituloField.setText(titulo);
             isbnField.setText(isbn);

@@ -9,6 +9,11 @@ import com.biblioteca.dao.EjemplarDAO;
 import com.biblioteca.dao.PrestamoDAO;
 import com.biblioteca.dao.PublicacionDAO;
 import com.biblioteca.dao.UsuarioDAO;
+import com.biblioteca.dto.EjemplarConTituloDTO;
+import com.biblioteca.dto.EstadoEjemplarDTO;
+import com.biblioteca.dto.ObtenerPublicacionDetallesPorIdDTO;
+import com.biblioteca.dto.UsuarioEstadoPorDNIOID;
+import com.biblioteca.modelo.TipoPublicacion;
 
 /**
  * Controlador para la lógica de concesión de préstamos
@@ -33,7 +38,7 @@ public class ControladorConcederPrestamo {
      * Busca el usuario por DNI o ID y devuelve arreglo: id, dni, nombre_completo,
      * sancion_activa (SANCIONADO/ACTIVO/BAJA), tipo_desc
      */
-    public String[] buscarUsuarioPorDniOId(String dniOrId) {
+    public UsuarioEstadoPorDNIOID buscarUsuarioPorDniOId(String dniOrId) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -52,31 +57,37 @@ public class ControladorConcederPrestamo {
      * Retorna: idEjemplar, idPublicacion, numEjemplar, estadoEjemplar, titulo,
      * numEdicion, tipoPublicacion
      */
-    public String[] detectarEjemplar(int idEjemplar) {
-        String[] resultado = null;
+    public EjemplarConTituloDTO detectarEjemplar(int idEjemplar) {
+        EjemplarConTituloDTO resultado = null;
         try (Connection conexion = this.dbConnection.getConnection()) {
             EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
             PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
 
             // obtener info ejemplar
-            String[] ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
+            EstadoEjemplarDTO ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
             if (ejemplar == null) {
                 return null;
             }
             // ejemplar: id, id_publicacion, num_ejemplar, estado, ubicacion
-            int idPublicacion = Integer.parseInt(ejemplar[1]);
-            String[] detallesPub = publicacionDAO.obtenerPublicacionDetallesPorId(idPublicacion);
+            int idPublicacion = ejemplar.getIdPublicacion();
+            ObtenerPublicacionDetallesPorIdDTO detallesPub = publicacionDAO.obtenerPublicacionDetallesPorId(idPublicacion);
             if (detallesPub == null) {
                 return null;
             }
 
             // detallesPub: tipo, titulo, codigo_isbn, idioma, temas, modulos, ciclos,
             // editorial, num_edicion, fecha_publicacion, autores, periodicidad, id
-            String tipo = detallesPub[0];
-            String titulo = detallesPub[1];
-            String numEdicion = detallesPub[8];
-            resultado = new String[] { ejemplar[0], ejemplar[1], ejemplar[2], ejemplar[4], titulo,
-                    (numEdicion == null ? "" : numEdicion), (tipo == null ? "" : tipo) };
+            String tipo = detallesPub.getTipoPublicacion().name();
+            String titulo = detallesPub.getTitulo();
+            String numEdicion = detallesPub.getNumEdicion();
+            resultado = new EjemplarConTituloDTO(
+                    ejemplar.getId(),
+                    ejemplar.getIdPublicacion(),
+                    ejemplar.getNumEjemplar(),
+                    ejemplar.getEstado(),
+                    titulo,
+                    Integer.parseInt(numEdicion),
+                    TipoPublicacion.valueOf(tipo));
         } catch (Exception e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
@@ -94,39 +105,57 @@ public class ControladorConcederPrestamo {
                 return "No se puede obtener conexión a BD";
             }
 
-            // Validaciones
-            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
-            String[] usuario = usuarioDAO.obtenerUsuarioYEstadoPorDniOId(String.valueOf(idUsuario));
-            // comprobar usuario válido
-            if (usuario == null) {
-                return "Usuario no encontrado";
-            }
-            String sancion = usuario[3];
-            // comprobar sanciones o baja
-            if ("SANCIONADO".equalsIgnoreCase(sancion) || "BAJA".equalsIgnoreCase(sancion)) {
-                return "El usuario tiene sanciones o está dado de baja";
+            // 1. ejemplar existe y obtener info publicación
+            EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
+            EstadoEjemplarDTO ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
+            if (ejemplar == null) {
+                return "Ejemplar no encontrado";
             }
 
-            EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
+            // 2. comprobar estado del ejemplar
+            String estadoEjemplar = ejemplar.getEstado();
+            if (!"DISPONIBLE".equalsIgnoreCase(estadoEjemplar)) {
+                return "El ejemplar esta dado de baja";
+            }
+
+            // 3. publicacion existe
+            // Obtiene detalles de la publicación
+            int idPublicacion = ejemplar.getIdPublicacion();
+            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
+            ObtenerPublicacionDetallesPorIdDTO detallesPub = publicacionDAO.obtenerPublicacionDetallesPorId(idPublicacion);
+            if (detallesPub == null) {
+                return "Publicación no encontrada";
+            }
+
+            // 4. estado de la publicacion esta en true o false (activo o baja)
+            if (!detallesPub.getEstado()) {
+                return "La publicación asociada al ejemplar está dada de baja";
+            }
+
+            String tipoPub = detallesPub.getTipoPublicacion().name(); // 'L' o 'R'
+
+            // 5. Ejemplar no tiene prestamo activo
             // comprobar si el ejemplar ya tiene préstamo activo
             if (ejemplarDAO.tienePrestamosActivosEjemplar(idEjemplar)) {
                 return "El ejemplar ya tiene un préstamo activo";
             }
 
-            // Obtener info publicación
-            String[] ejemplar = ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
-            if (ejemplar == null) {
-                return "Ejemplar no encontrado";
+
+            // Validar usuario
+            // Validaciones usuario
+            UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
+            UsuarioEstadoPorDNIOID usuario = usuarioDAO.obtenerUsuarioYEstadoPorDniOId(String.valueOf(idUsuario));
+            // 6. comprobar usuario existe
+            if (usuario == null) {
+                return "Usuario no encontrado";
             }
 
-            // Obtiene detalles de la publicación
-            int idPublicacion = Integer.parseInt(ejemplar[1]);
-            PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
-            String[] detallesPub = publicacionDAO.obtenerPublicacionDetallesPorId(idPublicacion);
-            if (detallesPub == null) {
-                return "Publicación no encontrada";
+            // 7. comprobar usuario activo (no sancionado ni baja)
+            String sancion = usuario.getSancionActiva();
+            // comprobar sanciones o baja
+            if ("SANCIONADO".equalsIgnoreCase(sancion) || "BAJA".equalsIgnoreCase(sancion)) {
+                return "El usuario tiene sanciones o está dado de baja";
             }
-            String tipoPub = detallesPub[0]; // 'L' o 'R'
 
             // Ver reglas: libros -> 7 días para todos. Revistas -> solo 1 concedida (por
             // usuario) y durante el propio día,

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.biblioteca.dto.EjemplarTipoPublicacionDTO;
+import com.biblioteca.dto.EstadoEjemplarDTO;
 import com.biblioteca.modelo.TipoPublicacion;
 
 /**
@@ -147,7 +148,7 @@ public class EjemplarDAO {
      * @return arreglo con {id, id_publicacion, num_ejemplar, fecha_adquisicion,
      *         estado} o null
      */
-    public String[] obtenerEjemplarPorId(int idEjemplar) {
+    public EstadoEjemplarDTO obtenerEjemplarPorId(int idEjemplar) {
         // Consulta SQL
         final String sql = SQL_SELECT_EJEMPLAR_POR_ID;
         try (
@@ -164,7 +165,11 @@ public class EjemplarDAO {
                     String fechaStr = (fecha != null) ? fecha.toString() : "";
                     boolean enServicio = rs.getBoolean("estado");
                     String estadoStr = enServicio ? "DISPONIBLE" : "BAJA";
-                    return new String[] { id, idPub, num, fechaStr, estadoStr };
+                    return new EstadoEjemplarDTO(
+                        Integer.parseInt(id), 
+                        Integer.parseInt(idPub), 
+                        Integer.parseInt(num),
+                            fechaStr, estadoStr);
                 }
             }
         } catch (Exception e) {

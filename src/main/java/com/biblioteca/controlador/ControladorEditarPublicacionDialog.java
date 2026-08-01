@@ -12,6 +12,7 @@ import com.biblioteca.dao.CicloDAO;
 import com.biblioteca.dao.ModuloDAO;
 import com.biblioteca.dao.PublicacionDAO;
 import com.biblioteca.dao.TemaDAO;
+import com.biblioteca.dto.ObtenerPublicacionDetallesPorIdDTO;
 
 /**
  * Controlador responsable de la edición de publicaciones.
@@ -49,7 +50,7 @@ public class ControladorEditarPublicacionDialog {
      *         modulosCSV, ciclosCSV, editorial, num_edicion, fecha_publicacion,
      *         autoresCSV, periodicidad, id — o null si no se encuentra
      */
-    public String[] obtenerDetallesPublicacion(int id) {
+    public ObtenerPublicacionDetallesPorIdDTO obtenerDetallesPublicacion(int id) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");

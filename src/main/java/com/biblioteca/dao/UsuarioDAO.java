@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import com.biblioteca.dto.UsuarioEstadoPorDNIOID;
 import com.biblioteca.dto.UsuarioTipoDTO;
 import com.biblioteca.modelo.TipoUsuario;
 import com.biblioteca.modelo.Usuario;
@@ -310,9 +311,9 @@ public class UsuarioDAO {
      * @param dniOrId cadena que contiene DNI o ID
      * @return String[] con los datos o null si no existe
      */
-    public String[] obtenerUsuarioYEstadoPorDniOId(String dniOrId) {
+    public UsuarioEstadoPorDNIOID obtenerUsuarioYEstadoPorDniOId(String dniOrId) {
         // Listado de usuarios
-        String[] devolver = null;
+        UsuarioEstadoPorDNIOID devolver = null;
         try {
             // Consulta SQL dependiendo si es número (id) o texto (dni)
             boolean esNumero = dniOrId != null && dniOrId.matches("^\\d+$");
@@ -327,18 +328,12 @@ public class UsuarioDAO {
                 try (ResultSet rs = ps.executeQuery()) {
                     // Ejecutar consulta
                     if (rs.next()) {
-                        devolver = new String[5];
-                        devolver[0] = rs.getString("id");
-                        devolver[1] = rs.getString("dni");
-                        devolver[2] = rs.getString("nombre_completo");
-                        devolver[3] = rs.getString("sancion_activa");
-                        // convertir tipo a descripcion si es posible
-                        String tipoCode = rs.getString("tipo");
-
-                        String tipoDesc = tipoCode != null
-                                ? TipoUsuario.valueOf(tipoCode).getDescripcion()
-                                : "";
-                        devolver[4] = tipoDesc;
+                        devolver = new UsuarioEstadoPorDNIOID(
+                                rs.getInt("id"),
+                                rs.getString("dni"),
+                                rs.getString("nombre_completo"),
+                                rs.getString("sancion_activa"),
+                                TipoUsuario.valueOf(rs.getString("tipo")));
                     }
                 }
             }

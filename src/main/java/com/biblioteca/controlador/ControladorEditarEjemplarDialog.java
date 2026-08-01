@@ -7,6 +7,7 @@ import java.time.LocalDate;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.EjemplarDAO;
+import com.biblioteca.dto.EstadoEjemplarDTO;
 
 /**
  * Controlador dedicado a la edición de ejemplares desde el diálogo.
@@ -35,7 +36,7 @@ public class ControladorEditarEjemplarDialog {
      * Devuelve arreglo: {id, id_publicacion, num_ejemplar, fecha_adquisicion,
      * estado}
      */
-    public String[] obtenerDetallesEjemplar(int idEjemplar) {
+    public EstadoEjemplarDTO obtenerDetallesEjemplar(int idEjemplar) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -71,11 +72,9 @@ public class ControladorEditarEjemplarDialog {
                 conexion.setAutoCommit(false);
 
                 // Recuperar estado actual del ejemplar para preservarlo
-                String[] detalles = dao.obtenerEjemplarPorId(idEjemplar);
+                EstadoEjemplarDTO detalles = dao.obtenerEjemplarPorId(idEjemplar);
                 boolean estadoActual = true; // Por defecto activo
-                if (detalles != null && detalles.length > 4) {
-                    estadoActual = "DISPONIBLE".equals(detalles[4]);
-                }
+                estadoActual = "DISPONIBLE".equals(detalles.getEstado());
 
                 Date fechaSql = (fechaAdquisicion != null) ? Date.valueOf(fechaAdquisicion)
                         : new Date(System.currentTimeMillis());

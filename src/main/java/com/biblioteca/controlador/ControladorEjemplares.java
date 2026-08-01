@@ -4,6 +4,7 @@ import java.sql.Connection;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.EjemplarDAO;
+import com.biblioteca.dto.EstadoEjemplarDTO;
 
 /**
  * Controlador para la gestión de ejemplares
@@ -53,7 +54,7 @@ public class ControladorEjemplares {
      * @return arreglo con {id, id_publicacion, num_ejemplar, fecha_adquisicion,
      *         estado} o null
      */
-    public String[] obtenerDetallesEjemplar(int idEjemplar) {
+    public EstadoEjemplarDTO obtenerDetallesEjemplar(int idEjemplar) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");

@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.RootPaneContainer;
 
 import com.biblioteca.controlador.Controlador;
+import com.biblioteca.dto.EstadoEjemplarDTO;
 
 /**
  * Diálogo de confirmación para eliminar (marcar como baja) un ejemplar.
@@ -109,15 +110,11 @@ public class EliminarEjemplarDialog extends JDialog {
         eliminar.addActionListener(e -> {
             // Antes de eliminar, obtener id_publicacion para refrescar la vista tras la
             // operación
-            String[] detalles = controlador.getControladorEjemplares().obtenerDetallesEjemplar(idEjemplar);
+            EstadoEjemplarDTO detalles = controlador.getControladorEjemplares().obtenerDetallesEjemplar(idEjemplar);
             int idPublicacion = -1;
             // extraer id_publicacion de los detalles obtenidos
-            if (detalles != null && detalles.length > 1) {
-                try {
-                    idPublicacion = Integer.parseInt(detalles[1]);
-                } catch (Exception ex) {
-                    idPublicacion = -1;
-                }
+            if (detalles != null) {
+                idPublicacion = detalles.getIdPublicacion();
             }
 
             // Intentar eliminar el ejemplar

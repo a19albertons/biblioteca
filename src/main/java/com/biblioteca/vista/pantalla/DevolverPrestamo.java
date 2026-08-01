@@ -12,6 +12,8 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentListener;
 
 import com.biblioteca.controlador.Controlador;
+import com.biblioteca.dto.EjemplarConTituloDTO;
+import com.biblioteca.dto.UsuarioEstadoPorDNIOID;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.BorderFactory;
@@ -154,15 +156,15 @@ public class DevolverPrestamo {
                     return;
                 }
                 // detectar ejemplar
-                String[] detectado = controlador.getControladorDevolverPrestamo().detectarEjemplar(idEj);
+                EjemplarConTituloDTO detectado = controlador.getControladorDevolverPrestamo().detectarEjemplar(idEj);
                 if (detectado == null) {
                     txtPublicacion.setText("");
                     return;
                 }
                 // Aplica datos en el formato adecuado
-                String pubTitulo = detectado[4];
-                String numEd = detectado[5];
-                String tipoPub = detectado[6];
+                String pubTitulo = detectado.getTitulo();
+                String numEd = String.valueOf(detectado.getNumEdicion());
+                String tipoPub = detectado.getTipoPublicacion().toString();
                 if ("L".equalsIgnoreCase(tipoPub)) {
                     String texto = "Detectado: " + pubTitulo
                             + (numEd != null && !numEd.isEmpty() ? " (Ed. " + numEd + ")" : "");
@@ -227,25 +229,25 @@ public class DevolverPrestamo {
                 return;
             }
             // buscar usuario y comprobar resultado
-            String[] datos = controlador.getControladorDevolverPrestamo().buscarUsuarioPorDniOId(input);
-            if (datos == null) {
+            UsuarioEstadoPorDNIOID usuario = controlador.getControladorDevolverPrestamo().buscarUsuarioPorDniOId(input);
+            if (usuario == null) {
                 resultadoSocio.setText("<html><span style='color:#F4791B'>Usuario no encontrado</span></html>");
                 usuarioSeleccionado[0] = -1;
                 return;
             }
             // datos: id, dni, nombre_completo, sancion_activa, tipo_desc
-            usuarioSeleccionado[0] = Integer.parseInt(datos[0]);
-            String estado = datos[3];
-            String tipoDesc = datos[4];
+            usuarioSeleccionado[0] = usuario.getId();
+            String estado = usuario.getSancionActiva();
+            String tipoDesc = usuario.getTipoUsuario().getDescripcion();
             // mostrar resultado de estado usuario
             if ("SANCIONADO".equalsIgnoreCase(estado)) {
-                resultadoSocio.setText("<html>Usuario: " + datos[2] + " (" + tipoDesc
+                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto() + " (" + tipoDesc
                         + ") - <span style='color:#F4791B; font-weight:bold'>Tiene sanciones</span></html>");
             } else if ("BAJA".equalsIgnoreCase(estado)) {
-                resultadoSocio.setText("<html>Usuario: " + datos[2]
+                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto()
                         + " - <span style='color:#F4791B; font-weight:bold'>Dado de baja</span></html>");
             } else {
-                resultadoSocio.setText("<html>Usuario: " + datos[2] + " (" + tipoDesc
+                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto() + " (" + tipoDesc
                         + ") - <span style='color:#2BC187; font-weight:bold'>Sin sanciones</span></html>");
             }
         });

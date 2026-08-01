@@ -8,6 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.biblioteca.dto.ObtenerPublicacionDetallesPorIdDTO;
+import com.biblioteca.modelo.TipoPublicacion;
+
 /**
  * DAO para Publicacion
  */
@@ -59,7 +62,8 @@ public class PublicacionDAO {
             + "COALESCE(GROUP_CONCAT(DISTINCT c.nombre SEPARATOR ', '),'') AS ciclos, "
             + "p.editorial, l.num_edicion, l.fecha_publicacion, "
             + "COALESCE(GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', '),'') AS autores, "
-            + "r.periodicidad "
+            + "r.periodicidad, "
+            + "p.estado "
             + "FROM publicaciones p "
             + "LEFT JOIN libros l ON p.id = l.id_publicacion "
             + "LEFT JOIN revistas r ON p.id = r.id_publicacion "
@@ -419,7 +423,7 @@ public class PublicacionDAO {
      *         fecha_publicacion (YYYY-MM-DD), autoresCSV, periodicidad, id
      *         (o null si no existe la publicación)
      */
-    public String[] obtenerPublicacionDetallesPorId(int id) {
+    public ObtenerPublicacionDetallesPorIdDTO obtenerPublicacionDetallesPorId(int id) {
         final String sql = SQL_PUBLICACION_DETALLES_POR_ID;
 
         try (
@@ -442,15 +446,26 @@ public class PublicacionDAO {
                     String fechaPub = rs.getString("fecha_publicacion");
                     String autores = rs.getString("autores");
                     String periodicidad = rs.getString("periodicidad");
+                    Boolean estado = rs.getBoolean("estado");
 
                     // devolver arreglo con valores (evitar nulls)
-                    return new String[] { tipo == null ? "" : tipo, titulo == null ? "" : titulo,
-                            isbn == null ? "" : isbn, idioma == null ? "" : idioma,
-                            temas == null ? "" : temas, modulos == null ? "" : modulos,
-                            ciclos == null ? "" : ciclos, editorial == null ? "" : editorial,
-                            numEd == null ? "" : numEd, fechaPub == null ? "" : fechaPub,
-                            autores == null ? "" : autores, periodicidad == null ? "" : periodicidad,
-                            String.valueOf(id) };
+                    return new ObtenerPublicacionDetallesPorIdDTO(
+                            TipoPublicacion.valueOf(tipo),
+                            titulo == null ? "" : titulo, 
+                            isbn == null ? "" : isbn, 
+                            idioma == null ? "" : idioma,
+                            temas == null ? "" : temas, 
+                            modulos == null ? "" : modulos,
+                            ciclos == null ? "" : ciclos, 
+                            editorial == null ? "" : editorial,
+                            numEd == null ? "" : numEd, 
+                            fechaPub == null ? "" : fechaPub,
+                            autores == null ? "" : autores, 
+                            periodicidad == null ? "" : periodicidad,
+                            id,
+                            estado
+
+                    );
                 }
             }
         } catch (Exception e) {
