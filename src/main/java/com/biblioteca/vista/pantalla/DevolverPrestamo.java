@@ -279,11 +279,8 @@ public class DevolverPrestamo {
                 return;
             }
 
-            String err = controlador.getControladorDevolverPrestamo().devolverPrestamo(usuarioSeleccionado[0], idEj);
-
             // ejecutar devolución
-            controlador.getControladorDevolverPrestamo().devolverPrestamo(usuarioSeleccionado[0],
-                    idEj);
+            String err = controlador.getControladorDevolverPrestamo().devolverPrestamo(usuarioSeleccionado[0], idEj);
             if (err == null) {
                 JOptionPane.showMessageDialog(null, "Devolución registrada correctamente", "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
