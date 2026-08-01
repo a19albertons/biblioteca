@@ -28,7 +28,7 @@ public class UsuarioDAO {
             + "THEN 'SANCIONADO' ELSE 'ACTIVO' END AS sancion_activa, "
             + "u.tipo "
             + "FROM usuarios u ORDER BY u.nombre ASC, u.apellido1 ASC, u.apellido2 ASC";
-    private static final String SQL_INSERT_USUARIO = "INSERT INTO usuarios (dni, nombre, apellido1, apellido2, email, contrasena, tipo, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_USUARIO = "INSERT INTO usuarios (dni, nombre, apellido1, apellido2, email, contrasena, tipo, estado, usuario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_SELECT_USUARIO_POR_ID = "SELECT id, dni, nombre, apellido1, apellido2, email, tipo, estado FROM usuarios WHERE id = ?";
     private static final String SQL_USUARIO_Y_ESTADO_BASE = "SELECT u.id, u.dni, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS nombre_completo, "
             + "CASE WHEN u.estado = FALSE THEN 'BAJA' "
@@ -42,6 +42,7 @@ public class UsuarioDAO {
     private static final String SQL_USUARIOS_SANCIONABLES = "SELECT u.id, u.dni, CONCAT(u.apellido1, ', ', u.nombre) AS nombre_completo, u.tipo "
             + "FROM usuarios u WHERE u.tipo = 'E' AND u.estado = TRUE ORDER BY u.apellido1, u.nombre";
     private static final String SQL_OBTENER_USUARIO_TIPO_DTO = "SELECT id, tipo FROM usuarios WHERE id = ?";
+    private static final String SQL_CONSULTA_NUMERO_USUARIOS_POR_USUARIO = "SELECT COUNT(*) AS total FROM usuarios WHERE usuario LIKE ?";
 
     /**
      * Constructor de UsuarioDAO
@@ -239,10 +240,11 @@ public class UsuarioDAO {
      * @param contrasena
      * @param tipo       código (E,P,A,C,L)
      * @param estado     true = activo
+     * @param usuario    nombre de usuario (login)
      * @return true si la inserción fue exitosa
      */
     public boolean insertarUsuario(Connection conexion, String dni, String nombre, String apellido1, String apellido2,
-            String email, String contrasena, String tipo, boolean estado) {
+            String email, String contrasena, String tipo, boolean estado, String usuario) {
         // Consulta SQL
         final String sql = SQL_INSERT_USUARIO;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -255,6 +257,7 @@ public class UsuarioDAO {
             ps.setString(6, contrasena);
             ps.setString(7, tipo);
             ps.setBoolean(8, estado);
+            ps.setString(9, usuario);
             // Ejecutar inserción
             int rows = ps.executeUpdate();
             return rows == 1;
@@ -493,5 +496,20 @@ public class UsuarioDAO {
             usuarioTipoDTO = null;
         }
         return usuarioTipoDTO;
+    }
+
+    public int consultaNumeroUsuariosPorUsuario(String usuarioConsultar) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_CONSULTA_NUMERO_USUARIOS_POR_USUARIO)) {
+            ps.setString(1, usuarioConsultar + "%"); // Usamos LIKE para buscar coincidencias
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error consultando número de usuarios por usuario: " + e.getMessage());
+            System.out.println(e.getCause());
+        }
+        return -1; // Retorna -1 en caso de error
     }
 }

@@ -2,6 +2,8 @@ package com.biblioteca.controlador;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
@@ -61,12 +63,31 @@ public class ControladorNuevoUsuarioDialog {
             String apellido2 = ""; // dejamos el campo apellido2 vacío por simplicidad
             String contrasena = dni.trim(); // la contraseña inicial es el DNI
 
+            // Crear string de usuario (login) a partir del nombre y apellido1
+            LocalDate fechaActual = LocalDate.now();
+            String fecha2digitos = fechaActual.format(DateTimeFormatter.ofPattern("yy"));
+            String apellido1Formateado = apellido1.substring(0, 0).toUpperCase();
+            String apellido2Formateado = apellido2.substring(0, 0).toUpperCase();
+            String usuarioConsultar = "A"+fecha2digitos+nombre.trim().toUpperCase().charAt(0)+nombre.trim().substring(1)+apellido1Formateado+apellido2Formateado;
+
+
             try {
                 // Iniciar transacción
                 conexion.setAutoCommit(false);
+                int numeroUsuariosMismoPatron = usuarioDAO.consultaNumeroUsuariosPorUsuario(usuarioConsultar);
+
+                String usuarioFinal;
+                if (numeroUsuariosMismoPatron == -1) {
+                    return false;
+                } else if (numeroUsuariosMismoPatron == 0) {
+                    usuarioFinal = usuarioConsultar;
+                } else {
+                    usuarioFinal = usuarioConsultar + (numeroUsuariosMismoPatron + 1);
+                }
+
                 boolean ok = usuarioDAO.insertarUsuario(conexion, dni.trim(), nombre.trim(), apellido1, apellido2,
                         email,
-                        contrasena, tipoCode, true);
+                        contrasena, tipoCode, true, usuarioFinal);
                 // Si no se pudo insertar, hacer rollback y devolver false
                 if (!ok) {
                     conexion.rollback();

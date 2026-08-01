@@ -153,37 +153,6 @@ create table
         FOREIGN KEY (id_autor) REFERENCES autores (id)
     );
 
-/* Triggers para generar el campo usuario según el formato AYYNombreIJ */
-DROP TRIGGER IF EXISTS usuarios_before_insert;
-DROP TRIGGER IF EXISTS usuarios_before_update;
-
-DELIMITER $$
-CREATE TRIGGER usuarios_before_insert
-BEFORE INSERT ON usuarios
-FOR EACH ROW
-BEGIN
-  SET NEW.usuario = CONCAT(
-    'A',
-    RIGHT(YEAR(CURDATE()), 2),
-    NEW.nombre,
-    COALESCE(SUBSTRING(NEW.apellido1,1,1), ''),
-    COALESCE(SUBSTRING(NEW.apellido2,1,1), '')
-  );
-END$$
-
-CREATE TRIGGER usuarios_before_update
-BEFORE UPDATE ON usuarios
-FOR EACH ROW
-BEGIN
-  SET NEW.usuario = CONCAT(
-    'A',
-    RIGHT(YEAR(CURDATE()), 2),
-    NEW.nombre,
-    COALESCE(SUBSTRING(NEW.apellido1,1,1), ''),
-    COALESCE(SUBSTRING(NEW.apellido2,1,1), '')
-  );
-END$$
-DELIMITER ;
 
 -- ==========================
 -- Datos de prueba / Población
