@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 
+import com.biblioteca.dto.ObtenerUltimoPrestamoPorEjemplarDTO;
 import com.biblioteca.dto.RegistroDevolucionDTO;
 
 /**
@@ -278,7 +279,7 @@ public class PrestamoDAO {
      * estado)
      * Devuelve: idPrestamo, idUsuario, fecha_inicio, fecha_fin, estado
      */
-    public String[] obtenerUltimoPrestamoPorEjemplar(int idEjemplar) {
+    public ObtenerUltimoPrestamoPorEjemplarDTO obtenerUltimoPrestamoPorEjemplar(int idEjemplar) {
         // Consulta SQL para obtener el último préstamo por ejemplar
         final String sql = SQL_SELECT_ULTIMO_PRESTAMO_POR_EJEMPLAR;
         try (
@@ -288,13 +289,12 @@ public class PrestamoDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 // Ejecutar consulta
                 if (rs.next()) {
-                    String id = String.valueOf(rs.getInt("id"));
-                    String idUsuario = String.valueOf(rs.getInt("id_usuario"));
-                    java.sql.Date fi = rs.getDate("fecha_inicio");
-                    java.sql.Date ff = rs.getDate("fecha_fin");
-                    String estado = String.valueOf(rs.getBoolean("estado"));
-                    return new String[] { id, idUsuario, fi != null ? fi.toString() : "",
-                            ff != null ? ff.toString() : "", estado };
+                    int id = rs.getInt("id");
+                    int idUsuario = rs.getInt("id_usuario");
+                    Date fechaInicio = rs.getDate("fecha_inicio");
+                    Date fechaFin = rs.getDate("fecha_fin");
+                    boolean estado = rs.getBoolean("estado");
+                    return new ObtenerUltimoPrestamoPorEjemplarDTO(id, idUsuario, fechaInicio, fechaFin, estado);
                 }
             }
         } catch (Exception e) {

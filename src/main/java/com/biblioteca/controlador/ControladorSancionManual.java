@@ -3,10 +3,15 @@ package com.biblioteca.controlador;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+import javax.swing.JOptionPane;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.PrestamoDAO;
 import com.biblioteca.dao.SancionDAO;
+import com.biblioteca.dto.ObtenerUltimoPrestamoPorEjemplarDTO;
 import com.biblioteca.dto.UsuarioFinSancionDTO;
 
 /**
@@ -32,99 +37,106 @@ public class ControladorSancionManual {
         this.dbConnection = dbConnection;
     }
 
-    /**
-     * Obtiene el último préstamo por ejemplar delegando en PrestamoDAO.
-     *
-     * @param idEjemplar
-     * @return arreglo con {id_prestamo, id_usuario, fecha_inicio, fecha_fin} o null
-     */
-    public String[] obtenerUltimoPrestamoPorEjemplar(int idEjemplar) {
-        try (var conexion = this.dbConnection.getConnection()) {
-            if (conexion == null) {
-                System.out.println("No se puede obtener conexión a BD");
-                return null;
-            }
-            PrestamoDAO prestamoDAO = new PrestamoDAO(conexion);
-            return prestamoDAO.obtenerUltimoPrestamoPorEjemplar(idEjemplar);
-        } catch (Exception e) {
-            // En caso de error, devolver null y loguear el error
-            System.out.println("Error al obtener conexión: " + e.getMessage());
-            return null;
+    public String aplicarSancionManual(int idUsuario, int idEjemplar, String finSancionString, String descripcion) {
+        // Validar usuario seleccionado
+        if (idUsuario == -1) {
+            JOptionPane.showMessageDialog(null, "Seleccione primero un usuario", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return "Error: Usuario no seleccionado";
         }
-    }
-
-    /**
-     * Obtiene la sanción activa para un usuario (delegación a SancionDAO)
-     *
-     * @param idUsuario
-     * @return arreglo {id, fin_sancion} o null
-     */
-    public UsuarioFinSancionDTO obtenerSancionActivaPorUsuario(int idUsuario) {
+        // Convertir el string de fecha a LocalDate
+        LocalDate finSancion;
+        try {
+            finSancion = LocalDate.parse(finSancionString);
+        } catch (Exception ex) {
+            return "Error: Fecha fin inválida (formato YYYY-MM-DD)";
+        }
+        boolean exito = false;
         try (Connection conexion = this.dbConnection.getConnection()) {
-            if (conexion == null) {
-                System.out.println("No se puede obtener conexión a BD");
-                return null;
-            }
-            SancionDAO sancionDAO = new SancionDAO(conexion);
-            return sancionDAO.obtenerSancionActivaPorUsuario(idUsuario);
-        } catch (SQLException e) {
-            System.out.println("Error al obtener conexión: " + e.getMessage());
-            return null;
-        } catch (Exception e) {
-            System.out.println("Error al obtener conexión: " + e.getMessage());
-            return null;
-        }
-    }
+            try {
+                if (conexion == null) {
+                    System.out.println("No se puede obtener conexión a BD");
+                    return "Error: No se puede obtener conexión a BD";
+                }
 
-    /**
-     * Desactiva una sanción por id (delegación a SancionDAO)
-     *
-     * @param idSancion
-     * @return true si desactivó la sanción
-     */
-    public boolean desactivarSancionPorId(int idSancion) {
-        try (Connection conexion = this.dbConnection.getConnection()) {
-            if (conexion == null) {
-                System.out.println("No se puede obtener conexión a BD");
-                return false;
-            }
-            SancionDAO sancionDAO = new SancionDAO(conexion);
-            return sancionDAO.desactivarSancionPorId(idSancion);
-        } catch (SQLException e) {
-            System.out.println("Error al obtener conexión: " + e.getMessage());
-            return false;
-        } catch (Exception e) {
-            System.out.println("Error al obtener conexión: " + e.getMessage());
-            return false;
-        }
-    }
+                // Empezamos transacción
+                conexion.setAutoCommit(false);
 
-    /**
-     * Inserta una sanción (delegación a SancionDAO)
-     *
-     * @param idUsuario
-     * @param idPrestamo
-     * @param inicio
-     * @param fin
-     * @param descripcion
-     * @return true si la inserción fue correcta
-     */
-    public boolean insertarSancion(int idUsuario, int idPrestamo, Date inicio, Date fin,
-            String descripcion) {
-        try (Connection conexion = this.dbConnection.getConnection()) {
-            if (conexion == null) {
-                System.out.println("No se puede obtener conexión a BD");
-                return false;
+                // Obtener el último préstamo por ejemplar.
+                PrestamoDAO prestamoDAO = new PrestamoDAO(conexion);
+                ObtenerUltimoPrestamoPorEjemplarDTO ultimoPrestamo = prestamoDAO
+                        .obtenerUltimoPrestamoPorEjemplar(idEjemplar);
+
+                // Validamos que la sanción sea para el usuario que tiene el último préstamo del
+                // ejemplar
+                if (ultimoPrestamo.getIdUsuario() != idUsuario) {
+                    return "Error: El usuario seleccionado no es el último en tener el ejemplar";
+                }
+
+                // Obtención del id de préstamo
+                int idPrestamo = ultimoPrestamo.getId();
+
+                LocalDate fechaActual = LocalDate.now();
+                if (finSancion.isBefore(fechaActual)) {
+                    return "Error: La fecha fin no puede ser anterior a la fecha de inicio";
+                }
+
+                // Consultar sancion usuario
+                SancionDAO sancionDAO = new SancionDAO(conexion);
+                UsuarioFinSancionDTO sancionActiva = sancionDAO.obtenerSancionActivaPorUsuario(idUsuario);
+
+                // Gestion fecha de sancion manual con consulta de sanción activa previa
+                LocalDate nuevoFinSancion;
+                if (sancionActiva != null && sancionActiva.getFinSancion() != null
+                        && !sancionActiva.getFinSancion().isEmpty()) {
+                    LocalDate finSancionActiva = LocalDate.parse(sancionActiva.getFinSancion());
+                    long diasPendienteOriginal = ChronoUnit.DAYS.between(fechaActual, finSancionActiva);
+                    long diasPendienteNuevaSancion = ChronoUnit.DAYS.between(fechaActual, finSancion);
+                    nuevoFinSancion = fechaActual.plusDays(diasPendienteOriginal + diasPendienteNuevaSancion);
+                    finSancion = nuevoFinSancion;
+                } else {
+                    nuevoFinSancion = finSancion;
+                }
+
+                // Desactivar sanción activa si existe
+                if (sancionActiva != null) {
+                    boolean desactivada = sancionDAO.desactivarSancionPorId(sancionActiva.getIdSancion());
+                    if (!desactivada) {
+                        return "Error: No se pudo desactivar la sanción activa";
+                    }
+                }
+
+                // Insertar nueva sanción
+                boolean insertado = sancionDAO.insertarSancion(idUsuario, idPrestamo, Date.valueOf(fechaActual),
+                        Date.valueOf(nuevoFinSancion), descripcion);
+                if (!insertado) {
+                    return "Error: No se pudo insertar la nueva sanción";
+                }
+
+                // cerramos operacion y confirmamos transacción
+                conexion.commit();
+                exito = true;
+                return null; // Indica éxito
+
+            } finally {
+                try {
+                    if (!exito) {
+                        conexion.rollback();
+                    }
+                    conexion.setAutoCommit(true);
+                } catch (SQLException e) {
+                    System.out.println("Error al restaurar auto-commit: " + e.getMessage());
+                }
+
             }
-            SancionDAO sancionDAO = new SancionDAO(conexion);
-            return sancionDAO.insertarSancion(idUsuario, idPrestamo, inicio, fin, descripcion);
-        } catch (SQLException e) {
-            System.out.println("Error al obtener conexión: " + e.getMessage());
-            return false;
-        } catch (Exception e) {
-            System.out.println("Error al obtener conexión: " + e.getMessage());
-            return false;
+
         }
+        // comprobar que el usuario fue el ultimo en tener el ejemplar
+        catch (SQLException e) {
+            System.out.println("Error al obtener conexión: " + e.getMessage());
+            return "Error: " + e.getMessage();
+        }
+
     }
 
 }

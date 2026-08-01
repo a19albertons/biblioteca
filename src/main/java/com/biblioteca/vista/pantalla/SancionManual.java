@@ -3,7 +3,6 @@ package com.biblioteca.vista.pantalla;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -18,7 +17,6 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 import com.biblioteca.controlador.Controlador;
-import com.biblioteca.dto.UsuarioFinSancionDTO;
 
 /**
  * Clase para la vista Sanción manual
@@ -228,13 +226,7 @@ public class SancionManual {
         });
 
         btnAplicarSancion.addActionListener(e -> {
-            // Validar usuario seleccionado
-            if (usuarioSeleccionado[0] == -1) {
-                JOptionPane.showMessageDialog(null, "Seleccione primero un usuario", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            // validar ejemplar
+            // validaciones para pasar el id del ejemplar a int
             String idEjStr = txtEjemplar.getText().trim();
             if (idEjStr.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
@@ -243,131 +235,30 @@ public class SancionManual {
             }
             int idEj;
             try {
-                idEj = Integer.parseInt(idEjStr);
+                idEj = Integer.parseInt(txtEjemplar.getText().trim());
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
                         JOptionPane.ERROR_MESSAGE);
+                // No pasa por el controlador
                 return;
             }
-            // comprobar que el usuario fue el ultimo en tener el ejemplar
-            String[] ultimo = controlador.getControladorSancionManual().obtenerUltimoPrestamoPorEjemplar(idEj);
-            if (ultimo == null) {
-                JOptionPane.showMessageDialog(null,
-                        "No se encontró historial de préstamos para este ejemplar", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            int idUsuarioUlt = Integer.parseInt(ultimo[1]);
-            if (idUsuarioUlt != usuarioSeleccionado[0]) {
-                JOptionPane.showMessageDialog(null,
-                        "El usuario seleccionado no fue el último en tener el ejemplar", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            int idPrestamo = Integer.parseInt(ultimo[0]);
-            // validar fecha fin
-            String finStr = txtFechaFin.getText().trim();
-            LocalDate hoy = LocalDate.parse(txtFechaInicio.getText().trim());
-            LocalDate fin;
-            try {
-                fin = LocalDate.parse(finStr);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Fecha fin inválida (formato YYYY-MM-DD)", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            if (fin.isBefore(hoy)) {
-                JOptionPane.showMessageDialog(null,
-                        "La fecha fin no puede ser anterior a la fecha de inicio", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            // preparar descripcion
-            String motivo = (String) comboMotivo.getSelectedItem();
-            String descAd = txtDescripcion.getText().trim();
-            String descripcionBase = motivo + " - " + (descAd.isEmpty() ? "" : descAd);
-            // comprobar sancion activa y acumulacion (usar controlador)
-            UsuarioFinSancionDTO sancionActiva = controlador.getControladorSancionManual().obtenerSancionActivaPorUsuario(usuarioSeleccionado[0]);
-            String descripcion = descripcionBase;
-            if (sancionActiva != null && sancionActiva.getFinSancion() != null && !sancionActiva.getFinSancion().isEmpty()) {
-                try {
-                    LocalDate finAct = LocalDate.parse(sancionActiva.getFinSancion());
-                    // días restantes de la sanción activa desde hoy (si es negativa, 0)
-                    long diasRestantes = ChronoUnit.DAYS.between(hoy, finAct);
-                    if (diasRestantes > 0) {
-                        // extender la fecha fin propuesta sumando los días restantes
-                        LocalDate finExtendida = fin.plusDays(diasRestantes);
-                        descripcion = descripcionBase + " (Acumulativa: sanción activa hasta " + finAct + "; se añaden "
-                                + diasRestantes + " días)";
-                        // usar la fin extendida como fecha final real
-                        fin = finExtendida;
-                    } else {
-                        descripcion = descripcionBase + " (Acumulativa: sanción activa hasta " + finAct
-                                + "; no se añade plazo adicional)";
-                    }
-                } catch (Exception ex) {
-                    // registrar el error al parsear la fecha anterior
-                    System.out.println("Error leyendo sanción previa para usuario " + usuarioSeleccionado[0] + ": "
-                            + ex.getMessage());
-                    ex.printStackTrace();
-                    descripcion = descripcionBase + " (Acumulativa: fallo leyendo sanción previa)";
-                }
-            }
-            // preparar notificación y desactivar sanción previa si existe
-            String notificacion = "Sanción aplicada: fin " + fin.toString();
-            boolean previaDesactivada = false;
-            // notificar acumulación si aplica
-            if (sancionActiva != null && sancionActiva.getFinSancion() != null && !sancionActiva.getFinSancion().isEmpty()) {
-                try {
-                    // analizar sanción activa previa para el mensaje
-                    LocalDate finAct = LocalDate.parse(sancionActiva.getFinSancion());
-                    long diasRestantes = ChronoUnit.DAYS.between(hoy, finAct);
-                    // construir mensaje adecuado
-                    if (diasRestantes > 0) {
-                        LocalDate finExtendida = fin;
-                        notificacion = "Sanción acumulativa: anterior fin " + finAct + ", nuevo fin " + finExtendida
-                                + ", se añadieron " + diasRestantes + " días.";
-                    } else {
-                        notificacion = "Sanción acumulativa: anterior fin " + finAct
-                                + ", no se añadió plazo adicional.";
-                    }
-                    // intentar desactivar la sanción previa
-                    try {
-                        int idPrev = sancionActiva.getIdSancion();
-                        previaDesactivada = controlador.getControladorSancionManual().desactivarSancionPorId(idPrev);
-                        if (previaDesactivada) {
-                            notificacion += " La sanción previa ha sido desactivada.";
-                        }
-                    } catch (Exception ex2) {
-                        // registrar el error al intentar desactivar la sanción previa
-                        System.out.println(
-                                "Error desactivando sanción previa (id=" + sancionActiva.getIdSancion() + "): " + ex2.getMessage());
-                        ex2.printStackTrace();
-                    }
-                } catch (Exception ex) {
-                    System.out.println("Error preparando notificación de sanción manual: " + ex.getMessage());
-                    ex.printStackTrace();
-                    notificacion = "Sanción aplicada.";
-                }
-            }
+            // Prepara descripcion
+            String descripcion = comboMotivo.getSelectedItem() + " - " + txtDescripcion.getText().trim();
 
-            // insertar sancion (usar idPrestamo obtenido del historial)
-            boolean ins = controlador.getControladorSancionManual().insertarSancion(usuarioSeleccionado[0], idPrestamo,
-                    java.sql.Date.valueOf(hoy), java.sql.Date.valueOf(fin), descripcion);
-            if (!ins) {
-                JOptionPane.showMessageDialog(null, "Error aplicando la sanción", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            JOptionPane.showMessageDialog(null, "Sanción aplicada correctamente", "Éxito",
-                    JOptionPane.INFORMATION_MESSAGE);
-            // notificar acumulación si aplica
-            if (notificacion != null && !notificacion.isEmpty()) {
-                JOptionPane.showMessageDialog(null, notificacion, "Información",
+            // Peticion de sancionar
+            String err = controlador.getControladorSancionManual().aplicarSancionManual(usuarioSeleccionado[0], idEj,
+                    txtFechaFin.getText().trim(), descripcion);
+            if (err != null) {
+                JOptionPane.showMessageDialog(null, err, "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Sanción aplicada correctamente.", "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
             }
+
             // limpiar
-            btnLimpiar.doClick();
+            if (err == null) {
+                btnLimpiar.doClick();
+            }
         });
 
         // Agregar paneles al panel principal
