@@ -19,7 +19,7 @@ public class UsuarioDAO {
     private final Connection conexion;
 
     // SQL constants 🔧
-    private static final String SQL_CONSULTA_INICIO_SESION = "SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?";
+    private static final String SQL_CONSULTA_INICIO_SESION = "SELECT * FROM usuarios WHERE usuario = ?";
     private static final String SQL_CONSULTA_RECUPERAR_CUENTA = "SELECT * FROM usuarios WHERE usuario = ? OR email = ?";
     private static final String SQL_TOTAL_SOCIOS_ACTIVOS = "SELECT COUNT(*) AS TOTAL FROM usuarios where estado = TRUE";
     private static final String SQL_LISTA_USUARIOS_ESTADO = "SELECT u.id, u.dni, CONCAT(u.nombre, ' ', u.apellido1, ' ', u.apellido2) AS nombre_completo, "
@@ -63,13 +63,12 @@ public class UsuarioDAO {
      * @param contrasena Contraseña del usuario
      * @return Usuario si las credenciales son correctas, null en caso contrario
      */
-    public Usuario consultaInicioSesion(String usuario, String contrasena) {
+    public Usuario consultaInicioSesion(String usuario) {
         Usuario devolver = null;
         try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_CONSULTA_INICIO_SESION)) {
             // establecer parámetros
             ps.setString(1, usuario);
-            ps.setString(2, contrasena);
             // ejecutar consulta
             try (ResultSet resultado = ps.executeQuery()) {
                 if (resultado.next()) {

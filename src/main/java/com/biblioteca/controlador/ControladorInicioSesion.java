@@ -5,6 +5,7 @@ import java.sql.Connection;
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
 import com.biblioteca.modelo.Usuario;
+import com.biblioteca.security.HashearContrasena;
 
 /**
  * Clase para el controlador de inicio de sesión
@@ -41,7 +42,16 @@ public class ControladorInicioSesion {
                 return null;
             }
             UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
-            return usuarioDAO.consultaInicioSesion(usuario, contrasena);
+            Usuario usuarioComprobar = usuarioDAO.consultaInicioSesion(usuario);
+
+            // Comprobamos si la contraseña del usuario coincide con la proporcionada
+            if (usuarioComprobar != null && HashearContrasena.verify(contrasena.toCharArray(), usuarioComprobar.getContrasena())) {
+                return usuarioComprobar;
+            } else {
+                // Credenciales incorrectas
+                System.out.println("Credenciales incorrectas");
+                return null;
+            }
         } catch (Exception e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;

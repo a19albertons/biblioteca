@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
+import com.biblioteca.security.HashearContrasena;
 
 /**
  * Controlador dedicado a la creación de nuevos usuarios (socios) desde el
@@ -76,6 +77,7 @@ public class ControladorNuevoUsuarioDialog {
                 conexion.setAutoCommit(false);
                 int numeroUsuariosMismoPatron = usuarioDAO.consultaNumeroUsuariosPorUsuario(usuarioConsultar);
 
+                // Genera el nombre de usuario final basado en el patrón y el número de usuarios existentes
                 String usuarioFinal;
                 if (numeroUsuariosMismoPatron == -1) {
                     return false;
@@ -85,9 +87,12 @@ public class ControladorNuevoUsuarioDialog {
                     usuarioFinal = usuarioConsultar + (numeroUsuariosMismoPatron + 1);
                 }
 
+                char[] contrasenaCharArray = contrasena.toCharArray();
+                String contrasenaHasheada = HashearContrasena.hash(contrasenaCharArray);
+
                 boolean ok = usuarioDAO.insertarUsuario(conexion, dni.trim(), nombre.trim(), apellido1, apellido2,
                         email,
-                        contrasena, tipoCode, true, usuarioFinal);
+                        contrasenaHasheada, tipoCode, true, usuarioFinal);
                 // Si no se pudo insertar, hacer rollback y devolver false
                 if (!ok) {
                     conexion.rollback();

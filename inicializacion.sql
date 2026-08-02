@@ -13,7 +13,7 @@ create table
            Ejemplo: A25JuanLP -> 'A' + 25 (año 2025) + Nombre (Juan) + 1ª letra apellido1 (L) + 1ª letra apellido2 (P) */
         usuario varchar(100) NOT NULL DEFAULT '' UNIQUE,
         email varchar(100) NOT NULL UNIQUE,
-        contrasena varchar(50) NOT NULL,
+        contrasena varchar(255) NOT NULL,
         /* E=Estudiante, P=Profesor, A=Administrativo, C=Conserje, L=Limpiador */
         tipo char(1) NOT NULL CHECK (Tipo IN ('E', 'P', 'A', 'C', 'L')),
         estado Boolean NOT NULL DEFAULT TRUE /* TRUE=activo, FALSE=desactivado */
@@ -231,26 +231,26 @@ INSERT INTO ejemplares (id, id_publicacion, num_ejemplar, fecha_adquisicion, est
 (10,1,3,'2024-09-12',TRUE);
 
 -- Usuarios (estudiante E, profesores P, administrativo A, conserje C, limpiador L)
-INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, Tipo, estado) VALUES
-(1,'11111111A','Juan','Pérez','García','juan.perez@example.com','passJuan1','E',TRUE),
-(2,'22222222B','Lucía','Martínez','Sánchez','lucia.martinez@example.com','passLucia2','E',TRUE),
-(3,'33333333C','Miguel','López','Pena','miguel.lopez@example.com','passMiguel3','P',TRUE),
-(4,'44444444D','Ana','García','Ramírez','ana.garcia@example.com','passAna4','P',TRUE),
-(5,'55555555E','Carlos','Ruiz','Fernández','carlos.ruiz@example.com','passCarlos5','A',TRUE),
-(6,'66666666F','Laura','Díaz','Torres','laura.conserje@example.com','passLaura6','C',TRUE),
-(7,'77777777G','Sergio','Navarro','Gómez','sergio.navarro@example.com','passSergio7','L',TRUE),
-(8,'88888888H','Marta','Ortega','Sanz','marta.ortega@example.com','passMarta8','E',TRUE),
-(9,'99999999I','Isabel','Soto','Molina','isabel.soto@example.com','passIsabel9','E',TRUE),
-(10,'00000000J','David','Giménez','Ruano','david.gimenez@example.com','passDavid10','P',TRUE);
+INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, Tipo, estado, usuario) VALUES
+(1,'11111111A','Juan','Pérez','García','juan.perez@example.com','$2a$12$yfxBboulQQyTqKXQDIiJo.X0kfYwOoO3Rjm3kslQ3X1YxFn.aQJy2','E',TRUE, 'A26JuanPG'), -- 'passJuan1'
+(2,'22222222B','Lucía','Martínez','Sánchez','lucia.martinez@example.com','$2a$12$HeD4FKCtItEIffPZzAMYse3hBezBzh75h.M0pWA/Xu.4ZW5j26XIK','E',TRUE, 'A26LuciaMS'), -- 'passLucia2'
+(3,'33333333C','Miguel','López','Pena','miguel.lopez@example.com','$2a$12$32lPK0/dTKqq5H5iZFk4iOMcQOXhN69oJAaT.9YL.uBMKum6eNHy.','P',TRUE, 'A26MiguelLP'), -- 'passMiguel3'
+(4,'44444444D','Ana','García','Ramírez','ana.garcia@example.com','$2a$12$AHagIxJCtEEUmRxpaoa9ouFyxChL9nz3wLgq34bxYPsR2vjldxltG','P',TRUE, 'A26AnaGR'), -- 'passAna4'
+(5,'55555555E','Carlos','Ruiz','Fernández','carlos.ruiz@example.com','$2a$12$F5YpQQPa3jCvtOgILcMF/.Al7fi0TORRodc.7eNi2TiD3pNn/GNTm','A',TRUE, 'A26CarlosRF'), -- 'passCarlos5'
+(6,'66666666F','Laura','Díaz','Torres','laura.conserje@example.com','$2a$12$O2fxiGfAu8sW8bXFUqMz5ODzQ2hOkkcjRF.3b9uhhoA/97w9BMU4a','C',TRUE, 'A26LauraDT'), -- 'passLaura6'
+(7,'77777777G','Sergio','Navarro','Gómez','sergio.navarro@example.com','$2a$12$EPgcESnWL7OsnC1.UZFXG.8XmOAhOcvneZ4hxB2T1LW5Hrlkdmd6K','L',TRUE, 'A26SergioNG'), -- 'passSergio7'
+(8,'88888888H','Marta','Ortega','Sanz','marta.ortega@example.com','$2a$12$KNATn4SgqWMGLeWslb6X.efq3fVfCwun5KK1WdCAt/zRLL0Hu47tu','E',TRUE, 'A26MartaOS'), -- 'passMarta8'
+(9,'99999999I','Isabel','Soto','Molina','isabel.soto@example.com','$2a$12$/UBIdLCHlTEf0uYeMCkr5uNOSc748opIH4KgmJtbtL/lECbThbDXG','E',TRUE, 'A26IsabelSM'), -- 'passIsabel9'
+(10,'00000000J','David','Giménez','Ruano','david.gimenez@example.com','$2a$12$8e4NOBwwIqe05x4HjOG03uSh60G7xXHkYlpowJ0E6m.l.wN.dh0.S','P',TRUE, 'A26DavidGR'); -- 'passDavid10'
 
 -- Usuarios de prueba adicionales para tests de inicio de sesión
 -- id 11: cuenta desactivada (para probar mensaje de cuenta desactivada)
 -- id 12: contraseña vacía (para probar validaciones de formulario)
 -- id 13: conserje de prueba (para probar la restricción de acceso de conserjes)
-INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, Tipo, estado) VALUES
-(11,'12121212K','Bloqueado','Usuario','Test','bloqueado.usuario@example.com','passBloq11','E',FALSE),
-(12,'13131313L','NoPass','Usuario','Test','nopass.usuario@example.com','','E',TRUE),
-(13,'14141414M','ConserjePrueba','Soler','Márquez','conserje@example.com','conserje123','C',TRUE);
+INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, Tipo, estado, usuario) VALUES
+(11,'12121212K','Bloqueado','Usuario','Test','bloqueado.usuario@example.com','$2a$12$dDkRkPkDuVEJCHEcxtAoRu3zhfqbSUWxi7O5eVezHSry//gI8WLr2','E',FALSE, 'A26BloqueadoUT'), -- 'passBloqueado11'
+(12,'13131313L','NoPass','Usuario','Test','nopass.usuario@example.com','$2a$12$o4hg0Gsr.bNTrUpjSuWufeE7Z0Y4JJYFCIHVD.cSWo4cXRnO3D7BS','E',TRUE, 'A26NoPassUT'), -- 'passNoPass12'
+(13,'14141414M','ConserjePrueba','Soler','Márquez','conserje@example.com','$2a$12$0zQEDNshTTW5Lizjwk8cke105inyswZyc05bjWFBwKY96BHz5VDp2','C',TRUE, 'A26ConserjePM'); -- 'passConserje13'
 
 -- Préstamos (algunos abiertos, algunos cerrados)
 INSERT INTO prestamos (id, id_usuario, id_ejemplar, fecha_inicio, fecha_fin, estado) VALUES

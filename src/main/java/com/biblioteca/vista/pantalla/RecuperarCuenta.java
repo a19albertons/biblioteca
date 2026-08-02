@@ -165,7 +165,7 @@ public class RecuperarCuenta {
                     return;
                 }
                 // Simular envío de correo y volver al inicio de sesión
-                // En un mundo bonito habría un plugin que mandaría tal correo
+                // Aquí se agregaría la lógica real de envío de correo electrónico (en este caso queda como placeholder)
                 JOptionPane.showMessageDialog(version,
                         "Debería haber recibido un correo electronico con su contraseña.",
                         "Recuperar cuenta", JOptionPane.INFORMATION_MESSAGE);
