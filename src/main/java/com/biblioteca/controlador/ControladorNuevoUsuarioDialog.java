@@ -67,8 +67,8 @@ public class ControladorNuevoUsuarioDialog {
             // Crear string de usuario (login) a partir del nombre y apellido1
             LocalDate fechaActual = LocalDate.now();
             String fecha2digitos = fechaActual.format(DateTimeFormatter.ofPattern("yy"));
-            String apellido1Formateado = apellido1.substring(0, 0).toUpperCase();
-            String apellido2Formateado = apellido2.substring(0, 0).toUpperCase();
+            String apellido1Formateado = apellido1.isEmpty() ? "" : apellido1.substring(0, 1).toUpperCase();
+            String apellido2Formateado = apellido2.isEmpty() ? "" : apellido2.substring(0, 1).toUpperCase();
             String usuarioConsultar = "A"+fecha2digitos+nombre.trim().toUpperCase().charAt(0)+nombre.trim().substring(1)+apellido1Formateado+apellido2Formateado;
 
 
