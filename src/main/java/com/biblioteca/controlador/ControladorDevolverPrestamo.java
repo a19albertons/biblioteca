@@ -276,8 +276,10 @@ public class ControladorDevolverPrestamo {
                         }
 
                         try {
-                            String finOriginal = sancionActiva.getFinSancion();
-                            if (finOriginal != null && !finOriginal.isEmpty()) {
+                            // Mira si hay sanción previa 
+                            if (sancionActiva != null && sancionActiva.getFinSancion() != null
+                                    && !sancionActiva.getFinSancion().isEmpty()) {
+                                String finOriginal = sancionActiva.getFinSancion();
                                 LocalDate finAct = LocalDate.parse(finOriginal);
                                 LocalDate finNuevo = finSancion;
                                 if (finNuevo.isAfter(finAct)) {
@@ -286,7 +288,8 @@ public class ControladorDevolverPrestamo {
                                 } else {
                                     ultimaNotificacionSancion = "La sanción permanece sin cambios a " + finAct;
                                 }
-                            } else {
+                            }
+                            else {
                                 ultimaNotificacionSancion = "Se ha aplicado una nueva sanción hasta " + finSancion;
                             }
                         } catch (Exception e) {
