@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import com.biblioteca.controlador.Controlador;
@@ -102,7 +103,7 @@ public class InicioSesion {
         contrasenaLabel.setFont(contrasenaLabel.getFont().deriveFont(Font.PLAIN));
         login.add(contrasenaLabel);
 
-        JTextField contrasenaField = new JTextField();
+        JPasswordField contrasenaField = new JPasswordField();
         contrasenaField.setBounds(30, 150, 240, 35);
         login.add(contrasenaField);
 
@@ -140,9 +141,9 @@ public class InicioSesion {
         btnAcceder.addActionListener(e -> {
             // Logica de backend para iniciar sesion
             // Se comprueban los 2 campos del formulario
-            if (!usuarioField.getText().trim().isEmpty() && !contrasenaField.getText().trim().isEmpty()) {
+            if (!usuarioField.getText().trim().isEmpty() && !String.valueOf(contrasenaField.getPassword()).trim().isEmpty()) {
                 // Invocamos al usuario desde el controlador
-                Usuario usuario = controlador.getControladorInicioSesion().iniciarSesion(usuarioField.getText().trim(), contrasenaField.getText().trim());
+                Usuario usuario = controlador.getControladorInicioSesion().iniciarSesion(usuarioField.getText().trim(), String.valueOf(contrasenaField.getPassword()).trim());
                 // Comprobar si el usuario es null (credenciales incorrectas)
                 if (controlador.getControladorLogin().usuarioNoValido(usuario)) {
                     JOptionPane.showMessageDialog(version, "Usuario o contraseña incorrectos.", "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
