@@ -1,0 +1,6 @@
+# La conexión a la bd
+mysql.url = tu localhost o servicio web (ej. jdbc:mysql://localhost:3306/biblioteca)
+# El usuario de la bd
+mysql.user = usuario
+# La contraseña
+mysql.password = contraseña

@@ -13,7 +13,7 @@ create table
            Ejemplo: A25JuanLP -> 'A' + 25 (año 2025) + Nombre (Juan) + 1ª letra apellido1 (L) + 1ª letra apellido2 (P) */
         usuario varchar(100) NOT NULL DEFAULT '' UNIQUE,
         email varchar(100) NOT NULL UNIQUE,
-        contrasena varchar(50) NOT NULL,
+        contrasena varchar(255) NOT NULL,
         /* E=Estudiante, P=Profesor, A=Administrativo, C=Conserje, L=Limpiador */
         tipo char(1) NOT NULL CHECK (Tipo IN ('E', 'P', 'A', 'C', 'L')),
         estado Boolean NOT NULL DEFAULT TRUE /* TRUE=activo, FALSE=desactivado */
@@ -153,37 +153,6 @@ create table
         FOREIGN KEY (id_autor) REFERENCES autores (id)
     );
 
-/* Triggers para generar el campo usuario según el formato AYYNombreIJ */
-DROP TRIGGER IF EXISTS usuarios_before_insert;
-DROP TRIGGER IF EXISTS usuarios_before_update;
-
-DELIMITER $$
-CREATE TRIGGER usuarios_before_insert
-BEFORE INSERT ON usuarios
-FOR EACH ROW
-BEGIN
-  SET NEW.usuario = CONCAT(
-    'A',
-    RIGHT(YEAR(CURDATE()), 2),
-    NEW.nombre,
-    COALESCE(SUBSTRING(NEW.apellido1,1,1), ''),
-    COALESCE(SUBSTRING(NEW.apellido2,1,1), '')
-  );
-END$$
-
-CREATE TRIGGER usuarios_before_update
-BEFORE UPDATE ON usuarios
-FOR EACH ROW
-BEGIN
-  SET NEW.usuario = CONCAT(
-    'A',
-    RIGHT(YEAR(CURDATE()), 2),
-    NEW.nombre,
-    COALESCE(SUBSTRING(NEW.apellido1,1,1), ''),
-    COALESCE(SUBSTRING(NEW.apellido2,1,1), '')
-  );
-END$$
-DELIMITER ;
 
 -- ==========================
 -- Datos de prueba / Población
@@ -229,12 +198,12 @@ INSERT INTO autores (id, nombre, nacionalidad) VALUES
 
 -- Publicaciones (libros = 'l', revistas = 'r')
 INSERT INTO publicaciones (id, titulo, editorial, codigo_isbn, idioma, tipo, estado) VALUES
-(1,'Introducción a la Programación con Java','Editorial Edu','978-1-23456-789-0','Español','l',TRUE),
-(2,'SQL Avanzado y Optimización','Editorial Datos','978-1-23456-789-1','Español','l',TRUE),
-(3,'Revista Tecnología Educativa Vol.1','Revista Edu','RV-2024-001','Español','r',TRUE),
-(4,'Redes y Comunicaciones 5ª Ed.','RedesPress','978-1-23456-789-2','Español','l',TRUE),
-(5,'Desarrollo Web Moderno','WebBooks','978-1-23456-789-3','Español','l',TRUE),
-(6,'Revista Sistemas y Seguridad Vol.3','Revista Sistemas','RV-2025-003','Español','r',TRUE);
+(1,'Introducción a la Programación con Java','Editorial Edu','978-1-23456-789-0','Español','L',TRUE),
+(2,'SQL Avanzado y Optimización','Editorial Datos','978-1-23456-789-1','Español','L',TRUE),
+(3,'Revista Tecnología Educativa Vol.1','Revista Edu','RV-2024-001','Español','R',TRUE),
+(4,'Redes y Comunicaciones 5ª Ed.','RedesPress','978-1-23456-789-2','Español','L',TRUE),
+(5,'Desarrollo Web Moderno','WebBooks','978-1-23456-789-3','Español','L',TRUE),
+(6,'Revista Sistemas y Seguridad Vol.3','Revista Sistemas','RV-2025-003','Español','R',TRUE);
 
 -- Libros (detalles para tipo 'l')
 INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES
@@ -262,26 +231,26 @@ INSERT INTO ejemplares (id, id_publicacion, num_ejemplar, fecha_adquisicion, est
 (10,1,3,'2024-09-12',TRUE);
 
 -- Usuarios (estudiante E, profesores P, administrativo A, conserje C, limpiador L)
-INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, Tipo, estado) VALUES
-(1,'11111111A','Juan','Pérez','García','juan.perez@example.com','passJuan1','E',TRUE),
-(2,'22222222B','Lucía','Martínez','Sánchez','lucia.martinez@example.com','passLucia2','E',TRUE),
-(3,'33333333C','Miguel','López','Pena','miguel.lopez@example.com','passMiguel3','P',TRUE),
-(4,'44444444D','Ana','García','Ramírez','ana.garcia@example.com','passAna4','P',TRUE),
-(5,'55555555E','Carlos','Ruiz','Fernández','carlos.ruiz@example.com','passCarlos5','A',TRUE),
-(6,'66666666F','Laura','Díaz','Torres','laura.conserje@example.com','passLaura6','C',TRUE),
-(7,'77777777G','Sergio','Navarro','Gómez','sergio.navarro@example.com','passSergio7','L',TRUE),
-(8,'88888888H','Marta','Ortega','Sanz','marta.ortega@example.com','passMarta8','E',TRUE),
-(9,'99999999I','Isabel','Soto','Molina','isabel.soto@example.com','passIsabel9','E',TRUE),
-(10,'00000000J','David','Giménez','Ruano','david.gimenez@example.com','passDavid10','P',TRUE);
+INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, Tipo, estado, usuario) VALUES
+(1,'11111111A','Juan','Pérez','García','juan.perez@example.com','$2a$12$yfxBboulQQyTqKXQDIiJo.X0kfYwOoO3Rjm3kslQ3X1YxFn.aQJy2','E',TRUE, 'A26JuanPG'), -- 'passJuan1'
+(2,'22222222B','Lucía','Martínez','Sánchez','lucia.martinez@example.com','$2a$12$HeD4FKCtItEIffPZzAMYse3hBezBzh75h.M0pWA/Xu.4ZW5j26XIK','E',TRUE, 'A26LuciaMS'), -- 'passLucia2'
+(3,'33333333C','Miguel','López','Pena','miguel.lopez@example.com','$2a$12$32lPK0/dTKqq5H5iZFk4iOMcQOXhN69oJAaT.9YL.uBMKum6eNHy.','P',TRUE, 'A26MiguelLP'), -- 'passMiguel3'
+(4,'44444444D','Ana','García','Ramírez','ana.garcia@example.com','$2a$12$AHagIxJCtEEUmRxpaoa9ouFyxChL9nz3wLgq34bxYPsR2vjldxltG','P',TRUE, 'A26AnaGR'), -- 'passAna4'
+(5,'55555555E','Carlos','Ruiz','Fernández','carlos.ruiz@example.com','$2a$12$F5YpQQPa3jCvtOgILcMF/.Al7fi0TORRodc.7eNi2TiD3pNn/GNTm','A',TRUE, 'A26CarlosRF'), -- 'passCarlos5'
+(6,'66666666F','Laura','Díaz','Torres','laura.conserje@example.com','$2a$12$O2fxiGfAu8sW8bXFUqMz5ODzQ2hOkkcjRF.3b9uhhoA/97w9BMU4a','C',TRUE, 'A26LauraDT'), -- 'passLaura6'
+(7,'77777777G','Sergio','Navarro','Gómez','sergio.navarro@example.com','$2a$12$EPgcESnWL7OsnC1.UZFXG.8XmOAhOcvneZ4hxB2T1LW5Hrlkdmd6K','L',TRUE, 'A26SergioNG'), -- 'passSergio7'
+(8,'88888888H','Marta','Ortega','Sanz','marta.ortega@example.com','$2a$12$KNATn4SgqWMGLeWslb6X.efq3fVfCwun5KK1WdCAt/zRLL0Hu47tu','E',TRUE, 'A26MartaOS'), -- 'passMarta8'
+(9,'99999999I','Isabel','Soto','Molina','isabel.soto@example.com','$2a$12$/UBIdLCHlTEf0uYeMCkr5uNOSc748opIH4KgmJtbtL/lECbThbDXG','E',TRUE, 'A26IsabelSM'), -- 'passIsabel9'
+(10,'00000000J','David','Giménez','Ruano','david.gimenez@example.com','$2a$12$8e4NOBwwIqe05x4HjOG03uSh60G7xXHkYlpowJ0E6m.l.wN.dh0.S','P',TRUE, 'A26DavidGR'); -- 'passDavid10'
 
 -- Usuarios de prueba adicionales para tests de inicio de sesión
 -- id 11: cuenta desactivada (para probar mensaje de cuenta desactivada)
 -- id 12: contraseña vacía (para probar validaciones de formulario)
 -- id 13: conserje de prueba (para probar la restricción de acceso de conserjes)
-INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, Tipo, estado) VALUES
-(11,'12121212K','Bloqueado','Usuario','Test','bloqueado.usuario@example.com','passBloq11','E',FALSE),
-(12,'13131313L','NoPass','Usuario','Test','nopass.usuario@example.com','','E',TRUE),
-(13,'14141414M','ConserjePrueba','Soler','Márquez','conserje@example.com','conserje123','C',TRUE);
+INSERT INTO usuarios (id, dni, nombre, apellido1, apellido2, email, contrasena, Tipo, estado, usuario) VALUES
+(11,'12121212K','Bloqueado','Usuario','Test','bloqueado.usuario@example.com','$2a$12$dDkRkPkDuVEJCHEcxtAoRu3zhfqbSUWxi7O5eVezHSry//gI8WLr2','E',FALSE, 'A26BloqueadoUT'), -- 'passBloqueado11'
+(12,'13131313L','NoPass','Usuario','Test','nopass.usuario@example.com','$2a$12$o4hg0Gsr.bNTrUpjSuWufeE7Z0Y4JJYFCIHVD.cSWo4cXRnO3D7BS','E',TRUE, 'A26NoPassUT'), -- 'passNoPass12'
+(13,'14141414M','ConserjePrueba','Soler','Márquez','conserje@example.com','$2a$12$0zQEDNshTTW5Lizjwk8cke105inyswZyc05bjWFBwKY96BHz5VDp2','C',TRUE, 'A26ConserjePM'); -- 'passConserje13'
 
 -- Préstamos (algunos abiertos, algunos cerrados)
 INSERT INTO prestamos (id, id_usuario, id_ejemplar, fecha_inicio, fecha_fin, estado) VALUES
@@ -348,12 +317,12 @@ INSERT INTO autores (id, nombre, nacionalidad) VALUES
 
 -- Nuevas publicaciones (libros y revistas)
 INSERT INTO publicaciones (id, titulo, editorial, codigo_isbn, idioma, tipo, estado) VALUES
-(7,'Python Avanzado: Buenas prácticas','Editorial Py','978-1-23456-789-4','Español','l',TRUE),
-(8,'Internet de las Cosas: Diseño y Prácticas','IoTPress','978-1-23456-789-5','Español','l',TRUE),
-(9,'Revista IA Aplicada Vol.2','Revista IA','RV-2025-010','Español','r',TRUE),
-(10,'Bases de Datos NoSQL','NoSQL Books','978-1-23456-789-6','Español','l',TRUE),
-(11,'Desarrollo Mobile en Android','MovilPress','978-1-23456-789-7','Español','l',TRUE),
-(12,'Revista Seguridad Informática Vol.4','Revista Security','RV-2025-020','Español','r',TRUE);
+(7,'Python Avanzado: Buenas prácticas','Editorial Py','978-1-23456-789-4','Español','L',TRUE),
+(8,'Internet de las Cosas: Diseño y Prácticas','IoTPress','978-1-23456-789-5','Español','L',TRUE),
+(9,'Revista IA Aplicada Vol.2','Revista IA','RV-2025-010','Español','R',TRUE),
+(10,'Bases de Datos NoSQL','NoSQL Books','978-1-23456-789-6','Español','L',TRUE),
+(11,'Desarrollo Mobile en Android','MovilPress','978-1-23456-789-7','Español','L',TRUE),
+(12,'Revista Seguridad Informática Vol.4','Revista Security','RV-2025-020','Español','R',TRUE);
 
 -- Detalles para libros
 INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES
@@ -404,7 +373,7 @@ INSERT INTO prestamos (id, id_usuario, id_ejemplar, fecha_inicio, fecha_fin, est
 (13,9,19,'2025-12-08','2025-12-22',TRUE);
 -- Publicación nueva sin ejemplares asociados
 INSERT INTO publicaciones (id, titulo, editorial, codigo_isbn, idioma, tipo, estado) VALUES
-(13,'Introducción a Rust: programación segura','Rust Press','978-1-23456-789-8','Español','l',TRUE);
+(13,'Introducción a Rust: programación segura','Rust Press','978-1-23456-789-8','Español','L',TRUE);
 
 -- Detalle de libro (no se crean ejemplares para esta publicación)
 INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES
