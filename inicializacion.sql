@@ -198,12 +198,12 @@ INSERT INTO autores (id, nombre, nacionalidad) VALUES
 
 -- Publicaciones (libros = 'l', revistas = 'r')
 INSERT INTO publicaciones (id, titulo, editorial, codigo_isbn, idioma, tipo, estado) VALUES
-(1,'Introducción a la Programación con Java','Editorial Edu','978-1-23456-789-0','Español','l',TRUE),
-(2,'SQL Avanzado y Optimización','Editorial Datos','978-1-23456-789-1','Español','l',TRUE),
-(3,'Revista Tecnología Educativa Vol.1','Revista Edu','RV-2024-001','Español','r',TRUE),
-(4,'Redes y Comunicaciones 5ª Ed.','RedesPress','978-1-23456-789-2','Español','l',TRUE),
-(5,'Desarrollo Web Moderno','WebBooks','978-1-23456-789-3','Español','l',TRUE),
-(6,'Revista Sistemas y Seguridad Vol.3','Revista Sistemas','RV-2025-003','Español','r',TRUE);
+(1,'Introducción a la Programación con Java','Editorial Edu','978-1-23456-789-0','Español','L',TRUE),
+(2,'SQL Avanzado y Optimización','Editorial Datos','978-1-23456-789-1','Español','L',TRUE),
+(3,'Revista Tecnología Educativa Vol.1','Revista Edu','RV-2024-001','Español','R',TRUE),
+(4,'Redes y Comunicaciones 5ª Ed.','RedesPress','978-1-23456-789-2','Español','L',TRUE),
+(5,'Desarrollo Web Moderno','WebBooks','978-1-23456-789-3','Español','L',TRUE),
+(6,'Revista Sistemas y Seguridad Vol.3','Revista Sistemas','RV-2025-003','Español','R',TRUE);
 
 -- Libros (detalles para tipo 'l')
 INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES
@@ -317,12 +317,12 @@ INSERT INTO autores (id, nombre, nacionalidad) VALUES
 
 -- Nuevas publicaciones (libros y revistas)
 INSERT INTO publicaciones (id, titulo, editorial, codigo_isbn, idioma, tipo, estado) VALUES
-(7,'Python Avanzado: Buenas prácticas','Editorial Py','978-1-23456-789-4','Español','l',TRUE),
-(8,'Internet de las Cosas: Diseño y Prácticas','IoTPress','978-1-23456-789-5','Español','l',TRUE),
-(9,'Revista IA Aplicada Vol.2','Revista IA','RV-2025-010','Español','r',TRUE),
-(10,'Bases de Datos NoSQL','NoSQL Books','978-1-23456-789-6','Español','l',TRUE),
-(11,'Desarrollo Mobile en Android','MovilPress','978-1-23456-789-7','Español','l',TRUE),
-(12,'Revista Seguridad Informática Vol.4','Revista Security','RV-2025-020','Español','r',TRUE);
+(7,'Python Avanzado: Buenas prácticas','Editorial Py','978-1-23456-789-4','Español','L',TRUE),
+(8,'Internet de las Cosas: Diseño y Prácticas','IoTPress','978-1-23456-789-5','Español','L',TRUE),
+(9,'Revista IA Aplicada Vol.2','Revista IA','RV-2025-010','Español','R',TRUE),
+(10,'Bases de Datos NoSQL','NoSQL Books','978-1-23456-789-6','Español','L',TRUE),
+(11,'Desarrollo Mobile en Android','MovilPress','978-1-23456-789-7','Español','L',TRUE),
+(12,'Revista Seguridad Informática Vol.4','Revista Security','RV-2025-020','Español','R',TRUE);
 
 -- Detalles para libros
 INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES
@@ -373,7 +373,7 @@ INSERT INTO prestamos (id, id_usuario, id_ejemplar, fecha_inicio, fecha_fin, est
 (13,9,19,'2025-12-08','2025-12-22',TRUE);
 -- Publicación nueva sin ejemplares asociados
 INSERT INTO publicaciones (id, titulo, editorial, codigo_isbn, idioma, tipo, estado) VALUES
-(13,'Introducción a Rust: programación segura','Rust Press','978-1-23456-789-8','Español','l',TRUE);
+(13,'Introducción a Rust: programación segura','Rust Press','978-1-23456-789-8','Español','L',TRUE);
 
 -- Detalle de libro (no se crean ejemplares para esta publicación)
 INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES
