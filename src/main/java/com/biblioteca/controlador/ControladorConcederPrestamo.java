@@ -80,14 +80,19 @@ public class ControladorConcederPrestamo {
             // editorial, num_edicion, fecha_publicacion, autores, periodicidad, id
             String tipo = detallesPub.getTipoPublicacion().name();
             String titulo = detallesPub.getTitulo();
-            String numEdicion = detallesPub.getNumEdicion();
+            int numEdicion;
+            try {
+                numEdicion = Integer.parseInt(detallesPub.getNumEdicion());
+            } catch (Exception e) {
+                numEdicion = 0; // si no hay numEdicion, poner 0
+            }
             resultado = new EjemplarConTituloDTO(
                     ejemplar.getId(),
                     ejemplar.getIdPublicacion(),
                     ejemplar.getNumEjemplar(),
                     ejemplar.getEstado(),
                     titulo,
-                    Integer.parseInt(numEdicion),
+                    numEdicion,
                     TipoPublicacion.valueOf(tipo));
         } catch (Exception e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
