@@ -69,7 +69,9 @@ public class ControladorSancionManual {
 
                 // Validamos que la sanción sea para el usuario que tiene el último préstamo del
                 // ejemplar
-                if (ultimoPrestamo.getIdUsuario() != idUsuario) {
+                if (ultimoPrestamo == null) {
+                    return "Error: No se encontró un préstamo para el ejemplar seleccionado";
+                } else if (ultimoPrestamo.getIdUsuario() != idUsuario) {
                     return "Error: El usuario seleccionado no es el último en tener el ejemplar";
                 }
 
