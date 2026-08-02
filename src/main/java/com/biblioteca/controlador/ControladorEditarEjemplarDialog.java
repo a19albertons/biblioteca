@@ -73,6 +73,10 @@ public class ControladorEditarEjemplarDialog {
 
                 // Recuperar estado actual del ejemplar para preservarlo
                 EstadoEjemplarDTO detalles = dao.obtenerEjemplarPorId(idEjemplar);
+                if (detalles == null) {
+                    System.out.println("No se encontró el ejemplar con id: " + idEjemplar);
+                    return false;
+                }
                 boolean estadoActual = true; // Por defecto activo
                 estadoActual = "DISPONIBLE".equals(detalles.getEstado());
 
