@@ -133,7 +133,7 @@ public class DevolverPrestamo {
         publicacion.setBounds(230, 250, 300, 35);
         contenido.add(publicacion);
 
-        JLabel txtPublicacion = new JLabel("Detectado: Estructura de Datos (Ed. 2)");
+        JLabel txtPublicacion = new JLabel();
         txtPublicacion.setBounds(230, 280, 260, 35);
         txtPublicacion.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 0, Color.white));
         contenido.add(txtPublicacion);
