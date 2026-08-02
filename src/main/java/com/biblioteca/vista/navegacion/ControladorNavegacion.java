@@ -1,4 +1,4 @@
-package com.biblioteca.vista.navegación;
+package com.biblioteca.vista.navegacion;
 
 import java.awt.CardLayout;
 import java.sql.Connection;

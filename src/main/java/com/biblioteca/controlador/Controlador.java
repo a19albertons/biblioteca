@@ -1,7 +1,7 @@
 package com.biblioteca.controlador;
 
 import com.biblioteca.conexiones.DBConnection;
-import com.biblioteca.vista.navegación.ControladorNavegacion;
+import com.biblioteca.vista.navegacion.ControladorNavegacion;
 
 /**
  * Controlador principal de la aplicación
