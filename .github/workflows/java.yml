@@ -18,6 +18,8 @@ jobs:
         name: Análisis estático del código
         runs-on: ubuntu-24.04
         strategy:
+            # Política ante fallos
+            fail-fast: false
             # Matriz de acciones de análisis estático
             matrix:
                 include:
