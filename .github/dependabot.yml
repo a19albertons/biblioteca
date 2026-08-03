@@ -1,0 +1,15 @@
+version: 2
+updates:
+  # Control sobre las dependencias de Maven
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: "desarrollo"
+    schedule:
+      interval: "daily"
+  
+  # Control sobre las dependencias de Docker Compose
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    target-branch: "desarrollo"
+    schedule:
+      interval: "daily"
