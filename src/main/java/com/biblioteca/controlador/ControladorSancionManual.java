@@ -30,14 +30,24 @@ public class ControladorSancionManual {
      * 
      * @param dbConnection
      */
-    public ControladorSancionManual(DBConnection dbConnection) {
+    public ControladorSancionManual(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
         this.dbConnection = dbConnection;
     }
 
-    public String aplicarSancionManual(int idUsuario, int idEjemplar, String finSancionString, String descripcion) {
+    /**
+     * Aplica una sanción manual al usuario del ejemplar especificado.
+     * 
+     * @param idUsuario        ID del usuario seleccionado
+     * @param idEjemplar       ID del ejemplar al que se aplica la sanción
+     * @param finSancionString Fecha final de la sanción en formato YYYY-MM-DD
+     * @param descripcion      Descripción de la sanción
+     * @return null en caso de éxito, mensaje de error en caso de fallo
+     */
+    public final String aplicarSancionManual(final int idUsuario, final int idEjemplar, final String finSancionString,
+            final String descripcion) {
         // Validar usuario seleccionado
         if (idUsuario == -1) {
             JOptionPane.showMessageDialog(null, "Seleccione primero un usuario", "Error",
@@ -129,12 +139,8 @@ public class ControladorSancionManual {
                 } catch (SQLException e) {
                     System.out.println("Error al restaurar auto-commit: " + e.getMessage());
                 }
-
-            }
-
-        }
-        // comprobar que el usuario fue el ultimo en tener el ejemplar
-        catch (SQLException e) {
+            } // comprobar que el usuario fue el ultimo en tener el ejemplar
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return "Error: " + e.getMessage();
         }

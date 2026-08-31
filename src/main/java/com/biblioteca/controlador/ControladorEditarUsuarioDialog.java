@@ -18,9 +18,9 @@ public class ControladorEditarUsuarioDialog {
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
      * 
-     * @param dbConnection
+     * @param dbConnection la conexión a la base de datos
      */
-    public ControladorEditarUsuarioDialog(DBConnection dbConnection) {
+    public ControladorEditarUsuarioDialog(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -28,10 +28,13 @@ public class ControladorEditarUsuarioDialog {
     }
 
     /**
-     * Obtiene los detalles de un usuario por id.
-     * Devuelve un array con: dni, nombre, apellido1, apellido2, email, tipo, id
-     */
-    public String[] obtenerDetallesUsuario(int idUsuario) {
+      * Obtiene los detalles de un usuario por id.
+      * Devuelve un array con: dni, nombre, apellido1, apellido2, email, tipo, id
+      * 
+      * @param idUsuario identificador único del usuario
+      * @return los detalles del usuario en formato array de strings
+      */
+    public String[] obtenerDetallesUsuario(final int idUsuario) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -47,9 +50,19 @@ public class ControladorEditarUsuarioDialog {
 
     /**
      * Actualiza los datos del usuario (no cambia la contraseña ni el estado)
+     * 
+     * @param idUsuario identificador único del usuario
+     * @param dni       número de identidad del usuario
+     * @param nombre    nombre del usuario
+     * @param apellido1 apellido del usuario
+     * @param apellido2 segundo apellido del usuario
+     * @param email     correo electrónico del usuario
+     * @param tipo      tipo de usuario
+     * @return true si la actualización fue exitosa, false en caso de error
      */
-    public boolean editarUsuario(int idUsuario, String dni, String nombre, String apellido1, String apellido2,
-            String email, String tipo) {
+    public boolean editarUsuario(final int idUsuario, final String dni, final String nombre, final String apellido1,
+            final String apellido2,
+            final String email, final String tipo) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");

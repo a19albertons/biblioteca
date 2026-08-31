@@ -20,7 +20,7 @@ public class ControladorGestionUsuarios {
      * 
      * @param dbConnection
      */
-    public ControladorGestionUsuarios(DBConnection dbConnection) {
+    public ControladorGestionUsuarios(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }

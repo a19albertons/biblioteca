@@ -20,11 +20,12 @@ public class ControladorNuevoEjemplarDialog {
     private final DBConnection dbConnection;
 
     /**
-     * 
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
+     *
+     * @param dbConnection la conexión a la base de datos
      */
-    public ControladorNuevoEjemplarDialog(DBConnection dbConnection) {
+    public ControladorNuevoEjemplarDialog(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -37,11 +38,11 @@ public class ControladorNuevoEjemplarDialog {
      * Esta operación es transaccional y calcula el siguiente número de ejemplar
      * para la publicación.
      *
-     * @param idPublicacion
+     * @param idPublicacion    ID de la publicación
      * @param fechaAdquisicion fecha de adquisición (java.time.LocalDate)
      * @return true si la inserción fue satisfactoria
      */
-    public boolean crearEjemplar(int idPublicacion, LocalDate fechaAdquisicion) {
+    public boolean crearEjemplar(final int idPublicacion, final LocalDate fechaAdquisicion) {
 
         // Obtener conexión a la base de datos
         try (Connection conexion = this.dbConnection.getConnection()) {

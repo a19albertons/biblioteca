@@ -29,9 +29,9 @@ public class ControladorNuevaPublicacionDialog {
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
      * 
-     * @param dbConnection
+     * @param dbConnection DBConnection para conexiones a la base de datos
      */
-    public ControladorNuevaPublicacionDialog(DBConnection dbConnection) {
+    public ControladorNuevaPublicacionDialog(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -55,8 +55,10 @@ public class ControladorNuevaPublicacionDialog {
      * @param autoresCsv  lista de autores separados por comas
      * @return true si la creación fue satisfactoria y commit realizado
      */
-    public boolean crearPublicacionLibro(String isbn, String titulo, String idioma, String temasCsv, String modulosCsv,
-            String ciclosCsv, String editorial, int numEdicion, LocalDate fechaPublic, String autoresCsv) {
+    public boolean crearPublicacionLibro(final String isbn, final String titulo, final String idioma,
+            final String temasCsv, final String modulosCsv,
+            final String ciclosCsv, final String editorial, final int numEdicion, final LocalDate fechaPublic,
+            final String autoresCsv) {
 
         // Generar conexión a la base de datos
         try (Connection conexion = this.dbConnection.getConnection();) {
@@ -94,8 +96,9 @@ public class ControladorNuevaPublicacionDialog {
                     String[] autores = autoresCsv.split(",");
                     for (String a : autores) {
                         String nombre = a.trim();
-                        if (nombre.isEmpty())
+                        if (nombre.isEmpty()) {
                             continue;
+                        }
                         int idAutor = autorDAO.obtenerOCrearPorNombre(nombre);
                         if (idAutor == -1) {
                             conexion.rollback();
@@ -113,8 +116,9 @@ public class ControladorNuevaPublicacionDialog {
                     String[] modulos = modulosCsv.split(",");
                     for (String m : modulos) {
                         String nombre = m.trim();
-                        if (nombre.isEmpty())
+                        if (nombre.isEmpty()) {
                             continue;
+                        }
                         int idModulo = moduloDAO.obtenerOCrear(nombre);
                         if (idModulo == -1) {
                             conexion.rollback();
@@ -132,8 +136,9 @@ public class ControladorNuevaPublicacionDialog {
                     String[] ciclos = ciclosCsv.split(",");
                     for (String cc : ciclos) {
                         String nombre = cc.trim();
-                        if (nombre.isEmpty())
+                        if (nombre.isEmpty()) {
                             continue;
+                        }
                         int idCiclo = cicloDAO.obtenerOCrear(nombre);
                         if (idCiclo == -1) {
                             conexion.rollback();
@@ -151,8 +156,9 @@ public class ControladorNuevaPublicacionDialog {
                     String[] temas = temasCsv.split(",");
                     for (String t : temas) {
                         String nombre = t.trim();
-                        if (nombre.isEmpty())
+                        if (nombre.isEmpty()) {
                             continue;
+                        }
                         int idTema = temaDAO.obtenerOCrear(conexion, nombre);
                         if (idTema == -1) {
                             conexion.rollback();
@@ -206,8 +212,9 @@ public class ControladorNuevaPublicacionDialog {
      * @param periodicidad texto de periodicidad
      * @return true si la creación fue satisfactoria y commit realizado
      */
-    public boolean crearPublicacionRevista(String isbn, String titulo, String idioma, String temasCsv,
-            String modulosCsv, String ciclosCsv, String editorial, String periodicidad) {
+    public boolean crearPublicacionRevista(final String isbn, final String titulo, final String idioma,
+            final String temasCsv,
+            final String modulosCsv, final String ciclosCsv, final String editorial, final String periodicidad) {
         try (Connection conexion = this.dbConnection.getConnection();) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -240,8 +247,9 @@ public class ControladorNuevaPublicacionDialog {
                     String[] modulos = modulosCsv.split(",");
                     for (String m : modulos) {
                         String nombre = m.trim();
-                        if (nombre.isEmpty())
+                        if (nombre.isEmpty()) {
                             continue;
+                        }
                         int idModulo = moduloDAO.obtenerOCrear(nombre);
                         if (idModulo == -1) {
                             conexion.rollback();
@@ -259,8 +267,9 @@ public class ControladorNuevaPublicacionDialog {
                     String[] ciclos = ciclosCsv.split(",");
                     for (String cc : ciclos) {
                         String nombre = cc.trim();
-                        if (nombre.isEmpty())
+                        if (nombre.isEmpty()) {
                             continue;
+                        }
                         int idCiclo = cicloDAO.obtenerOCrear(nombre);
                         if (idCiclo == -1) {
                             conexion.rollback();
@@ -278,8 +287,9 @@ public class ControladorNuevaPublicacionDialog {
                     String[] temas = temasCsv.split(",");
                     for (String t : temas) {
                         String nombre = t.trim();
-                        if (nombre.isEmpty())
+                        if (nombre.isEmpty()) {
                             continue;
+                        }
                         int idTema = temaDAO.obtenerOCrear(conexion, nombre);
                         if (idTema == -1) {
                             conexion.rollback();
@@ -311,8 +321,7 @@ public class ControladorNuevaPublicacionDialog {
                     System.out.println("Error cerrando conexión: " + ex.getMessage());
                 }
             }
-        }
-        catch (Exception e1) {
+        } catch (Exception e1) {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
