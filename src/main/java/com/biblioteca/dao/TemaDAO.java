@@ -14,16 +14,23 @@ public class TemaDAO {
      */
     private final Connection conexion;
 
-    // SQL constants 🔧
+    /**
+     * Constante SQL para obtener el id de un tema por su nombre
+     */
     private static final String SQL_SELECT_TEMA_ID_POR_NOMBRE = "SELECT id FROM temas WHERE nombre = ?";
+
+    /**
+     * Constante SQL para insertar un nuevo tema
+     */
     private static final String SQL_INSERT_TEMA = "INSERT INTO temas (nombre) VALUES (?)";
 
     /**
      * Constructor del DAO
      * 
-     * @param conexion
+     * @param conexion la conexión a la base de datos
+     * @throws IllegalArgumentException si conexion es null
      */
-    public TemaDAO(Connection conexion) {
+    public TemaDAO(final Connection conexion) {
         if (conexion == null) {
             throw new IllegalArgumentException("Connection cannot be null");
         }
@@ -33,10 +40,10 @@ public class TemaDAO {
     /**
      * Obtiene id por nombre
      * 
-     * @param nombre
-     * @return
+     * @param nombre nombre del tema
+     * @return el id del tema o -1 si no se encuentra
      */
-    public int obtenerIdPorNombre(String nombre) {
+    public final int obtenerIdPorNombre(final String nombre) {
         try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_TEMA_ID_POR_NOMBRE)) {
             // establecer parámetro
@@ -44,8 +51,9 @@ public class TemaDAO {
 
             // ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next())
+                if (rs.next()) {
                     return rs.getInt("id");
+                }
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -57,10 +65,10 @@ public class TemaDAO {
     /**
      * Crea un tema y devuelve su id
      * 
-     * @param nombre
-     * @return
+     * @param nombre nombre del tema
+     * @return el id del tema creado o -1 si ocurre un error
      */
-    public int crearTema(String nombre) {
+    public final int crearTema(final String nombre) {
         try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_TEMA,
                         Statement.RETURN_GENERATED_KEYS)) {
@@ -70,8 +78,9 @@ public class TemaDAO {
             ps.executeUpdate();
             // obtener id generado
             try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next())
+                if (rs.next()) {
                     return rs.getInt(1);
+                }
             }
         } catch (Exception e) {
             // debug
@@ -84,27 +93,33 @@ public class TemaDAO {
     /**
      * Obtiene o crea un tema
      * 
-     * @param nombre
-     * @return
+     * @param nombre nombre del tema
+     * @return el id del tema o -1 si no se encuentra
      */
-    public int obtenerOCrear(String nombre) {
+    public final int obtenerOCrear(final String nombre) {
         int id = obtenerIdPorNombre(nombre);
-        if (id != -1)
+        if (id != -1) {
             return id;
+        }
         return crearTema(nombre);
     }
 
     /**
      * Variante que usa una Connection existente
+     * 
+     * @param conexion la conexión a la base de datos
+     * @param nombre   nombre del tema
+     * @return el id del tema o -1 si no se encuentra
      */
-    public int obtenerOCrear(Connection conexion, String nombre) {
+    public final int obtenerOCrear(final Connection conexion, final String nombre) {
         try (PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_TEMA_ID_POR_NOMBRE)) {
             // establecer parámetro
             ps.setString(1, nombre);
             // ejecutar consulta
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next())
+                if (rs.next()) {
                     return rs.getInt("id");
+                }
             }
             // Si no existe, insertamos
             try (PreparedStatement ins = conexion.prepareStatement(SQL_INSERT_TEMA,
@@ -112,8 +127,9 @@ public class TemaDAO {
                 ins.setString(1, nombre);
                 ins.executeUpdate();
                 try (ResultSet rs2 = ins.getGeneratedKeys()) {
-                    if (rs2.next())
+                    if (rs2.next()) {
                         return rs2.getInt(1);
+                    }
                 }
             }
         } catch (Exception e) {

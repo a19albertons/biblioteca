@@ -12,12 +12,22 @@ import java.util.ArrayList;
 public class CicloDAO {
     /**
      * Conexión a la base de datos
+     * 
+     * @param conexion la conexión a la base de datos
      */
     private final Connection conexion;
 
-    // SQL constants 🔧
+    /**
+     * SQL para listar todos los ciclos ordenados por nombre
+     */
     private static final String SQL_LISTA_CICLOS = "SELECT nombre FROM ciclos ORDER BY nombre ASC";
+    /**
+     * SQL para obtener el id de un ciclo por nombre
+     */
     private static final String SQL_SELECT_CICLO_ID_POR_NOMBRE = "SELECT id FROM ciclos WHERE nombre = ?";
+    /**
+     * SQL para insertar un nuevo ciclo
+     */
     private static final String SQL_INSERT_CICLO = "INSERT INTO ciclos (nombre) VALUES (?)";
 
     /**
@@ -25,7 +35,7 @@ public class CicloDAO {
      * 
      * @param conexion conexión a la base de datos (no puede ser null)
      */
-    public CicloDAO(Connection conexion) {
+    public CicloDAO(final Connection conexion) {
         if (conexion == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -35,13 +45,12 @@ public class CicloDAO {
     /**
      * Obtiene los nombres de los ciclos
      * 
-     * @return
+     * @return lista de nombres de ciclos
      */
     public String[] listaCiclos() {
         // Listado de ciclos
         ArrayList<String> devolver = new ArrayList<>();
-        try ( // Consulta SQL
-                PreparedStatement ps = conexion.prepareStatement(SQL_LISTA_CICLOS);) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_LISTA_CICLOS);) {
             // Ejecutar consulta
             try (ResultSet rs = ps.executeQuery();) {
                 while (rs.next()) {
@@ -62,9 +71,9 @@ public class CicloDAO {
      * @param nombre nombre del ciclo
      * @return id del ciclo o -1 en caso de error
      */
-    public int obtenerOCrear(String nombre) {
+    public int obtenerOCrear(final String nombre) {
         try (
-                PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_CICLO_ID_POR_NOMBRE)) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_CICLO_ID_POR_NOMBRE);) {
             // establecer parámetro
             ps.setString(1, nombre);
             // ejecutar consulta
