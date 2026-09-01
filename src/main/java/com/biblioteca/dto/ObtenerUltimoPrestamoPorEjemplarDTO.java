@@ -3,11 +3,26 @@ package com.biblioteca.dto;
 import java.sql.Date;
 
 public class ObtenerUltimoPrestamoPorEjemplarDTO {
-    private int id;
-    private int idUsuario;
-    private Date fechaInicio;
-    private Date fechaFin;
-    private boolean estado;
+    /**
+     * Identificador del préstamo.
+     */
+    private final int id;
+    /**
+     * Identificador del usuario que realizó el préstamo.
+     */
+    private final int idUsuario;
+    /**
+     * Fecha de inicio del préstamo.
+     */
+    private final Date fechaInicio;
+    /**
+     * Fecha de fin del préstamo.
+     */
+    private final Date fechaFin;
+    /**
+     * Estado del préstamo (activo o finalizado).
+     */
+    private final boolean estado;
 
     /**
      * Constructor para ObtenerUltimoPrestamoPorEjemplarDTO
@@ -18,7 +33,8 @@ public class ObtenerUltimoPrestamoPorEjemplarDTO {
      * @param fechaFin    fecha de fin del préstamo
      * @param estado      estado del préstamo (activo o finalizado)
      */
-    public ObtenerUltimoPrestamoPorEjemplarDTO(int id, int idUsuario, Date fechaInicio, Date fechaFin, boolean estado) {
+    public ObtenerUltimoPrestamoPorEjemplarDTO(final int id, final int idUsuario, final Date fechaInicio,
+            final Date fechaFin, final boolean estado) {
         this.id = id;
         this.idUsuario = idUsuario;
         this.fechaInicio = fechaInicio;

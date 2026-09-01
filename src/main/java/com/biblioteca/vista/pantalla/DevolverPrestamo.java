@@ -237,7 +237,7 @@ public class DevolverPrestamo {
             }
             // datos: id, dni, nombre_completo, sancion_activa, tipo_desc
             usuarioSeleccionado[0] = usuario.getId();
-            String estado = usuario.getSancionActiva();
+            String estado = usuario.getSancionactiva();
             String tipoDesc = usuario.getTipoUsuario().getDescripcion();
             // mostrar resultado de estado usuario
             if ("SANCIONADO".equalsIgnoreCase(estado)) {

@@ -7,11 +7,36 @@ package com.biblioteca.dto;
  * número de ejemplar, fecha de adquisición y estado actual.
  */
 public class EstadoEjemplarDTO {
-    private int id;
-    private int idPublicacion;
-    private int numEjemplar;
-    private String fechaAdquisicion;
-    private String estado;
+    /**
+     * Identificador único del ejemplar
+     * 
+     * @return identificador del ejemplar
+     */
+    private final int id;
+    /**
+     * Identificador de la publicación asociada al ejemplar
+     * 
+     * @return identificador de la publicación
+     */
+    private final int idPublicacion;
+    /**
+     * Número del ejemplar
+     * 
+     * @return número del ejemplar
+     */
+    private final int numEjemplar;
+    /**
+     * Fecha en que se adquirió el ejemplar
+     * 
+     * @return fecha de adquisición
+     */
+    private final String fechaAdquisicion;
+    /**
+     * Estado actual del ejemplar (ej. DISPONIBLE / BAJA)
+     * 
+     * @return estado del ejemplar
+     */
+    private final String estado;
 
     /**
      * Constructor para estadoEjemplarDTO
@@ -22,7 +47,8 @@ public class EstadoEjemplarDTO {
      * @param fechaAdquisicion fecha en que se adquirió el ejemplar
      * @param estado           estado actual del ejemplar ej. DISPONIBLE / BAJA
      */
-    public EstadoEjemplarDTO(int id, int idPublicacion, int numEjemplar, String fechaAdquisicion, String estado) {
+    public EstadoEjemplarDTO(final int id, final int idPublicacion, final int numEjemplar,
+            final String fechaAdquisicion, final String estado) {
         this.id = id;
         this.idPublicacion = idPublicacion;
         this.numEjemplar = numEjemplar;
@@ -32,6 +58,7 @@ public class EstadoEjemplarDTO {
 
     /**
      * Getter para el ID del ejemplar
+     * 
      * @return id del ejemplar
      */
     public int getId() {
@@ -40,6 +67,7 @@ public class EstadoEjemplarDTO {
 
     /**
      * Getter para el ID de la publicación asociada al ejemplar
+     * 
      * @return id de la publicación
      */
     public int getIdPublicacion() {
@@ -48,6 +76,7 @@ public class EstadoEjemplarDTO {
 
     /**
      * Getter para el número del ejemplar
+     * 
      * @return número del ejemplar
      */
     public int getNumEjemplar() {
@@ -56,6 +85,7 @@ public class EstadoEjemplarDTO {
 
     /**
      * Getter para la fecha de adquisición del ejemplar
+     * 
      * @return fecha de adquisición
      */
     public String getFechaAdquisicion() {
@@ -64,6 +94,7 @@ public class EstadoEjemplarDTO {
 
     /**
      * Getter para el estado del ejemplar
+     * 
      * @return estado del ejemplar
      */
     public String getEstado() {

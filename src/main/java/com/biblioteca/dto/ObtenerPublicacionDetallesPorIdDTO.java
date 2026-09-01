@@ -9,20 +9,62 @@ import com.biblioteca.modelo.TipoPublicacion;
  * periodicidad y estado.
  */
 public class ObtenerPublicacionDetallesPorIdDTO {
-    private TipoPublicacion tipoPublicacion;
-    private String titulo;
-    private String codigoISBN;
-    private String idioma;
-    private String temas;
-    private String modulos;
-    private String ciclos;
-    private String editorial;
-    private String numEdicion;
-    private String fechaPublicacion;
-    private String autores;
-    private String periodicidad;
-    private int id_publicacion;
-    private Boolean estado; // true = activo, false = baja
+    /**
+     * Campo que representa el tipo de publicación.
+     */
+    private final TipoPublicacion tipoPublicacion;
+    /**
+     * Campo que representa el título de la publicación.
+     */
+    private final String titulo;
+    /**
+     * Campo que representa el código ISBN de la publicación.
+     */
+    private final String codigoISBN;
+    /**
+     * Campo que representa el idioma de la publicación.
+     */
+    private final String idioma;
+    /**
+     * Campo que representa los temas de la publicación.
+     */
+    private final String temas;
+    /**
+     * Campo que representa los módulos de la publicación.
+     */
+    private final String modulos;
+    /**
+     * Campo que representa los ciclos de la publicación.
+     */
+    private final String ciclos;
+    /**
+     * Campo que representa la editorial de la publicación.
+     */
+    private final String editorial;
+    /**
+     * Campo que representa el número de edición de la publicación.
+     */
+    private final String numEdicion;
+    /**
+     * Campo que representa la fecha de publicación.
+     */
+    private final String fechaPublicacion;
+    /**
+     * Campo que representa los autores de la publicación.
+     */
+    private final String autores;
+    /**
+     * Campo que representa la periodicidad de la publicación.
+     */
+    private final String periodicidad;
+    /**
+     * Campo que representa el ID de la publicación.
+     */
+    private final int idpublicacion;
+    /**
+     * Campo que representa el estado de la publicación.
+     */
+    private final Boolean estado; // true = activo, false = baja
 
     /**
      * Constructor para crear un DTO de detalles de publicación por ID.
@@ -39,13 +81,15 @@ public class ObtenerPublicacionDetallesPorIdDTO {
      * @param fechaPublicacion fecha de publicación
      * @param autores          autores de la publicación
      * @param periodicidad     periodicidad de la publicación
-     * @param id_publicacion   id de la publicación
+     * @param idpublicacion    ID de la publicación
      * @param estado           estado de la publicación (true = activo, false =
      *                         baja)
      */
-    public ObtenerPublicacionDetallesPorIdDTO(TipoPublicacion tipoPublicacion, String titulo, String codigoISBN,
-            String idioma, String temas, String modulos, String ciclos, String editorial, String numEdicion,
-            String fechaPublicacion, String autores, String periodicidad, int id_publicacion, Boolean estado) {
+    public ObtenerPublicacionDetallesPorIdDTO(final TipoPublicacion tipoPublicacion, final String titulo,
+            final String codigoISBN,
+            final String idioma, final String temas, final String modulos, final String ciclos, final String editorial,
+            final String numEdicion, final String fechaPublicacion, final String autores, final String periodicidad,
+            final int idpublicacion, final Boolean estado) {
         this.tipoPublicacion = tipoPublicacion;
         this.titulo = titulo;
         this.codigoISBN = codigoISBN;
@@ -58,7 +102,7 @@ public class ObtenerPublicacionDetallesPorIdDTO {
         this.fechaPublicacion = fechaPublicacion;
         this.autores = autores;
         this.periodicidad = periodicidad;
-        this.id_publicacion = id_publicacion;
+        this.idpublicacion = idpublicacion;
         this.estado = estado;
     }
 
@@ -175,8 +219,8 @@ public class ObtenerPublicacionDetallesPorIdDTO {
      * 
      * @return ID de la publicación
      */
-    public int getId_publicacion() {
-        return id_publicacion;
+    public int getIdpublicacion() {
+        return idpublicacion;
     }
 
     /**

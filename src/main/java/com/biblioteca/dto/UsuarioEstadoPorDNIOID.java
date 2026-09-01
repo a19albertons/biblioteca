@@ -6,31 +6,49 @@ import com.biblioteca.modelo.TipoUsuario;
  * DTO para representar el estado de un usuario por DNI o ID
  */
 public class UsuarioEstadoPorDNIOID {
-    private int id;
-    private String dni;
-    private String nombreCompleto;
-    private String SancionActiva;
-    private TipoUsuario tipoUsuario;
+    /**
+     * Identificador del usuario
+     */
+    private final int id;
+    /**
+     * DNI del usuario
+     */
+    private final String dni;
+    /**
+     * Nombre completo del usuario
+     */
+    private final String nombreCompleto;
+    /**
+     * Estado de sanción del usuario
+     */
+    private final String sancionactiva;
+    /**
+     * Tipo de usuario (ej. Estudiante, Profesor, etc.)
+     */
+    private final TipoUsuario tipoUsuario;
 
     /**
      * Constructor para UsuarioEstadoPorDNIOID
-     * @param id identificador del usuario
-     * @param dni DNI del usuario
+     * 
+     * @param id             identificador del usuario
+     * @param dni            DNI del usuario
      * @param nombreCompleto nombre completo del usuario
-     * @param sancionActiva estado de sanción del usuario
-     * @param tipoUsuario tipo de usuario (ej. Estudiante, Profesor, etc.)
+     * @param sancionActiva  estado de sanción del usuario
+     * @param tipoUsuario    tipo de usuario (ej. Estudiante, Profesor, etc.)
      */
-    public UsuarioEstadoPorDNIOID(int id, String dni, String nombreCompleto, String sancionActiva,
-            TipoUsuario tipoUsuario) {
+    public UsuarioEstadoPorDNIOID(final int id, final String dni, final String nombreCompleto,
+            final String sancionActiva,
+            final TipoUsuario tipoUsuario) {
         this.id = id;
         this.dni = dni;
         this.nombreCompleto = nombreCompleto;
-        SancionActiva = sancionActiva;
+        this.sancionactiva = sancionActiva;
         this.tipoUsuario = tipoUsuario;
     }
 
     /**
      * Getter para el ID del usuario
+     * 
      * @return id del usuario
      */
     public int getId() {
@@ -39,6 +57,7 @@ public class UsuarioEstadoPorDNIOID {
 
     /**
      * Getter para el DNI del usuario
+     * 
      * @return DNI del usuario
      */
     public String getDni() {
@@ -47,6 +66,7 @@ public class UsuarioEstadoPorDNIOID {
 
     /**
      * Getter para el nombre completo del usuario
+     * 
      * @return nombre completo del usuario
      */
     public String getNombreCompleto() {
@@ -55,20 +75,19 @@ public class UsuarioEstadoPorDNIOID {
 
     /**
      * Getter para el estado de sanción del usuario
+     * 
      * @return estado de sanción del usuario (SANCIONADO/ACTIVO/BAJA)
      */
-    public String getSancionActiva() {
-        return SancionActiva;
+    public String getSancionactiva() {
+        return sancionactiva;
     }
 
     /**
      * Getter para el tipo de usuario
+     * 
      * @return tipo de usuario (ej. Estudiante, Profesor, etc.)
      */
     public TipoUsuario getTipoUsuario() {
         return tipoUsuario;
     }
-
-    
-
 }
