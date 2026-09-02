@@ -103,8 +103,10 @@ public class ControladorNavegacion {
 
     /**
      * Constructor del controlador de navegación
+     * 
+     * @param controlador Controlador principal de la aplicación
      */
-    public ControladorNavegacion(Controlador controlador) {
+    public ControladorNavegacion(final Controlador controlador) {
 
         // guardamos la conexión inyectada desde el Controlador principal
         this.dbConnection = controlador.getDbConnection();
@@ -182,18 +184,18 @@ public class ControladorNavegacion {
     /**
      * Cambia la pantalla del panel padre
      * 
-     * @param nombrePantalla
+     * @param nombrePantalla nombre de la pantalla a mostrar
      */
-    public void cambiarPantallaPadre(String nombrePantalla) {
+    public void cambiarPantallaPadre(final String nombrePantalla) {
         cardPadre.show(panelPadre, nombrePantalla);
     }
 
     /**
      * Cambia la pantalla del panel hijo
      * 
-     * @param nombrePantalla
+     * @param nombrePantalla nombre de la pantalla a mostrar
      */
-    public void cambiarPantallaHijo(String nombrePantalla) {
+    public void cambiarPantallaHijo(final String nombrePantalla) {
         // Usar el panel que contiene el CardLayout (panelPrincipal) para evitar
         // la excepción "wrong parent for CardLayout" cuando se llama a show.
         if (panelPrincipal != null) {
@@ -206,7 +208,7 @@ public class ControladorNavegacion {
      *
      * @param idPublicacion id de la publicación a mostrar
      */
-    public void mostrarEjemplaresParaPublicacion(int idPublicacion) {
+    public void mostrarEjemplaresParaPublicacion(final int idPublicacion) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             // obtener resumen de la publicación usando la conexión compartida
             PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
@@ -241,7 +243,7 @@ public class ControladorNavegacion {
      *
      * @param nombrePantalla key de la pantalla hija (ej: "panelControl")
      */
-    public void marcarPantallaActiva(String nombrePantalla) {
+    public void marcarPantallaActiva(final String nombrePantalla) {
         if (this.barraLateral != null) {
             this.barraLateral.marcarPantallaActiva(nombrePantalla);
         }
