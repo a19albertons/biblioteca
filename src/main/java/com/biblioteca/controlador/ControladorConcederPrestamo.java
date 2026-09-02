@@ -175,7 +175,7 @@ public class ControladorConcederPrestamo {
                 }
 
                 // 7. comprobar usuario activo (no sancionado ni baja)
-                String sancion = usuario.getSancionActiva();
+                String sancion = usuario.getSancionactiva();
                 // comprobar sanciones o baja
                 if ("SANCIONADO".equalsIgnoreCase(sancion) || "BAJA".equalsIgnoreCase(sancion)) {
                     return "El usuario tiene sanciones o está dado de baja";
