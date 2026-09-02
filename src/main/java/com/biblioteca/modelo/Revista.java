@@ -6,11 +6,11 @@ package com.biblioteca.modelo;
 public class Revista extends Publicacion {
     // atributos de la tabla revistas
     /**
-     * periodicidad de la revista
+     * Periodicidad de la revista
      */
     private String periodicidad;
     /**
-     * numero de la revista
+     * Numero de la revista
      */
     private int numRevista;
 
@@ -18,9 +18,9 @@ public class Revista extends Publicacion {
     /**
      * Obtiene la periodicidad de la revista
      * 
-     * @return
+     * @return la periodicidad de la revista
      */
-    public String getPeriodicidad() {
+    public final String getPeriodicidad() {
         return periodicidad;
     }
 
@@ -29,7 +29,7 @@ public class Revista extends Publicacion {
      * 
      * @param periodicidad
      */
-    public void setPeriodicidad(String periodicidad) {
+    public void setPeriodicidad(final String periodicidad) {
         if (periodicidad != null) {
             this.periodicidad = periodicidad;
         } else {
@@ -40,9 +40,9 @@ public class Revista extends Publicacion {
     /**
      * Obtiene el numero de la revista
      * 
-     * @return
+     * @return el numero de la revista
      */
-    public int getNumRevista() {
+    public final int getNumRevista() {
         return numRevista;
     }
 
@@ -51,7 +51,7 @@ public class Revista extends Publicacion {
      * 
      * @param numRevista
      */
-    public void setNumRevista(int numRevista) {
+    public void setNumRevista(final int numRevista) {
         this.numRevista = numRevista;
     }
 
@@ -72,9 +72,11 @@ public class Revista extends Publicacion {
      * @param periodicidad
      * @param numRevista
      */
-    public Revista(String titulo, String editorial, String codigoISBN, String idioma, TipoPublicacion tipo,
-            boolean estado, java.util.List<Modulo> modulos, java.util.List<Ciclo> ciclos, java.util.List<Tema> temas,
-            String periodicidad, int numRevista) {
+    public Revista(final String titulo, final String editorial, final String codigoISBN, final String idioma,
+            final TipoPublicacion tipo,
+            final boolean estado, final java.util.List<Modulo> modulos, final java.util.List<Ciclo> ciclos,
+            final java.util.List<Tema> temas,
+            final String periodicidad, final int numRevista) {
         super(titulo, editorial, codigoISBN, idioma, tipo, estado, modulos, ciclos, temas);
         setPeriodicidad(periodicidad);
         setNumRevista(numRevista);
@@ -96,9 +98,11 @@ public class Revista extends Publicacion {
      * @param periodicidad
      * @param numRevista
      */
-    public Revista(int id, String titulo, String editorial, String codigoISBN, String idioma, TipoPublicacion tipo,
-            boolean estado, java.util.List<Modulo> modulos, java.util.List<Ciclo> ciclos, java.util.List<Tema> temas,
-            String periodicidad, int numRevista) {
+    public Revista(final int id, final String titulo, final String editorial, final String codigoISBN,
+            final String idioma, final TipoPublicacion tipo,
+            final boolean estado, final java.util.List<Modulo> modulos, final java.util.List<Ciclo> ciclos,
+            final java.util.List<Tema> temas,
+            final String periodicidad, final int numRevista) {
         super(id, titulo, editorial, codigoISBN, idioma, tipo, estado, modulos, ciclos, temas);
         this.periodicidad = periodicidad;
         this.numRevista = numRevista;

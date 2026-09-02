@@ -39,7 +39,7 @@ public class Sancion {
     /**
      * Obtiene el id de la sanción
      * 
-     * @return
+     * @return el id de la sanción
      */
     public int getId() {
         return id;
@@ -50,14 +50,14 @@ public class Sancion {
      * 
      * @param id
      */
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
     /**
      * Obtiene el usuario sancionado
      * 
-     * @return
+     * @return el usuario sancionado
      */
     public Usuario getUsuario() {
         return usuario;
@@ -68,7 +68,7 @@ public class Sancion {
      * 
      * @param usuario
      */
-    public void setUsuario(Usuario usuario) {
+    public void setUsuario(final Usuario usuario) {
         if (usuario == null) {
             throw new IllegalArgumentException("El usuario no puede ser nulo");
         }
@@ -78,7 +78,7 @@ public class Sancion {
     /**
      * Obtiene el préstamo relacionado
      * 
-     * @return
+     * @return el préstamo relacionado
      */
     public Prestamo getPrestamo() {
         return prestamo;
@@ -89,7 +89,7 @@ public class Sancion {
      * 
      * @param prestamo
      */
-    public void setPrestamo(Prestamo prestamo) {
+    public void setPrestamo(final Prestamo prestamo) {
         if (prestamo == null) {
             throw new IllegalArgumentException("El préstamo no puede ser nulo");
         }
@@ -99,7 +99,7 @@ public class Sancion {
     /**
      * Obtiene la fecha de inicio de la sanción
      * 
-     * @return
+     * @return la fecha de inicio de la sanción
      */
     public LocalDate getInicioSancion() {
         return inicioSancion;
@@ -110,7 +110,7 @@ public class Sancion {
      * 
      * @param inicioSancion
      */
-    public void setInicioSancion(LocalDate inicioSancion) {
+    public void setInicioSancion(final LocalDate inicioSancion) {
         if (inicioSancion == null) {
             throw new IllegalArgumentException("La fecha de inicio de sanción no puede ser nula");
         }
@@ -120,7 +120,7 @@ public class Sancion {
     /**
      * Obtiene la fecha de fin de la sanción
      * 
-     * @return
+     * @return la fecha de fin de la sanción
      */
     public LocalDate getFinSancion() {
         return finSancion;
@@ -131,7 +131,7 @@ public class Sancion {
      * 
      * @param finSancion
      */
-    public void setFinSancion(LocalDate finSancion) {
+    public void setFinSancion(final LocalDate finSancion) {
         if (finSancion == null) {
             throw new IllegalArgumentException("La fecha de fin de sanción no puede ser nula");
         }
@@ -144,7 +144,7 @@ public class Sancion {
     /**
      * Obtiene la descripción de la sanción
      * 
-     * @return
+     * @return la descripción de la sanción
      */
     public String getDescripcion() {
         return descripcion;
@@ -155,7 +155,7 @@ public class Sancion {
      * 
      * @param descripcion
      */
-    public void setDescripcion(String descripcion) {
+    public void setDescripcion(final String descripcion) {
         if (descripcion == null || descripcion.isEmpty()) {
             throw new IllegalArgumentException("La descripción no puede ser nula o vacía");
         }
@@ -165,7 +165,7 @@ public class Sancion {
     /**
      * Obtiene el estado de la sanción
      * 
-     * @return
+     * @return el estado de la sanción
      */
     public boolean isEstado() {
         return estado;
@@ -176,7 +176,7 @@ public class Sancion {
      * 
      * @param estado
      */
-    public void setEstado(boolean estado) {
+    public void setEstado(final boolean estado) {
         this.estado = estado;
     }
 
@@ -184,15 +184,16 @@ public class Sancion {
     /**
      * Crear nueva sanción
      * 
-     * @param usuario
-     * @param prestamo
-     * @param inicioSancion
-     * @param finSancion
-     * @param descripcion
-     * @param estado
+     * @param usuario       el usuario
+     * @param prestamo      el préstamo
+     * @param inicioSancion la fecha de inicio de la sanción
+     * @param finSancion    la fecha de fin de la sanción
+     * @param descripcion   la descripción de la sanción
+     * @param estado        el estado de la sanción
      */
-    public Sancion(Usuario usuario, Prestamo prestamo, LocalDate inicioSancion, LocalDate finSancion,
-            String descripcion, boolean estado) {
+    public Sancion(final Usuario usuario, final Prestamo prestamo, final LocalDate inicioSancion,
+            final LocalDate finSancion,
+            final String descripcion, final boolean estado) {
         setUsuario(usuario);
         setPrestamo(prestamo);
         setInicioSancion(inicioSancion);
@@ -204,16 +205,17 @@ public class Sancion {
     /**
      * Recupera una sancion de la base de datos
      * 
-     * @param id
-     * @param usuario
-     * @param prestamo
-     * @param inicioSancion
-     * @param finSancion
-     * @param descripcion
-     * @param estado
+     * @param id            el id de la sanción
+     * @param usuario       el usuario
+     * @param prestamo      el préstamo
+     * @param inicioSancion la fecha de inicio de la sanción
+     * @param finSancion    la fecha de fin de la sanción
+     * @param descripcion   la descripción de la sanción
+     * @param estado        el estado de la sanción
      */
-    public Sancion(int id, Usuario usuario, Prestamo prestamo, LocalDate inicioSancion, LocalDate finSancion,
-            String descripcion, boolean estado) {
+    public Sancion(final int id, final Usuario usuario, final Prestamo prestamo, final LocalDate inicioSancion,
+            final LocalDate finSancion,
+            final String descripcion, final boolean estado) {
         this.id = id;
         this.usuario = usuario;
         this.prestamo = prestamo;

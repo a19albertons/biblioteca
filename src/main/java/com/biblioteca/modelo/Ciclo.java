@@ -18,7 +18,7 @@ public class Ciclo {
     /**
      * Obtiene el id del ciclo
      * 
-     * @return
+     * @return el id del ciclo
      */
     public int getId() {
         return id;
@@ -27,16 +27,16 @@ public class Ciclo {
     /**
      * Permite recuperar el id del ciclo de la bd y establecerlo en el objeto
      * 
-     * @param id
+     * @param id final id del ciclo
      */
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
     /**
      * Obtiene el nombre del ciclo
      * 
-     * @return
+     * @return el nombre del ciclo
      */
     public String getNombre() {
         return nombre;
@@ -45,9 +45,9 @@ public class Ciclo {
     /**
      * Establece el nombre del ciclo
      * 
-     * @param nombre
+     * @param nombre final nombre del ciclo
      */
-    public void setNombre(String nombre) {
+    public void setNombre(final String nombre) {
         this.nombre = nombre;
     }
 
@@ -55,19 +55,19 @@ public class Ciclo {
     /**
      * Crear nuevo ciclo
      * 
-     * @param nombre
+     * @param nombre final nombre del ciclo
      */
-    public Ciclo(String nombre) {
+    public Ciclo(final String nombre) {
         setNombre(nombre);
     }
 
     /**
      * Recupera el ciclo de la BD
      * 
-     * @param id
-     * @param nombre
+     * @param id     final id del ciclo
+     * @param nombre final nombre del ciclo
      */
-    public Ciclo(int id, String nombre) {
+    public Ciclo(final int id, final String nombre) {
         this.id = id;
         this.nombre = nombre;
     }

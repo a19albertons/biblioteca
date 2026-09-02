@@ -36,9 +36,9 @@ public class Prestamo {
     /**
      * Obtiene el id del prestamo
      * 
-     * @return
+     * @return id del prestamo
      */
-    public int getId() {
+    public final int getId() {
         return id;
     }
 
@@ -47,16 +47,16 @@ public class Prestamo {
      * 
      * @param id
      */
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
     /**
      * Obtiene el usuario que pide el prestamo
      * 
-     * @return
+     * @return usuario que pide el prestamo
      */
-    public Usuario getUsuario() {
+    public final Usuario getUsuario() {
         return usuario;
     }
 
@@ -65,7 +65,7 @@ public class Prestamo {
      * 
      * @param usuario
      */
-    public void setUsuario(Usuario usuario) {
+    public void setUsuario(final Usuario usuario) {
         if (usuario == null) {
             throw new IllegalArgumentException("El usuario no puede ser nulo");
         }
@@ -75,9 +75,9 @@ public class Prestamo {
     /**
      * Obtiene el ejemplar prestado
      * 
-     * @return
+     * @return ejemplar prestado
      */
-    public Ejemplar getEjemplar() {
+    public final Ejemplar getEjemplar() {
         return ejemplar;
     }
 
@@ -86,7 +86,7 @@ public class Prestamo {
      * 
      * @param ejemplar
      */
-    public void setEjemplar(Ejemplar ejemplar) {
+    public void setEjemplar(final Ejemplar ejemplar) {
         if (ejemplar == null) {
             throw new IllegalArgumentException("El ejemplar no puede ser nulo");
         }
@@ -96,9 +96,9 @@ public class Prestamo {
     /**
      * Obtiene la fecha de inicio del prestamo
      * 
-     * @return
+     * @return fecha de inicio del prestamo
      */
-    public LocalDate getFechaInicio() {
+    public final LocalDate getFechaInicio() {
         return fechaInicio;
     }
 
@@ -107,7 +107,7 @@ public class Prestamo {
      * 
      * @param fechaInicio
      */
-    public void setFechaInicio(LocalDate fechaInicio) {
+    public void setFechaInicio(final LocalDate fechaInicio) {
         if (fechaInicio == null) {
             throw new IllegalArgumentException("La fecha de inicio no puede ser nula");
         }
@@ -117,9 +117,9 @@ public class Prestamo {
     /**
      * Obtiene la fecha de fin del prestamo
      * 
-     * @return
+     * @return fecha de fin del prestamo
      */
-    public LocalDate getFechaFin() {
+    public final LocalDate getFechaFin() {
         return fechaFin;
     }
 
@@ -128,7 +128,7 @@ public class Prestamo {
      * 
      * @param fechaFin
      */
-    public void setFechaFin(LocalDate fechaFin) {
+    public void setFechaFin(final LocalDate fechaFin) {
         if (fechaFin == null) {
             throw new IllegalArgumentException("La fecha de fin no puede ser nula");
         }
@@ -141,9 +141,9 @@ public class Prestamo {
     /**
      * Obtiene el estado del prestamo
      * 
-     * @return
+     * @return estado del prestamo
      */
-    public boolean isEstado() {
+    public final boolean isEstado() {
         return estado;
     }
 
@@ -152,7 +152,7 @@ public class Prestamo {
      * 
      * @param estado
      */
-    public void setEstado(boolean estado) {
+    public void setEstado(final boolean estado) {
         this.estado = estado;
     }
 
@@ -160,13 +160,14 @@ public class Prestamo {
     /**
      * Crear nuevo prestamo
      * 
-     * @param usuario
-     * @param ejemplar
-     * @param fechaInicio
-     * @param fechaFin
-     * @param estado
+     * @param usuario     el usuario
+     * @param ejemplar    el ejemplar
+     * @param fechaInicio la fecha de inicio
+     * @param fechaFin    la fecha de fin
+     * @param estado      el estado
      */
-    public Prestamo(Usuario usuario, Ejemplar ejemplar, LocalDate fechaInicio, LocalDate fechaFin, boolean estado) {
+    public Prestamo(final Usuario usuario, final Ejemplar ejemplar, final LocalDate fechaInicio,
+            final LocalDate fechaFin, final boolean estado) {
         setUsuario(usuario);
         setEjemplar(ejemplar);
         setFechaInicio(fechaInicio);
@@ -177,15 +178,16 @@ public class Prestamo {
     /**
      * Recupera un prestamos de la base de datos
      * 
-     * @param id
-     * @param usuario
-     * @param ejemplar
-     * @param fechaInicio
-     * @param fechaFin
-     * @param estado
+     * @param id          el id
+     * @param usuario     el usuario
+     * @param ejemplar    el ejemplar
+     * @param fechaInicio la fecha de inicio
+     * @param fechaFin    la fecha de fin
+     * @param estado      el estado
      */
-    public Prestamo(int id, Usuario usuario, Ejemplar ejemplar, LocalDate fechaInicio, LocalDate fechaFin,
-            boolean estado) {
+    public Prestamo(final int id, final Usuario usuario, final Ejemplar ejemplar, final LocalDate fechaInicio,
+            final LocalDate fechaFin,
+            final boolean estado) {
         this.id = id;
         this.usuario = usuario;
         this.ejemplar = ejemplar;

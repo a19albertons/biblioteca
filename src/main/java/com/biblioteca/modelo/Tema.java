@@ -18,7 +18,7 @@ public class Tema {
     /**
      * Obtiene el id del tema
      * 
-     * @return
+     * @return el id del tema
      */
     public int getId() {
         return id;
@@ -29,14 +29,14 @@ public class Tema {
      * 
      * @param id
      */
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
     /**
      * Obtiene el nombre del tema
      * 
-     * @return
+     * @return el nombre del tema
      */
     public String getNombre() {
         return nombre;
@@ -47,7 +47,7 @@ public class Tema {
      * 
      * @param nombre
      */
-    public void setNombre(String nombre) {
+    public void setNombre(final String nombre) {
         this.nombre = nombre;
     }
 
@@ -57,7 +57,7 @@ public class Tema {
      * 
      * @param nombre
      */
-    public Tema(String nombre) {
+    public Tema(final String nombre) {
         setNombre(nombre);
     }
 
@@ -67,7 +67,7 @@ public class Tema {
      * @param id
      * @param nombre
      */
-    public Tema(int id, String nombre) {
+    public Tema(final int id, final String nombre) {
         this.id = id;
         this.nombre = nombre;
     }
