@@ -40,8 +40,8 @@ public class NuevoUsuarioDialog extends JDialog {
      * Ventana padre
      */
     private JFrame parentFrame;
-    /** 
-     * Guardar glass pane previo para restaurarlo 
+    /**
+     * Guardar glass pane previo para restaurarlo
      */
     private Component previousGlassPane;
 
@@ -51,7 +51,7 @@ public class NuevoUsuarioDialog extends JDialog {
      * @param parent
      * @param controlador
      */
-    public NuevoUsuarioDialog(JFrame parent, Controlador controlador) {
+    public NuevoUsuarioDialog(final JFrame parent, final Controlador controlador) {
         // Llamar al constructor de JDialog con el padre, título y modalidad
         super(parent, "Nuevo Usuario", true);
         this.controlador = controlador;
@@ -63,12 +63,12 @@ public class NuevoUsuarioDialog extends JDialog {
         // Añadir listener para quitar overlay al cerrar
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
+            public void windowClosed(final WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -225,12 +225,14 @@ public class NuevoUsuarioDialog extends JDialog {
      * padre
      */
     @Override
-    public void setVisible(boolean b) {
-        if (b)
+    public void setVisible(final boolean b) {
+        if (b) {
             installOverlay();
+        }
         super.setVisible(b);
-        if (!b)
+        if (!b) {
             removeOverlay();
+        }
     }
 
     /**
@@ -239,8 +241,9 @@ public class NuevoUsuarioDialog extends JDialog {
      */
     private void installOverlay() {
         // Comprobar que el parentFrame existe
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Obtener el RootPaneContainer del frame padre
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
@@ -265,8 +268,9 @@ public class NuevoUsuarioDialog extends JDialog {
      */
     private void removeOverlay() {
         // Comprobar que el parentFrame existe
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Restaurar el glass pane previo (si lo tenemos)
             javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;

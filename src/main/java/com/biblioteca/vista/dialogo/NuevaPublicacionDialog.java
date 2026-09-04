@@ -115,7 +115,7 @@ public class NuevaPublicacionDialog extends JDialog {
      * @param parent
      * @param controlador
      */
-    public NuevaPublicacionDialog(JFrame parent, Controlador controlador) {
+    public NuevaPublicacionDialog(final JFrame parent, final Controlador controlador) {
         super(parent, "Nueva Publicación", true);
         this.controlador = controlador;
         this.parentFrame = parent;
@@ -126,12 +126,12 @@ public class NuevaPublicacionDialog extends JDialog {
         // Asegurar que si el diálogo se cierra por otros medios, el overlay se restaura
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
+            public void windowClosed(final WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -165,7 +165,7 @@ public class NuevaPublicacionDialog extends JDialog {
      * Sobrescribe setVisible para instalar/quitar overlay en el padre.
      */
     @Override
-    public void setVisible(boolean b) {
+    public void setVisible(final boolean b) {
         if (b) {
             installOverlay();
         }
@@ -181,8 +181,9 @@ public class NuevaPublicacionDialog extends JDialog {
      */
     private void installOverlay() {
         // Comprobar que el parentFrame no es nulo
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Guardar el glass pane previo para restaurarlo después
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
@@ -211,8 +212,9 @@ public class NuevaPublicacionDialog extends JDialog {
      */
     private void removeOverlay() {
         // Comprobar que el parentFrame no es nulo
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Restaurar el glass pane previo
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
@@ -231,7 +233,7 @@ public class NuevaPublicacionDialog extends JDialog {
     /**
      * Crea el panel del paso 1 (datos comunes)
      * 
-     * @return
+     * @return el panel del paso 1
      */
     private JPanel crearPaso1() {
         // Definir panel
@@ -362,7 +364,7 @@ public class NuevaPublicacionDialog extends JDialog {
     /**
      * Crea el panel del paso Libro
      * 
-     * @return
+     * @return el panel del paso Libro
      */
     private JPanel crearPasoLibro() {
         // Definir panel
@@ -412,20 +414,21 @@ public class NuevaPublicacionDialog extends JDialog {
         panel.add(autoresField, c);
 
         // Botón añadir
-        JButton añadir = new JButton("Añadir");
-        añadir.setBackground(Color.decode("#F4791B"));
-        añadir.setForeground(Color.white);
-        añadir.setBorder(null);
+        JButton anadir = new JButton("Añadir");
+        anadir.setBackground(Color.decode("#F4791B"));
+        anadir.setForeground(Color.white);
+        anadir.setBorder(null);
         c.gridx = 1;
         c.gridy++;
         c.anchor = GridBagConstraints.EAST;
-        panel.add(añadir, c);
+        panel.add(anadir, c);
 
         // Acción botón añadir
-        añadir.addActionListener(e -> {
+        anadir.addActionListener(e -> {
             // Validar campos
-            if (!validarPasoLibro())
+            if (!validarPasoLibro()) {
                 return;
+            }
             try {
                 // Intentar crear la publicación
                 boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionLibro(
@@ -471,7 +474,7 @@ public class NuevaPublicacionDialog extends JDialog {
     /**
      * Crea el panel del paso Revista
      * 
-     * @return
+     * @return el panel del paso Revista
      */
     private JPanel crearPasoRevista() {
         // Definir panel
@@ -501,20 +504,21 @@ public class NuevaPublicacionDialog extends JDialog {
         panel.add(periodicidadField, c);
 
         // Botón añadir
-        JButton añadir = new JButton("Añadir");
-        añadir.setBackground(Color.decode("#F4791B"));
-        añadir.setForeground(Color.white);
-        añadir.setBorder(null);
+        JButton anadir = new JButton("Añadir");
+        anadir.setBackground(Color.decode("#F4791B"));
+        anadir.setForeground(Color.white);
+        anadir.setBorder(null);
         c.gridx = 1;
         c.gridy++;
         c.anchor = GridBagConstraints.EAST;
-        panel.add(añadir, c);
+        panel.add(anadir, c);
 
         // Acción botón añadir
-        añadir.addActionListener(e -> {
+        anadir.addActionListener(e -> {
             // Validar campos
-            if (!validarPasoRevista())
+            if (!validarPasoRevista()) {
                 return;
+            }
             try {
                 // Intentar crear la publicación
                 boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionRevista(
@@ -558,7 +562,7 @@ public class NuevaPublicacionDialog extends JDialog {
     /**
      * Valida los campos comunes del paso 1
      * 
-     * @return
+     * @return true si los campos son válidos, false si hay errores
      */
     private boolean validarPasoComun() {
         // Campos obligatorios en tabla `publicaciones`: titulo, editorial, codigo_isbn,
@@ -590,11 +594,12 @@ public class NuevaPublicacionDialog extends JDialog {
     /**
      * Valida los campos del paso Libro
      * 
-     * @return
+     * @return true si los campos son válidos, false si hay errores
      */
     private boolean validarPasoLibro() {
-        if (!validarPasoComun())
+        if (!validarPasoComun()) {
             return false;
+        }
         // Campos obligatorios en tabla `libros`: num_edicion, fecha_publicacion
         String numEd = numeroEdicionField.getText().trim();
         if (numEd.isEmpty()) {
@@ -633,11 +638,12 @@ public class NuevaPublicacionDialog extends JDialog {
     /**
      * Valida los campos del paso Revista
      * 
-     * @return
+     * @return true si los campos son válidos, false si hay errores
      */
     private boolean validarPasoRevista() {
-        if (!validarPasoComun())
+        if (!validarPasoComun()) {
             return false;
+        }
         // Campos obligatorios en tabla `revistas`: periodicidad, num_revista
         // (num_revista can be derived or optional here, but periodicidad is NOT NULL)
         String per = periodicidadField.getText().trim();
@@ -653,7 +659,7 @@ public class NuevaPublicacionDialog extends JDialog {
      * 
      * @param field
      */
-    private void configurarCampo(JTextField field) {
+    private void configurarCampo(final JTextField field) {
         field.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.decode("#CCCCCC")),
                 BorderFactory.createEmptyBorder(6, 8, 6, 8)));
         field.setFont(Fonts.openSans(12f));

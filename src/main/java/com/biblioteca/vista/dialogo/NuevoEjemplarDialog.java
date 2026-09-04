@@ -33,15 +33,15 @@ public class NuevoEjemplarDialog extends JDialog {
     /**
      * Controlador de la aplicación
      */
-    private Controlador controlador;
+    private final Controlador controlador;
     /**
      * Frame padre (para overlay)
      */
-    private JFrame parentFrame;
+    private final JFrame parentFrame;
     /**
      * ID de la publicación a la que se añade el ejemplar
      */
-    private int idPublicacion;
+    private final int idPublicacion;
     /**
      * Componente previo del glass pane (para restaurar al cerrar el diálogo)
      */
@@ -54,7 +54,7 @@ public class NuevoEjemplarDialog extends JDialog {
      * @param controlador
      * @param idPublicacion
      */
-    public NuevoEjemplarDialog(JFrame parent, Controlador controlador, int idPublicacion) {
+    public NuevoEjemplarDialog(final JFrame parent, final Controlador controlador, final int idPublicacion) {
         super(parent, "Nuevo Ejemplar", true);
         this.controlador = controlador;
         this.parentFrame = parent;
@@ -66,12 +66,12 @@ public class NuevoEjemplarDialog extends JDialog {
         // Cierra el overlay al cerrar el diálogo
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
+            public void windowClosed(final WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -159,7 +159,7 @@ public class NuevoEjemplarDialog extends JDialog {
      * Controla la visibilidad del diálogo y el overlay
      */
     @Override
-    public void setVisible(boolean b) {
+    public final void setVisible(final boolean b) {
         if (b) {
             installOverlay();
         }
@@ -174,8 +174,9 @@ public class NuevoEjemplarDialog extends JDialog {
      */
     private void installOverlay() {
         // Controla si el frame padre es nulo
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Guardar el componente previo del glass pane para restaurarlo después
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
@@ -202,8 +203,9 @@ public class NuevoEjemplarDialog extends JDialog {
      */
     private void removeOverlay() {
         // Controla si el frame padre es nulo
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Restaurar el componente previo del glass pane
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
