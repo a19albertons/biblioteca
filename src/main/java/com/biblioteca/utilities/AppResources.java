@@ -6,9 +6,20 @@ import java.net.URL;
  * Clase que contiene las rutas de los recursos de la aplicación
  * AppResources
  */
-public class AppResources {
+public final class AppResources {
+    /**
+     * Ruta al logo de la aplicación
+     */
     public static final String LOGO_PATH = "/imagenes/logo.png";
+
+    /**
+     * Ruta al icono de editar
+     */
     public static final String EDITAR_PATH = "/imagenes/editar.png";
+
+    /**
+     * Ruta al icono de eliminar
+     */
     public static final String ELIMINAR_PATH = "/imagenes/eliminar.png";
 
     private AppResources() {
