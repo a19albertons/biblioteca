@@ -3,6 +3,8 @@ package com.biblioteca.vista.pantalla;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -26,14 +28,49 @@ public class SancionManual {
     /**
      * Controlador de la aplicación
      */
-    Controlador controlador;
+    private Controlador controlador;
+
+    /**
+     * Campo para mostrar el resultado de la selección del socio
+     */
+    private JLabel resultadoSocio;
+    /**
+     * Campo para almacenar el ID del usuario seleccionado
+     */
+    private int[] usuarioSeleccionado;
+
+    /**
+     * Campo de la interfaz para seleccionar el motivo de la sanción
+     */
+    private JComboBox<String> comboMotivo;
+    /**
+     * Campo de la interfaz para ingresar el ID del ejemplar sancionado
+     */
+    private JTextField txtEjemplar;
+    /**
+     * Campo de la interfaz para ingresar la descripción de la sanción
+     */
+    private JTextField txtDescripcion;
+    /**
+     * Campo de la interfaz para ingresar la fecha de finalización de la sanción
+     */
+    private JTextField txtFechaFin;
+
+    /**
+     * Devuelve el controlador
+     *
+     * @return Devuelve el controlador principal de la aplicación
+     */
+    public Controlador getControlador() {
+        return controlador;
+    }
 
     /**
      * Constructor de la vista SancionManual
      *
      * @param controlador controlador principal
      */
-    public SancionManual(Controlador controlador) {
+    public SancionManual(final Controlador controlador) {
         this.controlador = controlador;
     }
 
@@ -48,46 +85,90 @@ public class SancionManual {
         panel.setBackground(Color.decode("#EDF3F6"));
         panel.setLayout(null);
 
-        // Panel de encabezado con título
+        JPanel encabezado = createHeaderPanel();
+        JPanel formularioSancion = createFormPanel();
+
+        addStepLabels(formularioSancion);
+        createUserSelectionButton(formularioSancion);
+        createFormFields(formularioSancion);
+        createButtons(formularioSancion);
+
+        panel.add(encabezado);
+        panel.add(formularioSancion);
+
+        return panel;
+    }
+
+    /**
+     * Crea el panel de encabezado con el título "Panel de Control".
+     *
+     * @return JPanel encabezado panel
+     */
+    private JPanel createHeaderPanel() {
         JPanel encabezado = new JPanel();
         encabezado.setSize(new Dimension(600, 60));
         encabezado.setBackground(Color.white);
         encabezado.setLayout(null);
         encabezado.setBounds(0, 0, 600, 60);
 
-        // Titulo
         JLabel titulo = new JLabel("Panel de Control");
         titulo.setFont(titulo.getFont().deriveFont(24f));
         titulo.setBounds(10, 10, 200, 40);
         encabezado.add(titulo);
 
-        // Formulario sancion manual
+        return encabezado;
+    }
+
+    /**
+     * Crea el panel de formulario para sanciones manuales.
+     *
+     * @return JPanel formularioSancion panel
+     */
+    private JPanel createFormPanel() {
         JPanel formularioSancion = new JPanel();
         formularioSancion.setSize(540, 450);
         formularioSancion.setBounds(30, 90, 540, 450);
         formularioSancion.setBackground(Color.white);
         formularioSancion.setLayout(null);
+        return formularioSancion;
+    }
 
-        // Paso 1: Usuario afectado
+    /**
+     * Añade las etiquetas de paso al panel de formulario.
+     *
+     * @param formularioSancion el panel de formulario donde se añadirán las
+     *                          etiquetas
+     */
+    private void addStepLabels(final JPanel formularioSancion) {
         JLabel paso1 = new JLabel("1. Usuario afectado:");
         paso1.setFont(paso1.getFont().deriveFont(16f));
         paso1.setBounds(20, 10, 300, 30);
         paso1.setForeground(Color.decode("#468DAE"));
         formularioSancion.add(paso1);
 
-        // Resultado elegir socio
-        JLabel resultadoSocio = new JLabel("");
+        resultadoSocio = new JLabel("");
         resultadoSocio.setBounds(20, 50, 500, 40);
         resultadoSocio.setText(
                 "<html>Usuario: Estudiante) : <span style='color:#2BC187; font-weight:bold'>Sin sanciones</span></html>");
         resultadoSocio.setBackground(Color.decode("#EDF3F6"));
         resultadoSocio.setOpaque(true);
-        // Pequeño margen izquierdo para separar el texto del borde (10px)
         resultadoSocio.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
         formularioSancion.add(resultadoSocio);
 
-        // mutable holder para el id de usuario seleccionado (para usar desde lambdas)
-        final int[] usuarioSeleccionado = new int[] { -1 };
+        JLabel paso2 = new JLabel("2. Detalles de la sanción y ejemplar afectado:");
+        paso2.setFont(paso2.getFont().deriveFont(16f));
+        paso2.setBounds(20, 110, 400, 30);
+        paso2.setForeground(Color.decode("#468DAE"));
+        formularioSancion.add(paso2);
+    }
+
+    /**
+     * Crea el botón de selección de usuario y su listener de acción.
+     *
+     * @param formularioSancion el panel de formulario padre
+     */
+    private void createUserSelectionButton(final JPanel formularioSancion) {
+        usuarioSeleccionado = new int[] { -1 };
 
         JButton btnCambiarUsuario = new JButton("Cambiar");
         btnCambiarUsuario.setBounds(390, 55, 100, 30);
@@ -95,28 +176,25 @@ public class SancionManual {
         btnCambiarUsuario.setForeground(Color.WHITE);
         btnCambiarUsuario.setFocusPainted(false);
         btnCambiarUsuario.setBorder(null);
-        // Para que el botón quede encima del JLabel
         formularioSancion.add(btnCambiarUsuario, 0);
 
-        // Acción del botón Cambiar -> abrir modal con usuarios sancionables
         btnCambiarUsuario.addActionListener(e -> {
-            // obtener usuarios sancionables desde el controlador
-            String[][] usuarios = controlador.getControladorGestionUsuarios().obtenerUsuariosSancionables();
+            String[][] usuarios = getControlador()
+                    .getControladorGestionUsuarios().obtenerUsuariosSancionables();
             if (usuarios == null || usuarios.length == 0) {
                 JOptionPane.showMessageDialog(null, "No hay usuarios sancionables", "Información",
                         JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            // construir lista de strings y mapping a ids
-            java.util.Map<String, Integer> mapa = new java.util.LinkedHashMap<>();
+
+            Map<String, Integer> mapa = new LinkedHashMap<>();
             DefaultListModel<String> listModel = new DefaultListModel<>();
             for (String[] u : usuarios) {
-                String item = u[2] + " | DNI: " + u[1] + " | Estudiante"; // Apellido, Nombre
+                String item = u[2] + " | DNI: " + u[1] + " | Estudiante";
                 listModel.addElement(item);
                 mapa.put(item, Integer.parseInt(u[0]));
             }
 
-            // mostrar diálogo con lista
             JList<String> jlist = new JList<>(listModel);
             jlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             JScrollPane scroll = new JScrollPane(jlist);
@@ -124,78 +202,75 @@ public class SancionManual {
             int option = JOptionPane.showConfirmDialog(null, scroll, "Seleccione usuario",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-            // si se seleccionó un usuario, actualizar resultadoSocio y usuarioSeleccionado
             if (option == JOptionPane.OK_OPTION) {
                 String sel = jlist.getSelectedValue();
                 if (sel != null) {
                     usuarioSeleccionado[0] = mapa.get(sel);
-                    // mostrar en resultadoSocio: Apellido, Nombre | DNI | Estudiante
                     resultadoSocio.setText("<html><b>" + sel + "</b></html>");
                 }
             }
         });
+    }
 
-        // Paso 2: Detalles de la sancion y ejemplar afectado
-        JLabel paso2 = new JLabel("2. Detalles de la sanción y ejemplar afectado:");
-        paso2.setFont(paso2.getFont().deriveFont(16f));
-        paso2.setBounds(20, 110, 400, 30);
-        paso2.setForeground(Color.decode("#468DAE"));
-        formularioSancion.add(paso2);
-
-        // Motivo de la sancion
+    /**
+     * Crea los campos de formulario para los detalles de la sanción.
+     *
+     * @param formularioSancion the parent form panel
+     */
+    private void createFormFields(final JPanel formularioSancion) {
         JLabel lblMotivo = new JLabel("Motivo de la sanción:");
         lblMotivo.setBounds(20, 150, 200, 25);
         formularioSancion.add(lblMotivo);
 
-        // JcomboBox motivo (opciones predefinidas)
-        JComboBox<String> comboMotivo = new JComboBox<>();
+        comboMotivo = new JComboBox<>();
         comboMotivo.setBounds(20, 180, 230, 30);
         comboMotivo.addItem("Daño de material");
         comboMotivo.addItem("Pérdida del material");
         comboMotivo.addItem("Comportamiento inapropiado");
         formularioSancion.add(comboMotivo);
 
-        // Ejemplar afectado (alineado a la derecha del motivo)
         JLabel lblEjemplar = new JLabel("Ejemplar:");
         lblEjemplar.setBounds(270, 150, 200, 25);
         formularioSancion.add(lblEjemplar);
 
-        JTextField txtEjemplar = new JTextField();
+        txtEjemplar = new JTextField();
         txtEjemplar.setBounds(270, 180, 230, 30);
         formularioSancion.add(txtEjemplar);
 
-        // Descripción de la sanción
         JLabel lblDescripcion = new JLabel("Descripción / Observaciones:");
         lblDescripcion.setBounds(20, 220, 200, 25);
         formularioSancion.add(lblDescripcion);
 
-        JTextField txtDescripcion = new JTextField();
+        txtDescripcion = new JTextField();
         txtDescripcion.setBounds(20, 250, 480, 80);
         formularioSancion.add(txtDescripcion);
 
-        // Fecha de inicio de la sanción
         JLabel lblFechaInicio = new JLabel("Fecha de inicio de la sanción:");
         lblFechaInicio.setBounds(20, 340, 200, 25);
         formularioSancion.add(lblFechaInicio);
 
         JTextField txtFechaInicio = new JTextField();
         txtFechaInicio.setBounds(20, 370, 200, 30);
-        // fijar fecha inicio a hoy y no editable
         String hoyStr = LocalDate.now().toString();
         txtFechaInicio.setText(hoyStr);
         txtFechaInicio.setEditable(false);
         formularioSancion.add(txtFechaInicio);
 
-        // Fecha de fin de la sanción
         JLabel lblFechaFin = new JLabel("Fecha de fin de la sanción:");
         lblFechaFin.setBounds(270, 340, 200, 25);
         formularioSancion.add(lblFechaFin);
 
-        JTextField txtFechaFin = new JTextField();
+        txtFechaFin = new JTextField();
         txtFechaFin.setBounds(270, 370, 200, 30);
         formularioSancion.add(txtFechaFin);
+    }
 
-        // Limpiar Formulario
+    /**
+     * Creates and configures the action buttons.
+     *
+     * @param formularioSancion the parent form panel
+     */
+    private void createButtons(final JPanel formularioSancion) {
         JButton btnLimpiar = new JButton("Limpiar Formulario");
         btnLimpiar.setBounds(150, 410, 150, 30);
         btnLimpiar.setBackground(Color.white);
@@ -204,7 +279,6 @@ public class SancionManual {
         btnLimpiar.setBorder(null);
         formularioSancion.add(btnLimpiar);
 
-        // Aplicar Sanción
         JButton btnAplicarSancion = new JButton("Aplicar Sanción");
         btnAplicarSancion.setBounds(320, 410, 150, 30);
         btnAplicarSancion.setBackground(Color.decode("#F4791B"));
@@ -213,9 +287,7 @@ public class SancionManual {
         btnAplicarSancion.setBorder(null);
         formularioSancion.add(btnAplicarSancion);
 
-        // Acciones botones
         btnLimpiar.addActionListener(e -> {
-            // limpiar formulario
             usuarioSeleccionado[0] = -1;
             resultadoSocio.setText(
                     "<html>Usuario: Estudiante) : <span style='color:#2BC187; font-weight:bold'>Sin sanciones</span></html>");
@@ -226,7 +298,6 @@ public class SancionManual {
         });
 
         btnAplicarSancion.addActionListener(e -> {
-            // validaciones para pasar el id del ejemplar a int
             String idEjStr = txtEjemplar.getText().trim();
             if (idEjStr.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
@@ -239,15 +310,12 @@ public class SancionManual {
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
                         JOptionPane.ERROR_MESSAGE);
-                // No pasa por el controlador
                 return;
             }
-            // Prepara descripcion
             String descripcion = comboMotivo.getSelectedItem() + " - " + txtDescripcion.getText().trim();
 
-            // Peticion de sancionar
-            String err = controlador.getControladorSancionManual().aplicarSancionManual(usuarioSeleccionado[0], idEj,
-                    txtFechaFin.getText().trim(), descripcion);
+            String err = getControlador().getControladorSancionManual()
+                    .aplicarSancionManual(usuarioSeleccionado[0], idEj, txtFechaFin.getText().trim(), descripcion);
             if (err != null) {
                 JOptionPane.showMessageDialog(null, err, "Error", JOptionPane.ERROR_MESSAGE);
             } else {
@@ -255,17 +323,10 @@ public class SancionManual {
                         JOptionPane.INFORMATION_MESSAGE);
             }
 
-            // limpiar
             if (err == null) {
                 btnLimpiar.doClick();
             }
         });
-
-        // Agregar paneles al panel principal
-        panel.add(encabezado);
-        panel.add(formularioSancion);
-
-        return panel;
     }
 
 }

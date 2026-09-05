@@ -33,7 +33,7 @@ public class CatalogoLibros {
     /**
      * Controlador de la aplicación
      */
-    Controlador controlador;
+    private Controlador controlador;
 
     // Componentes que se mantienen como campo para permitir refresco dinámico
     /**
@@ -41,9 +41,17 @@ public class CatalogoLibros {
      */
     private JPanel panel;
     /**
+     * Panel de encabezado
+     */
+    private JPanel encabezado;
+    /**
      * Campo de búsqueda
      */
     private JTextField buscadorField;
+    /**
+     * Boton de buscar
+     */
+    private JButton btnBuscar;
     /**
      * ComboBox de ciclos para filtro
      */
@@ -52,6 +60,10 @@ public class CatalogoLibros {
      * ComboBox de editoriales para filtro
      */
     private JComboBox<String> comboEditorialField;
+    /**
+     * Label de filtros
+     */
+    private JLabel filtros;
     /**
      * Contenedor de las cards de publicaciones
      */
@@ -70,8 +82,18 @@ public class CatalogoLibros {
      *
      * @param controlador controlador principal
      */
-    public CatalogoLibros(Controlador controlador) {
+    public CatalogoLibros(final Controlador controlador) {
         this.controlador = controlador;
+    }
+
+    /**
+     * Refresca la lista de publicaciones y filtros en la vista. Vuelve a obtener
+     * los datos desde el controlador y repuebla los combos y cards.
+     * 
+     * @return el controlador de la vista
+     */
+    public Controlador getControlador() {
+        return controlador;
     }
 
     /**
@@ -80,13 +102,39 @@ public class CatalogoLibros {
      * @return JPanel con la lista y filtros del catálogo
      */
     public JPanel pantalla() {
+        // Inicializar panel principal
         panel = new JPanel();
         panel.setPreferredSize(new Dimension(600, 600));
         panel.setBackground(Color.decode("#EDF3F6"));
         panel.setLayout(null);
 
+        // Inicializar componentes
+        createHeader();
+        setupSearchArea();
+        setupFilters();
+        setupCardsSection();
+        setupEventListeners();
+
+        // Agregar componentes al panel principal
+        panel.add(encabezado);
+        panel.add(buscadorField);
+        panel.add(btnBuscar);
+        panel.add(filtros);
+        panel.add(comboCiclosField);
+        panel.add(comboEditorialField);
+        panel.add(scrollPublicaciones);
+
+        return panel;
+    }
+
+    /**
+     * Crea el panel de encabezado con título y botón de nueva publicación
+     *
+     * @return el panel del encabezado
+     */
+    private JPanel createHeader() {
         // Panel de encabezado con título
-        JPanel encabezado = new JPanel();
+        encabezado = new JPanel();
         encabezado.setSize(new Dimension(600, 60));
         encabezado.setBackground(Color.white);
         encabezado.setLayout(null);
@@ -109,14 +157,22 @@ public class CatalogoLibros {
 
         // Abrir modal para nueva publicación
         btnNuevaPub.addActionListener(e -> {
-            NuevaPublicacionDialog dialog = new NuevaPublicacionDialog(controlador.getControladorNavegacion().getVentana(), controlador);
+            NuevaPublicacionDialog dialog = new NuevaPublicacionDialog(
+                    controlador.getControladorNavegacion().getVentana(), controlador);
             dialog.setVisible(true);
         });
 
+        return encabezado;
+    }
+
+    /**
+     * Configura el área de búsqueda y el botón de buscar
+     */
+    private void setupSearchArea() {
         // Buscador con hint y padding izquierdo
         buscadorField = new JTextField() {
             @Override
-            protected void paintComponent(Graphics g) {
+            protected void paintComponent(final Graphics g) {
                 super.paintComponent(g);
                 if (getText().isEmpty()) {
                     Graphics2D g2 = (Graphics2D) g.create();
@@ -134,18 +190,24 @@ public class CatalogoLibros {
         buscadorField.setBackground(Color.white);
         buscadorField.setForeground(Color.decode("#000000"));
         // padding izquierdo 8px y borde para el input
-        buscadorField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.decode("#ffffff")), BorderFactory.createEmptyBorder(0, 8, 0, 0)));
+        buscadorField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.decode("#ffffff")), BorderFactory.createEmptyBorder(0, 8, 0, 0)));
 
-        // Buscar 
-        JButton btnBuscar = new JButton("Buscar");
+        // Buscar
+        btnBuscar = new JButton("Buscar");
         btnBuscar.setBounds(400, 80, 80, 40);
         btnBuscar.setBackground(Color.decode("#468DAE"));
         btnBuscar.setForeground(Color.WHITE);
         btnBuscar.setFocusPainted(false);
-        btnBuscar.setBorder(null); 
+        btnBuscar.setBorder(null);
+    }
 
+    /**
+     * Configura los filtros de ciclos y editoriales
+     */
+    private void setupFilters() {
         // Filtros
-        JLabel filtros = new JLabel("Filtrar por :");
+        filtros = new JLabel("Filtrar por :");
         filtros.setBounds(30, 130, 80, 20);
 
         // JcomboBox ciclos y editorial
@@ -154,61 +216,65 @@ public class CatalogoLibros {
         comboCiclosField.addItem("Ciclos");
         // Cargar lista de ciclos en background
         BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().listaCiclos(),
-            // Actualizar UI con resultados
-            result -> {
-                String[] listaCiclos = result;
-                // Manejo de errores y populación del combo
-                if (listaCiclos == null) {
-                    JOptionPane.showMessageDialog(null,
-                            "Error cargando lista de ciclos. Compruebe la conexión a la base de datos.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                } else if (listaCiclos.length == 0) {
-                    JOptionPane.showMessageDialog(null,
-                            "No hay ciclos disponibles para mostrar.", "Información",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
-                for (String ciclo : listaCiclos) {
-                    comboCiclosField.addItem(ciclo);
-                }
-            },
-            ex -> JOptionPane.showMessageDialog(null,
-                    "Error cargando lista de ciclos. Compruebe la conexión a la base de datos.", "Error",
-                    JOptionPane.ERROR_MESSAGE)
-        );
+                () -> controlador.getControladorPanelControl().listaCiclos(),
+                // Actualizar UI con resultados
+                result -> {
+                    String[] listaCiclos = result;
+                    // Manejo de errores y populación del combo
+                    if (listaCiclos == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando lista de ciclos. Compruebe la conexión a la base de datos.", "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    } else if (listaCiclos.length == 0) {
+                        JOptionPane.showMessageDialog(null,
+                                "No hay ciclos disponibles para mostrar.", "Información",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
+                    for (final String ciclo : listaCiclos) {
+                        comboCiclosField.addItem(ciclo);
+                    }
+                },
+                ex -> JOptionPane.showMessageDialog(null,
+                        "Error cargando lista de ciclos. Compruebe la conexión a la base de datos.", "Error",
+                        JOptionPane.ERROR_MESSAGE));
 
         comboEditorialField = new JComboBox<>();
         comboEditorialField.setBounds(230, 130, 100, 20);
         comboEditorialField.addItem("Editorial");
         // Cargar lista de editoriales en background
         BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().listaEditoriales(),
-            // Actualizar UI con resultados
-            result -> {
-                String[] listaEditoriales = result;
-                // Manejo de errores y populación del combo
-                if (listaEditoriales == null) {
-                    JOptionPane.showMessageDialog(null,
-                            "Error cargando lista de editoriales. Compruebe la conexión a la base de datos.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                } else if (listaEditoriales.length == 0) {
-                    JOptionPane.showMessageDialog(null,
-                            "No hay editoriales disponibles para mostrar.", "Información",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
-                for (String editorial : listaEditoriales) {
-                    comboEditorialField.addItem(editorial);
-                }
-            },
-            ex -> JOptionPane.showMessageDialog(null,
-                    "Error cargando lista de editoriales. Compruebe la conexión a la base de datos.", "Error",
-                    JOptionPane.ERROR_MESSAGE)
-        );
+                () -> controlador.getControladorPanelControl().listaEditoriales(),
+                // Actualizar UI con resultados
+                result -> {
+                    String[] listaEditoriales = result;
+                    // Manejo de errores y populación del combo
+                    if (listaEditoriales == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando lista de editoriales. Compruebe la conexión a la base de datos.",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    } else if (listaEditoriales.length == 0) {
+                        JOptionPane.showMessageDialog(null,
+                                "No hay editoriales disponibles para mostrar.", "Información",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
+                    for (final String editorial : listaEditoriales) {
+                        comboEditorialField.addItem(editorial);
+                    }
+                },
+                ex -> JOptionPane.showMessageDialog(null,
+                        "Error cargando lista de editoriales. Compruebe la conexión a la base de datos.", "Error",
+                        JOptionPane.ERROR_MESSAGE));
+    }
 
+    /**
+     * Configura la sección de cards de publicaciones
+     */
+    private void setupCardsSection() {
         // Seccion de las cards de publicaciones
         // Cards dinámicos: contenedor con grid de 3 columnas y scroll
         cardsContainer = new JPanel(new java.awt.GridLayout(0, 3, 15, 15));
@@ -225,33 +291,38 @@ public class CatalogoLibros {
         // Poblar inicialmente vacío y luego cargar datos reales en background
         poblarCards(cardsContainer, resumenPublicacionesField, "", "Ciclos", "Editorial");
         BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().listaPublicacionesResumen(),
-            // Actualizar UI con resultados
-            result -> {
-                String[][] resumen = result;
-                // Manejo de errores y populación del combo
-                if (resumen == null) {
-                    JOptionPane.showMessageDialog(null,
-                            "Error cargando resumen de publicaciones. Compruebe la conexión a la base de datos.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                } else if (resumen.length == 0) {
-                    JOptionPane.showMessageDialog(null,
-                            "No hay publicaciones registradas para mostrar.", "Información",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    resumen = new String[0][0];
-                }
-                // Guardar resumen y poblar cards
-                resumenPublicacionesField = resumen;
-                poblarCards(cardsContainer, resumenPublicacionesField, "", "Ciclos", "Editorial");
-                scrollPublicaciones.revalidate();
-                scrollPublicaciones.repaint();
-            },
-            ex -> JOptionPane.showMessageDialog(null,
-                    "Error cargando resumen de publicaciones. Compruebe la conexión a la base de datos.", "Error",
-                    JOptionPane.ERROR_MESSAGE)
-        );
+                () -> controlador.getControladorPanelControl().listaPublicacionesResumen(),
+                // Actualizar UI con resultados
+                result -> {
+                    String[][] resumen = result;
+                    // Manejo de errores y populación del combo
+                    if (resumen == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando resumen de publicaciones. Compruebe la conexión a la base de datos.",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    } else if (resumen.length == 0) {
+                        JOptionPane.showMessageDialog(null,
+                                "No hay publicaciones registradas para mostrar.", "Información",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        resumen = new String[0][0];
+                    }
+                    // Guardar resumen y poblar cards
+                    resumenPublicacionesField = resumen;
+                    poblarCards(cardsContainer, resumenPublicacionesField, "", "Ciclos", "Editorial");
+                    scrollPublicaciones.revalidate();
+                    scrollPublicaciones.repaint();
+                },
+                ex -> JOptionPane.showMessageDialog(null,
+                        "Error cargando resumen de publicaciones. Compruebe la conexión a la base de datos.", "Error",
+                        JOptionPane.ERROR_MESSAGE));
+    }
 
+    /**
+     * Configura los listeners de eventos para aplicar filtros
+     */
+    private void setupEventListeners() {
         // Eventos para aplicar filtros
         btnBuscar.addActionListener(e -> {
             String criterio = buscadorField.getText().trim();
@@ -279,33 +350,23 @@ public class CatalogoLibros {
             scrollPublicaciones.revalidate();
             scrollPublicaciones.repaint();
         });
-        
-        // Agregar componentes al panel principal
-        panel.add(encabezado);
-        panel.add(buscadorField);
-        panel.add(btnBuscar);
-        panel.add(filtros);
-        panel.add(comboCiclosField);
-        panel.add(comboEditorialField);
-        panel.add(scrollPublicaciones);
-
-        return panel;
     }
 
     /**
      * Poblador de cards: aplica filtros y reconstruye el contenedor de cards
      *
-     * @param cardsContainer contenedor donde se añaden las cards
-     * @param publicaciones datos sin filtrar (resumen)
-     * @param search texto de búsqueda (título/isbn/autores)
-     * @param cicloFilter filtro de ciclo ("Ciclos" indica sin filtro)
+     * @param cardsContainer  contenedor donde se añaden las cards
+     * @param publicaciones   datos sin filtrar (resumen)
+     * @param search          texto de búsqueda (título/isbn/autores)
+     * @param cicloFilter     filtro de ciclo ("Ciclos" indica sin filtro)
      * @param editorialFilter filtro de editorial ("Editorial" indica sin filtro)
      */
-    private void poblarCards(JPanel cardsContainer, String[][] publicaciones, String search, String cicloFilter, String editorialFilter) {
+    private void poblarCards(final JPanel cardsContainer, final String[][] publicaciones, final String search,
+            final String cicloFilter, final String editorialFilter) {
         cardsContainer.removeAll();
 
         if (publicaciones != null) {
-            for (String[] fila : publicaciones) {
+            for (final String[] fila : publicaciones) {
                 String tituloTxt = fila[0] != null ? fila[0] : "";
                 String isbnTxt = fila[1] != null ? fila[1] : "";
                 String autoresTxt = fila[2] != null ? fila[2] : "";
@@ -323,7 +384,8 @@ public class CatalogoLibros {
                 boolean matches = true;
                 if (search != null && !search.isEmpty()) {
                     String s = search.toLowerCase();
-                    if (!(tituloTxt.toLowerCase().contains(s) || isbnTxt.toLowerCase().contains(s) || autoresTxt.toLowerCase().contains(s))) {
+                    if (!(tituloTxt.toLowerCase().contains(s) || isbnTxt.toLowerCase().contains(s)
+                            || autoresTxt.toLowerCase().contains(s))) {
                         matches = false;
                     }
                 }
@@ -338,8 +400,9 @@ public class CatalogoLibros {
                     }
                 }
 
-                if (!matches)
+                if (!matches) {
                     continue;
+                }
 
                 // Construir card por publicación
                 JPanel card = new JPanel();
@@ -404,7 +467,7 @@ public class CatalogoLibros {
                 card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 card.addMouseListener(new MouseAdapter() {
                     @Override
-                    public void mouseClicked(MouseEvent e) {
+                    public void mouseClicked(final MouseEvent e) {
                         // Navegar a la pantalla de ejemplares y cargar la publicación seleccionada
                         try {
                             int id = Integer.parseInt(idPub);
@@ -416,12 +479,12 @@ public class CatalogoLibros {
                     }
 
                     @Override
-                    public void mouseEntered(MouseEvent e) {
+                    public void mouseEntered(final MouseEvent e) {
                         card.setBackground(Color.decode("#F6F9FB"));
                     }
 
                     @Override
-                    public void mouseExited(MouseEvent e) {
+                    public void mouseExited(final MouseEvent e) {
                         card.setBackground(Color.white);
                     }
                 });
@@ -447,8 +510,10 @@ public class CatalogoLibros {
      */
     public void refrescarPublicaciones() {
         // Guardar selecciones actuales
-        String selCiclo = comboCiclosField.getSelectedItem() == null ? null : comboCiclosField.getSelectedItem().toString();
-        String selEditorial = comboEditorialField.getSelectedItem() == null ? null : comboEditorialField.getSelectedItem().toString();
+        String selCiclo = comboCiclosField.getSelectedItem() == null ? null
+                : comboCiclosField.getSelectedItem().toString();
+        String selEditorial = comboEditorialField.getSelectedItem() == null ? null
+                : comboEditorialField.getSelectedItem().toString();
 
         // Indicar carga
         comboCiclosField.removeAllItems();
@@ -458,91 +523,98 @@ public class CatalogoLibros {
 
         // Cargar ciclos en background
         BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().listaCiclos(),
-            // Actualizar UI con resultados
-            result -> {
-                // Repoblar combo ciclos
-                comboCiclosField.removeAllItems();
-                comboCiclosField.addItem("Ciclos");
-                // Manejo de errores y populación del combo
-                if (result == null) {
-                    JOptionPane.showMessageDialog(null,
-                            "Error cargando lista de ciclos. Compruebe la conexión a la base de datos.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                } else if (result.length == 0) {
-                    JOptionPane.showMessageDialog(null,
-                            "No hay ciclos disponibles para mostrar.", "Información",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
-                for (String ciclo : result) comboCiclosField.addItem(ciclo);
-                if (selCiclo != null) comboCiclosField.setSelectedItem(selCiclo);
-            },
-            ex -> JOptionPane.showMessageDialog(null,
-                    "Error cargando lista de ciclos. Compruebe la conexión a la base de datos.", "Error",
-                    JOptionPane.ERROR_MESSAGE)
-        );
+                () -> controlador.getControladorPanelControl().listaCiclos(),
+                // Actualizar UI con resultados
+                result -> {
+                    // Repoblar combo ciclos
+                    comboCiclosField.removeAllItems();
+                    comboCiclosField.addItem("Cargando...");
+                    // Manejo de errores y populación del combo
+                    if (result == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando lista de ciclos. Compruebe la conexión a la base de datos.", "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    } else if (result.length == 0) {
+                        JOptionPane.showMessageDialog(null,
+                                "No hay ciclos disponibles para mostrar.", "Información",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
+                    for (final String ciclo : result) {
+                        comboCiclosField.addItem(ciclo);
+                    }
+                    if (selCiclo != null) {
+                        comboCiclosField.setSelectedItem(selCiclo);
+                    }
+                },
+                ex -> JOptionPane.showMessageDialog(null,
+                        "Error cargando lista de ciclos. Compruebe la conexión a la base de datos.", "Error",
+                        JOptionPane.ERROR_MESSAGE));
 
         // Cargar editoriales en background
         BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().listaEditoriales(),
-            // Actualizar UI con resultados
-            result -> {
-                // Repoblar combo editoriales
-                comboEditorialField.removeAllItems();
-                comboEditorialField.addItem("Editorial");
-                // Manejo de errores y populación del combo
-                if (result == null) {
-                    JOptionPane.showMessageDialog(null,
-                            "Error cargando lista de editoriales. Compruebe la conexión a la base de datos.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                } else if (result.length == 0) {
-                    JOptionPane.showMessageDialog(null,
-                            "No hay editoriales disponibles para mostrar.", "Información",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
-                for (String editorial : result) comboEditorialField.addItem(editorial);
-                if (selEditorial != null) comboEditorialField.setSelectedItem(selEditorial);
-            },
-            ex -> JOptionPane.showMessageDialog(null,
-                    "Error cargando lista de editoriales. Compruebe la conexión a la base de datos.", "Error",
-                    JOptionPane.ERROR_MESSAGE)
-        );
+                () -> controlador.getControladorPanelControl().listaEditoriales(),
+                // Actualizar UI con resultados
+                result -> {
+                    // Repoblar combo editoriales
+                    comboEditorialField.removeAllItems();
+                    comboEditorialField.addItem("Editorial");
+                    // Manejo de errores y populación del combo
+                    if (result == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando lista de editoriales. Compruebe la conexión a la base de datos.",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    } else if (result.length == 0) {
+                        JOptionPane.showMessageDialog(null,
+                                "No hay editoriales disponibles para mostrar.", "Información",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
+                    for (final String editorial : result) {
+                        comboEditorialField.addItem(editorial);
+                    }
+                    if (selEditorial != null) {
+                        comboEditorialField.setSelectedItem(selEditorial);
+                    }
+                },
+                ex -> JOptionPane.showMessageDialog(null,
+                        "Error cargando lista de editoriales. Compruebe la conexión a la base de datos.", "Error",
+                        JOptionPane.ERROR_MESSAGE));
 
         // Actualizar resumen en background y repoblar cards
         BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().listaPublicacionesResumen(),
-            // Actualizar UI con resultados
-            result -> {
-                // Manejo de errores y populación del combo
-                if (result == null) {
-                    JOptionPane.showMessageDialog(null,
-                            "Error cargando resumen de publicaciones. Compruebe la conexión a la base de datos.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    resumenPublicacionesField = new String[0][0];
-                } else if (result.length == 0) {
-                    JOptionPane.showMessageDialog(null,
-                            "No hay publicaciones registradas para mostrar.", "Información",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    resumenPublicacionesField = new String[0][0];
-                } else {
-                    resumenPublicacionesField = result;
-                }
-                // Repoblar cards con filtros actuales
-                String criterio = buscadorField.getText().trim();
-                String cicloSel = (String) comboCiclosField.getSelectedItem();
-                String editorialSel = (String) comboEditorialField.getSelectedItem();
-                poblarCards(cardsContainer, resumenPublicacionesField, criterio, cicloSel, editorialSel);
-                scrollPublicaciones.revalidate();
-                scrollPublicaciones.repaint();
-            },
-            ex -> JOptionPane.showMessageDialog(null,
-                    "Error cargando resumen de publicaciones. Compruebe la conexión a la base de datos.", "Error",
-                    JOptionPane.ERROR_MESSAGE)
-        );
+                () -> controlador.getControladorPanelControl().listaPublicacionesResumen(),
+                // Actualizar UI con resultados
+                result -> {
+                    // Manejo de errores y populación del combo
+                    if (result == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando resumen de publicaciones. Compruebe la conexión a la base de datos.",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        resumenPublicacionesField = new String[0][0];
+                    } else if (result.length == 0) {
+                        JOptionPane.showMessageDialog(null,
+                                "No hay publicaciones registradas para mostrar.", "Información",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        resumenPublicacionesField = new String[0][0];
+                    } else {
+                        resumenPublicacionesField = result;
+                    }
+                    // Repoblar cards con filtros actuales
+                    final String criterio = buscadorField.getText().trim();
+                    final String cicloSel = (String) comboCiclosField.getSelectedItem();
+                    final String editorialSel = (String) comboEditorialField.getSelectedItem();
+                    poblarCards(cardsContainer, resumenPublicacionesField, criterio, cicloSel, editorialSel);
+                    scrollPublicaciones.revalidate();
+                    scrollPublicaciones.repaint();
+                },
+                ex -> JOptionPane.showMessageDialog(null,
+                        "Error cargando resumen de publicaciones. Compruebe la conexión a la base de datos.", "Error",
+                        JOptionPane.ERROR_MESSAGE));
     }
 
 }
