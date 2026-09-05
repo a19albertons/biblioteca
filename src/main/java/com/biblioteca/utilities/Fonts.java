@@ -32,10 +32,10 @@ public final class Fonts {
     /**
      * Carga y registra una fuente desde recursos embebidos
      * 
-     * @param resourceName
-     * @return
+     * @param resourceName nombre del recurso de fuente
+     * @return la fuente cargada o null si no se encuentra
      */
-    private static Font loadAndRegister(String resourceName) {
+    private static Font loadAndRegister(final String resourceName) {
         // Intentar cargar la fuente desde recursos
         try (InputStream is = Fonts.class.getResourceAsStream("/fonts/" + resourceName)) {
             // Si no se encuentra el recurso, devolver null
@@ -61,10 +61,10 @@ public final class Fonts {
      * Si la fuente no está cargada, devuelve una fuente por defecto con familia
      * "Open Sans".
      * 
-     * @param size
-     * @return
+     * @param size tamaño en puntos
+     * @return la fuente Open Sans con el tamaño especificado
      */
-    public static Font openSans(float size) {
+    public static Font openSans(final float size) {
         // Devuelve la fuente Open Sans en tamaño específico
         if (openSansRegular != null) {
             return openSansRegular.deriveFont(Font.PLAIN, Math.round(size));

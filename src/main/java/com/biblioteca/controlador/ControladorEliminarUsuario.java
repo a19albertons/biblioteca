@@ -14,15 +14,13 @@ public class ControladorEliminarUsuario {
      */
     private final DBConnection dbConnection;
 
-
-
     /**
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
      * 
-     * @param dbConnection
+     * @param dbConnection DBConnection para conexiones a la base de datos
      */
-    public ControladorEliminarUsuario(DBConnection dbConnection) {
+    public ControladorEliminarUsuario(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -32,8 +30,11 @@ public class ControladorEliminarUsuario {
     /**
      * Devuelve true si el usuario puede ser dado de baja (sin préstamos activos) y
      * lo marca como inactivo.
+     * 
+     * @param idUsuario ID del usuario a eliminar
+     * @return true si el usuario puede ser dado de baja y lo marca como inactivo
      */
-    public boolean eliminarUsuario(int idUsuario) {
+    public boolean eliminarUsuario(final int idUsuario) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");

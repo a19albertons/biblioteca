@@ -48,7 +48,7 @@ public class EliminarUsuarioDialog extends JDialog {
      * @param controlador
      * @param idUsuario
      */
-    public EliminarUsuarioDialog(JFrame parent, Controlador controlador, int idUsuario) {
+    public EliminarUsuarioDialog(final JFrame parent, final Controlador controlador, final int idUsuario) {
         // Diálogo modal
         super(parent, "Eliminar Usuario", true);
         this.controlador = controlador;
@@ -63,12 +63,12 @@ public class EliminarUsuarioDialog extends JDialog {
         // Añadir listener para quitar overlay al cerrar
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
+            public void windowClosed(final WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -133,15 +133,18 @@ public class EliminarUsuarioDialog extends JDialog {
     }
 
     /**
-     * Muestra u oculta el diálogo, instalando o quitando el overlay en el frame padre
+     * Muestra u oculta el diálogo, instalando o quitando el overlay en el frame
+     * padre
      */
     @Override
-    public void setVisible(boolean b) {
-        if (b)
+    public void setVisible(final boolean b) {
+        if (b) {
             installOverlay();
+        }
         super.setVisible(b);
-        if (!b)
+        if (!b) {
             removeOverlay();
+        }
     }
 
     /**
@@ -149,8 +152,9 @@ public class EliminarUsuarioDialog extends JDialog {
      */
     private void installOverlay() {
         // Añadir listener para quitar overlay al cerrar
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Recordar el glass pane previo
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
@@ -173,8 +177,9 @@ public class EliminarUsuarioDialog extends JDialog {
      */
     private void removeOverlay() {
         // Quitar overlay
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Restaurar el glass pane previo (si lo teníamos)
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;

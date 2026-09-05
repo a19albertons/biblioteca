@@ -18,7 +18,7 @@ public class Modulo {
     /**
      * Obtiene el id del modulo
      * 
-     * @return
+     * @return el id del modulo
      */
     public int getId() {
         return id;
@@ -29,14 +29,14 @@ public class Modulo {
      * 
      * @param id
      */
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
     /**
      * Obtiene el nombre del modulo
      * 
-     * @return
+     * @return el nombre del modulo
      */
     public String getNombre() {
         return nombre;
@@ -47,7 +47,7 @@ public class Modulo {
      * 
      * @param nombre
      */
-    public void setNombre(String nombre) {
+    public void setNombre(final String nombre) {
         if (nombre != null) {
             this.nombre = nombre;
         } else {
@@ -61,7 +61,7 @@ public class Modulo {
      * 
      * @param nombre
      */
-    public Modulo(String nombre) {
+    public Modulo(final String nombre) {
         setNombre(nombre);
     }
 
@@ -71,7 +71,7 @@ public class Modulo {
      * @param id
      * @param nombre
      */
-    public Modulo(int id, String nombre) {
+    public Modulo(final int id, final String nombre) {
         this.id = id;
         this.nombre = nombre;
     }

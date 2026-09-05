@@ -124,7 +124,7 @@ public class EditarPublicacionDialog extends JDialog {
      * @param controlador   controlador principal de la aplicación
      * @param idPublicacion id de la publicación a editar
      */
-    public EditarPublicacionDialog(JFrame parent, Controlador controlador, int idPublicacion) {
+    public EditarPublicacionDialog(final JFrame parent, final Controlador controlador, final int idPublicacion) {
         super(parent, "Editar Publicación", true);
         this.controlador = controlador;
         this.parentFrame = parent;
@@ -135,12 +135,12 @@ public class EditarPublicacionDialog extends JDialog {
 
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
+            public void windowClosed(final WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -170,16 +170,14 @@ public class EditarPublicacionDialog extends JDialog {
 
     /**
      * Configura un campo de texto con los estilos por defecto
-     * 
-     * @param field campo a configurar
      */
     @Override
-    public void setVisible(boolean b) {
-        if (b) {
+    public void setVisible(final boolean visible) {
+        if (visible) {
             installOverlay();
         }
-        super.setVisible(b);
-        if (!b) {
+        super.setVisible(visible);
+        if (!visible) {
             removeOverlay();
         }
     }
@@ -196,8 +194,9 @@ public class EditarPublicacionDialog extends JDialog {
         try {
             ObtenerPublicacionDetallesPorIdDTO datos = controlador.getControladorEditarPublicacionDialog()
                     .obtenerDetallesPublicacion(idPublicacion);
-            if (datos == null)
+            if (datos == null) {
                 return;
+            }
             // datos: tipo, titulo, codigo_isbn, idioma, temasCSV, modulosCSV, ciclosCSV,
             // editorial, num_edicion, fecha_publicacion, autoresCSV, periodicidad, id
             String tipo = datos.getTipoPublicacion() != null ? datos.getTipoPublicacion().name() : "";
@@ -247,8 +246,9 @@ public class EditarPublicacionDialog extends JDialog {
      * que está bloqueada mientras el diálogo está abierto.
      */
     private void installOverlay() {
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
             Component current = rpc.getRootPane().getGlassPane();
@@ -271,8 +271,9 @@ public class EditarPublicacionDialog extends JDialog {
      * Quita el overlay de la ventana padre al cerrar el diálogo.
      */
     private void removeOverlay() {
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
             if (previousGlassPane != null) {
@@ -290,7 +291,7 @@ public class EditarPublicacionDialog extends JDialog {
     /**
      * Crea el panel del primer paso del wizard (datos comunes)
      * 
-     * @return
+     * @return panel del wizard paso 1
      */
     private JPanel crearPaso1() {
         // Crear panel para paso 1
@@ -409,7 +410,7 @@ public class EditarPublicacionDialog extends JDialog {
     /**
      * Crea el panel del paso Libro del wizard
      * 
-     * @return
+     * @return panel del paso de libro
      */
     private JPanel crearPasoLibro() {
         // Crear panel para paso Libro
@@ -468,8 +469,9 @@ public class EditarPublicacionDialog extends JDialog {
         // Acción botón Guardar
         guardar.addActionListener(e -> {
             // Validar y guardar cambios
-            if (!validarPasoLibro())
+            if (!validarPasoLibro()) {
                 return;
+            }
             try {
                 // llamar al controlador para actualizar la publicación
                 boolean ok = controlador.getControladorEditarPublicacionDialog().editarPublicacionLibro(
@@ -518,7 +520,7 @@ public class EditarPublicacionDialog extends JDialog {
     /**
      * Crea el panel del paso Revista del wizard
      * 
-     * @return
+     * @return panel del paso de Revista
      */
     private JPanel crearPasoRevista() {
         // Crear panel para paso Revista
@@ -559,8 +561,9 @@ public class EditarPublicacionDialog extends JDialog {
         // Acción botón Guardar
         guardar.addActionListener(e -> {
             // Validar y guardar cambios
-            if (!validarPasoRevista())
+            if (!validarPasoRevista()) {
                 return;
+            }
             try {
                 // llamar al controlador para actualizar la publicación
                 boolean ok = controlador.getControladorEditarPublicacionDialog().editarPublicacionRevista(
@@ -637,11 +640,12 @@ public class EditarPublicacionDialog extends JDialog {
     /**
      * Valida los campos del paso Libro
      * 
-     * @return
+     * @return true si los campos están válidos, false en caso contrario
      */
     private boolean validarPasoLibro() {
-        if (!validarPasoComun())
+        if (!validarPasoComun()) {
             return false;
+        }
         String numEd = numeroEdicionField.getText().trim();
         if (numEd.isEmpty()) {
             JOptionPane.showMessageDialog(this, "El número de edición es requerido", "Error",
@@ -678,11 +682,12 @@ public class EditarPublicacionDialog extends JDialog {
     /**
      * Valida los campos del paso Revista
      * 
-     * @return
+     * @return true si los campos están válidos, false en caso contrario
      */
     private boolean validarPasoRevista() {
-        if (!validarPasoComun())
+        if (!validarPasoComun()) {
             return false;
+        }
         String per = periodicidadField.getText().trim();
         if (per.isEmpty()) {
             JOptionPane.showMessageDialog(this, "La periodicidad es requerida", "Error", JOptionPane.ERROR_MESSAGE);
@@ -694,8 +699,10 @@ public class EditarPublicacionDialog extends JDialog {
     /**
      * Aplica estilo y fuente a los campos de texto (coincide con el estilo usado
      * en `NuevaPublicacionDialog` para consistencia visual).
+     * 
+     * @param field campo de texto a configurar
      */
-    private void configurarCampo(JTextField field) {
+    private void configurarCampo(final JTextField field) {
         field.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.decode("#CCCCCC")),
                 BorderFactory.createEmptyBorder(6, 8, 6, 8)));
         field.setFont(Fonts.openSans(12f));

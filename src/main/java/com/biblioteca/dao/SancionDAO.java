@@ -15,9 +15,19 @@ public class SancionDAO {
      */
     private final Connection conexion;
 
-    // SQL constants 🔧
+    /**
+     * Constante SQL para insertar sanción
+     */
     private static final String SQL_INSERT_SANCION = "INSERT INTO sanciones (id_usuario, id_prestamo, inicio_sancion, fin_sancion, descripcion, estado) VALUES (?, ?, ?, ?, ?, TRUE)";
+
+    /**
+     * Constante SQL para obtener sanción activa por usuario (estado = TRUE)
+     */
     private static final String SQL_SELECT_SANCION_ACTIVA_POR_USUARIO = "SELECT id, fin_sancion FROM sanciones WHERE id_usuario = ? AND estado = TRUE LIMIT 1";
+
+    /**
+     * Constante SQL para desactivar sanción (estado = FALSE)
+     */
     private static final String SQL_UPDATE_DESACTIVAR_SANCION = "UPDATE sanciones SET estado = FALSE WHERE id = ?";
 
     /**
@@ -25,7 +35,7 @@ public class SancionDAO {
      * 
      * @param conexion
      */
-    public SancionDAO(Connection conexion) {
+    public SancionDAO(final Connection conexion) {
         if (conexion == null) {
             throw new IllegalArgumentException("Connection cannot be null");
         }
@@ -42,7 +52,8 @@ public class SancionDAO {
      * @param descripcion
      * @return true si se insertó correctamente
      */
-    public boolean insertarSancion(int idUsuario, int idPrestamo, Date inicio, Date fin, String descripcion) {
+    public boolean insertarSancion(final int idUsuario, final int idPrestamo, final Date inicio, final Date fin,
+            final String descripcion) {
         // insertar sanción
         final String sql = SQL_INSERT_SANCION;
         try (
@@ -70,7 +81,7 @@ public class SancionDAO {
      * @param idUsuario
      * @return UsuarioFinSancionDTO con id y fin_sancion
      */
-    public UsuarioFinSancionDTO obtenerSancionActivaPorUsuario(int idUsuario) {
+    public UsuarioFinSancionDTO obtenerSancionActivaPorUsuario(final int idUsuario) {
         // obtener sanción activa
         final String sql = SQL_SELECT_SANCION_ACTIVA_POR_USUARIO;
         UsuarioFinSancionDTO dto = null;
@@ -107,7 +118,7 @@ public class SancionDAO {
      * @param idSancion
      * @return true si afectó exactamente una fila
      */
-    public boolean desactivarSancionPorId(int idSancion) {
+    public boolean desactivarSancionPorId(final int idSancion) {
         // consulta SQL para desactivar sanción
         final String sql = SQL_UPDATE_DESACTIVAR_SANCION;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {

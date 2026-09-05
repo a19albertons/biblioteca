@@ -26,7 +26,7 @@ public class ControladorNuevoUsuarioDialog {
      * 
      * @param dbConnection
      */
-    public ControladorNuevoUsuarioDialog(DBConnection dbConnection) {
+    public ControladorNuevoUsuarioDialog(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -44,7 +44,8 @@ public class ControladorNuevoUsuarioDialog {
      * @param tipoCode  código de tipo de usuario (E,P,A,C,L)
      * @return true si la creación y commit fue satisfactoria
      */
-    public boolean crearUsuario(String dni, String nombre, String apellidos, String email, String tipoCode) {
+    public boolean crearUsuario(final String dni, final String nombre, final String apellidos, final String email,
+            final String tipoCode) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             // Comprobar conexión
             if (conexion == null) {
@@ -69,15 +70,16 @@ public class ControladorNuevoUsuarioDialog {
             String fecha2digitos = fechaActual.format(DateTimeFormatter.ofPattern("yy"));
             String apellido1Formateado = apellido1.isEmpty() ? "" : apellido1.substring(0, 1).toUpperCase();
             String apellido2Formateado = apellido2.isEmpty() ? "" : apellido2.substring(0, 1).toUpperCase();
-            String usuarioConsultar = "A"+fecha2digitos+nombre.trim().toUpperCase().charAt(0)+nombre.trim().substring(1)+apellido1Formateado+apellido2Formateado;
-
+            String usuarioConsultar = "A" + fecha2digitos + nombre.trim().toUpperCase().charAt(0)
+                    + nombre.trim().substring(1) + apellido1Formateado + apellido2Formateado;
 
             try {
                 // Iniciar transacción
                 conexion.setAutoCommit(false);
                 int numeroUsuariosMismoPatron = usuarioDAO.consultaNumeroUsuariosPorUsuario(usuarioConsultar);
 
-                // Genera el nombre de usuario final basado en el patrón y el número de usuarios existentes
+                // Genera el nombre de usuario final basado en el patrón y el número de usuarios
+                // existentes
                 String usuarioFinal;
                 if (numeroUsuariosMismoPatron == -1) {
                     return false;

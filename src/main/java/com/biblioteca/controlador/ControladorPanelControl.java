@@ -22,7 +22,7 @@ public class ControladorPanelControl {
      * 
      * @param dbConnection
      */
-    public ControladorPanelControl(DBConnection dbConnection) {
+    public ControladorPanelControl(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -32,7 +32,7 @@ public class ControladorPanelControl {
     /**
      * Obtiene el número de préstamos realizados hoy
      * 
-     * @return
+     * @return String con el número de préstamos realizados hoy
      */
     public String obtenerPrestamosHoy() {
         try (Connection conexion = this.dbConnection.getConnection()) {
@@ -53,7 +53,7 @@ public class ControladorPanelControl {
     /**
      * Obtiene el número de préstamos pendientes
      * 
-     * @return
+     * @return String con el número de préstamos pendientes
      */
     public String obtenerPrestamosPendientes() {
         try (Connection conexion = this.dbConnection.getConnection()) {
@@ -73,7 +73,7 @@ public class ControladorPanelControl {
     /**
      * Obtiene el número total de socios activos
      * 
-     * @return
+     * @return String con el número total de socios activos
      */
     public String obtenerTotalSociosActivos() {
         try (Connection conexion = this.dbConnection.getConnection()) {
@@ -94,7 +94,7 @@ public class ControladorPanelControl {
     /**
      * Obtiene los últimos movimientos de préstamos
      * 
-     * @return
+     * @return String[][] con los últimos movimientos de préstamos
      */
     public String[][] obtenerUltimosMovimientos() {
         try (Connection conexion = this.dbConnection.getConnection()) {
@@ -113,7 +113,7 @@ public class ControladorPanelControl {
     /**
      * Obtiene la lista de ciclos
      * 
-     * @return
+     * @return String[] con la lista de ciclos
      */
     public String[] listaCiclos() {
         String[] listaCiclos = new String[0];
@@ -131,7 +131,7 @@ public class ControladorPanelControl {
     /**
      * Obtiene la lista de editoriales
      * 
-     * @return
+     * @return String[] con la lista de editoriales
      */
     public String[] listaEditoriales() {
         try (Connection conexion = this.dbConnection.getConnection()) {

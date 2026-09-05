@@ -22,9 +22,9 @@ public class ControladorEditarEjemplarDialog {
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
      * 
-     * @param dbConnection
+     * @param dbConnection la conexión a la base de datos
      */
-    public ControladorEditarEjemplarDialog(DBConnection dbConnection) {
+    public ControladorEditarEjemplarDialog(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -35,8 +35,11 @@ public class ControladorEditarEjemplarDialog {
      * Obtiene detalles básicos del ejemplar para prellenar el diálogo de edición.
      * Devuelve arreglo: {id, id_publicacion, num_ejemplar, fecha_adquisicion,
      * estado}
+     * 
+     * @param idEjemplar identificador del ejemplar
+     * @return detalles del ejemplar como EstadoEjemplarDTO
      */
-    public EstadoEjemplarDTO obtenerDetallesEjemplar(int idEjemplar) {
+    public EstadoEjemplarDTO obtenerDetallesEjemplar(final int idEjemplar) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -55,11 +58,11 @@ public class ControladorEditarEjemplarDialog {
      * recupera desde la base de datos para evitar que este diálogo lo gestione.
      * Operación transaccional.
      *
-     * @param idEjemplar
-     * @param fechaAdquisicion LocalDate
-     * @return true si actualización exitosa
+     * @param idEjemplar       identificador del ejemplar a editar
+     * @param fechaAdquisicion fecha de adquisición del ejemplar
+     * @return true si actualización exitosa, false en caso de error
      */
-    public boolean editarEjemplar(int idEjemplar, LocalDate fechaAdquisicion) {
+    public boolean editarEjemplar(final int idEjemplar, final LocalDate fechaAdquisicion) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");

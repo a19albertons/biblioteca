@@ -73,7 +73,7 @@ public class EditarUsuarioDialog extends JDialog {
      * @param controlador
      * @param idUsuario
      */
-    public EditarUsuarioDialog(JFrame parent, Controlador controlador, int idUsuario) {
+    public EditarUsuarioDialog(final JFrame parent, final Controlador controlador, final int idUsuario) {
         // Inicializar diálogo
         super(parent, "Editar Usuario", true);
         this.controlador = controlador;
@@ -88,12 +88,12 @@ public class EditarUsuarioDialog extends JDialog {
         // Añadir listener para manejar el overlay al cerrar
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
+            public void windowClosed(final WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -234,9 +234,10 @@ public class EditarUsuarioDialog extends JDialog {
 
     /**
      * Configura un campo de texto estándar
+     * 
      * @param f
      */
-    private void configureField(JTextField f) {
+    private void configureField(final JTextField f) {
         f.setPreferredSize(new Dimension(220, 28));
     }
 
@@ -248,8 +249,9 @@ public class EditarUsuarioDialog extends JDialog {
             // Obtener datos del usuario
             String[] datos = controlador.getControladorEditarUsuarioDialog().obtenerDetallesUsuario(idUsuario);
             // No hay datos acaba el metodo
-            if (datos == null)
+            if (datos == null) {
                 return;
+            }
             // Rellenar campos
             dniField.setText(datos.length > 0 ? datos[0] : "");
             nombreField.setText(datos.length > 1 ? datos[1] : "");
@@ -277,21 +279,25 @@ public class EditarUsuarioDialog extends JDialog {
      * Muestra u oculta el diálogo, gestionando el overlay
      */
     @Override
-    public void setVisible(boolean b) {
-        if (b)
+    public void setVisible(final boolean b) {
+        if (b) {
             installOverlay();
+        }
         super.setVisible(b);
-        if (!b)
+        if (!b) {
             removeOverlay();
+        }
     }
 
     /**
      * Instala un overlay translúcido en el frame padre
      */
     private void installOverlay() {
-        // Instala un panel translúcido sobre el frame padre para deshabilitar la interacción
-        if (parentFrame == null)
+        // Instala un panel translúcido sobre el frame padre para deshabilitar la
+        // interacción
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Recordar el glass pane previo
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
@@ -314,8 +320,9 @@ public class EditarUsuarioDialog extends JDialog {
      */
     private void removeOverlay() {
         // Restaura el glass pane previo
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Restaurar el glass pane previo (si lo teníamos)
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;

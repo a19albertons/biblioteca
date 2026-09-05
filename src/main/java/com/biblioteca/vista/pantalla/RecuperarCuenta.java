@@ -31,15 +31,24 @@ public class RecuperarCuenta {
     /**
      * Controlador de la aplicación
      */
-    Controlador controlador;
+    private final Controlador controlador;
 
     /**
      * Constructor de la vista RecuperarCuenta
      *
      * @param controlador controlador principal
      */
-    public RecuperarCuenta(Controlador controlador) {
+    public RecuperarCuenta(final Controlador controlador) {
         this.controlador = controlador;
+    }
+
+    /**
+     * Obtiene el controlador de la aplicación
+     *
+     * @return Controlador
+     */
+    public Controlador getControlador() {
+        return controlador;
     }
 
     /**
@@ -115,17 +124,17 @@ public class RecuperarCuenta {
         // Cambiar cursor y manejar click
         volver.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(final MouseEvent e) {
                 controlador.getControladorNavegacion().cambiarPantallaPadre("inicioSesion");
             }
 
             @Override
-            public void mouseEntered(MouseEvent e) {
+            public void mouseEntered(final MouseEvent e) {
                 volver.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
 
             @Override
-            public void mouseExited(MouseEvent e) {
+            public void mouseExited(final MouseEvent e) {
                 volver.setCursor(Cursor.getDefaultCursor());
             }
         });
@@ -179,17 +188,17 @@ public class RecuperarCuenta {
 
         volver.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(final MouseEvent e) {
                 controlador.getControladorNavegacion().cambiarPantallaPadre("inicioSesion");
             }
 
             @Override
-            public void mouseEntered(MouseEvent e) {
+            public void mouseEntered(final MouseEvent e) {
                 volver.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
 
             @Override
-            public void mouseExited(MouseEvent e) {
+            public void mouseExited(final MouseEvent e) {
                 volver.setCursor(Cursor.getDefaultCursor());
             }
         });

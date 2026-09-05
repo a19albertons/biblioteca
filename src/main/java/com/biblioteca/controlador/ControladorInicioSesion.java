@@ -19,9 +19,9 @@ public class ControladorInicioSesion {
     /**
      * Constructor con DBConnection (inyección)
      * 
-     * @param dbConnection
+     * @param dbConnection final DBConnection para conexiones a la base de datos
      */
-    public ControladorInicioSesion(DBConnection dbConnection) {
+    public ControladorInicioSesion(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -31,11 +31,11 @@ public class ControladorInicioSesion {
     /**
      * Inicia sesión con las credenciales proporcionadas
      * 
-     * @param usuario
-     * @param contrasena
-     * @return
+     * @param usuario    final String nombre de usuario
+     * @param contrasena final String contraseña
+     * @return Usuario autenticado o null si falló
      */
-    public Usuario iniciarSesion(String usuario, String contrasena) {
+    public Usuario iniciarSesion(final String usuario, final String contrasena) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -45,7 +45,8 @@ public class ControladorInicioSesion {
             Usuario usuarioComprobar = usuarioDAO.consultaInicioSesion(usuario);
 
             // Comprobamos si la contraseña del usuario coincide con la proporcionada
-            if (usuarioComprobar != null && HashearContrasena.verify(contrasena.toCharArray(), usuarioComprobar.getContrasena())) {
+            if (usuarioComprobar != null
+                    && HashearContrasena.verify(contrasena.toCharArray(), usuarioComprobar.getContrasena())) {
                 return usuarioComprobar;
             } else {
                 // Credenciales incorrectas

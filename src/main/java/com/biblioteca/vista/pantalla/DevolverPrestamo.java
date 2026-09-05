@@ -26,15 +26,24 @@ public class DevolverPrestamo {
     /**
      * Controlador de la aplicación
      */
-    Controlador controlador;
+    private final Controlador controlador;
 
     /**
      * Constructor de la vista DevolverPrestamo
      *
      * @param controlador controlador principal
      */
-    public DevolverPrestamo(Controlador controlador) {
+    public DevolverPrestamo(final Controlador controlador) {
         this.controlador = controlador;
+    }
+
+    /**
+     * Getter para el controlador
+     *
+     * @return el controlador de la aplicación
+     */
+    public Controlador getControlador() {
+        return controlador;
     }
 
     /**
@@ -48,20 +57,31 @@ public class DevolverPrestamo {
         panel.setBackground(Color.decode("#EDF3F6"));
         panel.setLayout(null);
 
-        // Panel de encabezado con título
+        JPanel encabezado = crearEncabezado();
+        JPanel contenido = crearContenido();
+
+        panel.add(encabezado);
+        panel.add(contenido);
+        return panel;
+    }
+
+    /**
+     * Crea el panel de encabezado
+     *
+     * @return el panel de encabezado
+     */
+    private JPanel crearEncabezado() {
         JPanel encabezado = new JPanel();
         encabezado.setSize(new Dimension(600, 60));
         encabezado.setBackground(Color.white);
         encabezado.setLayout(null);
         encabezado.setBounds(0, 0, 600, 60);
 
-        // Titulo
         JLabel titulo = new JLabel("Devolución Préstamo");
         titulo.setFont(titulo.getFont().deriveFont(24f));
         titulo.setBounds(30, 10, 300, 40);
         encabezado.add(titulo);
 
-        // Link / boton formulario registrar prestamo (estilo enlace azul)
         JButton btnFormularioRegistrar = new JButton("Formulario registrar prestamo");
         btnFormularioRegistrar.setBounds(360, 15, 220, 30);
         btnFormularioRegistrar.setBackground(Color.white);
@@ -70,15 +90,43 @@ public class DevolverPrestamo {
         btnFormularioRegistrar.setBorder(null);
         encabezado.add(btnFormularioRegistrar);
 
-        // Panel de contenido
+        // Eventos botones
+        btnFormularioRegistrar.addActionListener(e -> {
+            controlador.getControladorNavegacion().cambiarPantallaHijo("concederPrestamo");
+        });
+
+        return encabezado;
+    }
+
+    /**
+     * Crea el panel de contenido
+     *
+     * @return el panel de contenido
+     */
+    private JPanel crearContenido() {
         JPanel contenido = new JPanel();
         contenido.setSize(540, 480);
         contenido.setLayout(null);
         contenido.setBackground(Color.white);
         contenido.setBounds(30, 80, 540, 480);
 
-        // Componentes del formulario
-        // Paso 1: Identificar socio
+        JTextField txtIdEjemplar = new JTextField();
+        txtIdEjemplar.setBounds(20, 280, 200, 35);
+        contenido.add(txtIdEjemplar);
+
+        configurarPasoSocio(contenido);
+        configurarPasoEjemplar(contenido, txtIdEjemplar);
+        configurarBotonesAccion(contenido, txtIdEjemplar);
+
+        return contenido;
+    }
+
+    /**
+     * Configura el paso 1: Identificar socio
+     *
+     * @param contenido el panel de contenido
+     */
+    private void configurarPasoSocio(final JPanel contenido) {
         JLabel paso1 = new JLabel("1. Identificar Socio (Usuario)");
         paso1.setBounds(20, 20, 350, 30);
         paso1.setForeground(Color.decode("#468DAE"));
@@ -103,32 +151,61 @@ public class DevolverPrestamo {
 
         JLabel resultadoSocio = new JLabel("");
         resultadoSocio.setBounds(20, 150, 480, 40);
-        resultadoSocio.setText("<html>Usuario: (Estudiante) - <span style='color:#2BC187; font-weight:bold'>Sin Sanciones</span></html>");
+        resultadoSocio.setText(
+                "<html>Usuario: (Estudiante) - <span style='color:#2BC187; font-weight:bold'>Sin Sanciones</span></html>");
         resultadoSocio.setBackground(Color.decode("#EDF3F6"));
         resultadoSocio.setOpaque(true);
         resultadoSocio.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
         contenido.add(resultadoSocio);
 
-        // mutable holder para el id de usuario seleccionado (para usar desde lambdas)
         final int[] usuarioSeleccionado = new int[] { -1 };
+        btnBuscarSocio.addActionListener(e -> {
+            String input = txtDniID.getText().trim();
+            if (input.isEmpty()) {
+                resultadoSocio.setText("<html><span style='color:#F4791B'>Ingrese DNI o ID</span></html>");
+                usuarioSeleccionado[0] = -1;
+                return;
+            }
+            UsuarioEstadoPorDNIOID usuario = getControlador().getControladorDevolverPrestamo()
+                    .buscarUsuarioPorDniOId(input);
+            if (usuario == null) {
+                resultadoSocio.setText("<html><span style='color:#F4791B'>Usuario no encontrado</span></html>");
+                usuarioSeleccionado[0] = -1;
+                return;
+            }
+            usuarioSeleccionado[0] = usuario.getId();
+            String estado = usuario.getSancionactiva();
+            String tipoDesc = usuario.getTipoUsuario().getDescripcion();
+            if ("SANCIONADO".equalsIgnoreCase(estado)) {
+                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto() + " (" + tipoDesc
+                        + ") - <span style='color:#F4791B; font-weight:bold'>Tiene sanciones</span></html>");
+            } else if ("BAJA".equalsIgnoreCase(estado)) {
+                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto()
+                        + " - <span style='color:#F4791B; font-weight:bold'>Dado de baja</span></html>");
+            } else {
+                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto() + " (" + tipoDesc
+                        + ") - <span style='color:#2BC187; font-weight:bold'>Sin sanciones</span></html>");
+            }
+        });
+    }
 
-        // Paso 2: Identificar Ejemplar
+    /**
+     * Configura el paso 2: Identificar ejemplar
+     *
+     * @param contenido     el panel de contenido
+     * @param txtIdEjemplar campo de texto para el ID del ejemplar
+     */
+    private void configurarPasoEjemplar(final JPanel contenido, final JTextField txtIdEjemplar) {
         JLabel paso2 = new JLabel("2. Identificar Ejemplar");
         paso2.setBounds(20, 200, 300, 30);
         paso2.setForeground(Color.decode("#468DAE"));
         paso2.setFont(paso2.getFont().deriveFont(16f));
         contenido.add(paso2);
 
-        // ID Ejemplar
         JLabel idEjemplar = new JLabel("ID Ejemplar:");
         idEjemplar.setBounds(20, 250, 100, 25);
         contenido.add(idEjemplar);
 
-        JTextField txtIdEjemplar = new JTextField();
-        txtIdEjemplar.setBounds(20, 280, 200, 35);
-        contenido.add(txtIdEjemplar);
-
-        // Publicacion (mostrador de publicación detectada)
         JLabel publicacion = new JLabel("Publicación");
         publicacion.setBounds(230, 250, 300, 35);
         contenido.add(publicacion);
@@ -138,16 +215,23 @@ public class DevolverPrestamo {
         txtPublicacion.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 0, Color.white));
         contenido.add(txtPublicacion);
 
-        // Detectar automáticamente al escribir ID de ejemplar
+        configurarDetectorEjemplar(txtIdEjemplar, txtPublicacion);
+    }
+
+    /**
+     * Configura el detector de ejemplar mediante DocumentListener
+     *
+     * @param txtIdEjemplar  campo de texto para el ID del ejemplar
+     * @param txtPublicacion etiqueta para mostrar la publicación detectada
+     */
+    private void configurarDetectorEjemplar(final JTextField txtIdEjemplar, final JLabel txtPublicacion) {
         txtIdEjemplar.getDocument().addDocumentListener(new DocumentListener() {
             private void doDetect() {
                 String idEjStr = txtIdEjemplar.getText().trim();
-                // Si está vacío, limpiar y salir
                 if (idEjStr.isEmpty()) {
                     txtPublicacion.setText("");
                     return;
                 }
-                // intentar parsear id ejemplar
                 int idEj;
                 try {
                     idEj = Integer.parseInt(idEjStr);
@@ -155,13 +239,12 @@ public class DevolverPrestamo {
                     txtPublicacion.setText("");
                     return;
                 }
-                // detectar ejemplar
-                EjemplarConTituloDTO detectado = controlador.getControladorDevolverPrestamo().detectarEjemplar(idEj);
+                EjemplarConTituloDTO detectado = getControlador().getControladorDevolverPrestamo()
+                        .detectarEjemplar(idEj);
                 if (detectado == null) {
                     txtPublicacion.setText("");
                     return;
                 }
-                // Aplica datos en el formato adecuado
                 String pubTitulo = detectado.getTitulo();
                 String numEd = String.valueOf(detectado.getNumEdicion());
                 String tipoPub = detectado.getTipoPublicacion().toString();
@@ -177,26 +260,30 @@ public class DevolverPrestamo {
                 }
             }
 
-            // modifcacion del texto de ejemplar
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate(final DocumentEvent e) {
                 doDetect();
             }
 
-            // modifcacion del texto de ejemplar
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate(final DocumentEvent e) {
                 doDetect();
             }
 
-            // modifcacion del texto de ejemplar
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(final DocumentEvent e) {
                 doDetect();
             }
         });
+    }
 
-        // Boton cancelar
+    /**
+     * Configura los botones de acción
+     *
+     * @param contenido     el panel de contenido
+     * @param txtIdEjemplar campo de texto para el ID del ejemplar
+     */
+    private void configurarBotonesAccion(final JPanel contenido, final JTextField txtIdEjemplar) {
         JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setBounds(250, 420, 100, 35);
         btnCancelar.setBackground(Color.white);
@@ -205,7 +292,6 @@ public class DevolverPrestamo {
         btnCancelar.setBorder(null);
         contenido.add(btnCancelar);
 
-        // Boton Devolver Prestamo
         JButton btnDevolverPrestamo = new JButton("DEVOLVER PRESTAMO");
         btnDevolverPrestamo.setBounds(370, 420, 120, 35);
         btnDevolverPrestamo.setBackground(Color.decode("#F4791B"));
@@ -215,55 +301,17 @@ public class DevolverPrestamo {
         btnDevolverPrestamo.setFont(new Font("Open Sans", Font.PLAIN, 11));
         contenido.add(btnDevolverPrestamo);
 
-        // Eventos botones
-        btnFormularioRegistrar.addActionListener(e -> {
-            controlador.getControladorNavegacion().cambiarPantallaHijo("concederPrestamo");
-        });
-
-        btnBuscarSocio.addActionListener(e -> {
-            String input = txtDniID.getText().trim();
-            // si está vacío, mensaje de error
-            if (input.isEmpty()) {
-                resultadoSocio.setText("<html><span style='color:#F4791B'>Ingrese DNI o ID</span></html>");
-                usuarioSeleccionado[0] = -1;
-                return;
-            }
-            // buscar usuario y comprobar resultado
-            UsuarioEstadoPorDNIOID usuario = controlador.getControladorDevolverPrestamo().buscarUsuarioPorDniOId(input);
-            if (usuario == null) {
-                resultadoSocio.setText("<html><span style='color:#F4791B'>Usuario no encontrado</span></html>");
-                usuarioSeleccionado[0] = -1;
-                return;
-            }
-            // datos: id, dni, nombre_completo, sancion_activa, tipo_desc
-            usuarioSeleccionado[0] = usuario.getId();
-            String estado = usuario.getSancionActiva();
-            String tipoDesc = usuario.getTipoUsuario().getDescripcion();
-            // mostrar resultado de estado usuario
-            if ("SANCIONADO".equalsIgnoreCase(estado)) {
-                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto() + " (" + tipoDesc
-                        + ") - <span style='color:#F4791B; font-weight:bold'>Tiene sanciones</span></html>");
-            } else if ("BAJA".equalsIgnoreCase(estado)) {
-                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto()
-                        + " - <span style='color:#F4791B; font-weight:bold'>Dado de baja</span></html>");
-            } else {
-                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto() + " (" + tipoDesc
-                        + ") - <span style='color:#2BC187; font-weight:bold'>Sin sanciones</span></html>");
-            }
-        });
-
         btnCancelar.addActionListener(e -> {
-            controlador.getControladorNavegacion().cambiarPantallaHijo("panelControl");
+            getControlador().getControladorNavegacion().cambiarPantallaHijo("panelControl");
         });
 
         btnDevolverPrestamo.addActionListener(e -> {
-            // Validar que se haya seleccionado usuario
+            final int[] usuarioSeleccionado = new int[] { -1 };
             if (usuarioSeleccionado[0] == -1) {
                 JOptionPane.showMessageDialog(null, "Seleccione primero un usuario válido", "Error",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            // validar id ejemplar
             String idEjStr = txtIdEjemplar.getText().trim();
             if (idEjStr.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
@@ -279,30 +327,24 @@ public class DevolverPrestamo {
                 return;
             }
 
-            // ejecutar devolución
-            String err = controlador.getControladorDevolverPrestamo().devolverPrestamo(usuarioSeleccionado[0], idEj);
+            String err = getControlador().getControladorDevolverPrestamo().devolverPrestamo(usuarioSeleccionado[0],
+                    idEj);
             if (err == null) {
                 JOptionPane.showMessageDialog(null, "Devolución registrada correctamente", "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
-                // Mostrar notificación sobre sanción si existe
-                String notif = controlador.getControladorDevolverPrestamo().obtenerYLimpiarUltimaNotificacionSancion();
+                String notif = getControlador().getControladorDevolverPrestamo()
+                        .obtenerYLimpiarUltimaNotificacionSancion();
                 if (notif != null) {
                     JOptionPane.showMessageDialog(null, notif, "Información", JOptionPane.INFORMATION_MESSAGE);
                 }
-                // refrescar vistas dependientes y volver al panelControl
-                controlador.getControladorNavegacion().refrescarPublicaciones();
-                controlador.getControladorNavegacion().refrescarPanelControl();
-                controlador.getControladorNavegacion().marcarPantallaActiva("panelControl");
-                controlador.getControladorNavegacion().cambiarPantallaHijo("panelControl");
+                getControlador().getControladorNavegacion().refrescarPublicaciones();
+                getControlador().getControladorNavegacion().refrescarPanelControl();
+                getControlador().getControladorNavegacion().marcarPantallaActiva("panelControl");
+                getControlador().getControladorNavegacion().cambiarPantallaHijo("panelControl");
             } else {
                 JOptionPane.showMessageDialog(null, err, "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
-
-        // Añadir los dos subpaneles al principal
-        panel.add(encabezado);
-        panel.add(contenido);
-        return panel;
     }
 
 }

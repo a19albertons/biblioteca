@@ -18,9 +18,9 @@ public class ControladorEjemplares {
     /**
      * Constructor con DBConnection (inyección)
      * 
-     * @param dbConnection
+     * @param dbConnection DBConnection para conexiones a la base de datos
      */
-    public ControladorEjemplares(DBConnection dbConnection) {
+    public ControladorEjemplares(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -30,10 +30,10 @@ public class ControladorEjemplares {
     /**
      * Obtiene los ejemplares de una publicación
      *
-     * @param idPublicacion
+     * @param idPublicacion ID de la publicación
      * @return String[][] con columnas: id, num_ejemplar, fecha, estado
      */
-    public String[][] obtenerEjemplaresPorPublicacion(int idPublicacion) {
+    public String[][] obtenerEjemplaresPorPublicacion(final int idPublicacion) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -50,11 +50,11 @@ public class ControladorEjemplares {
     /**
      * Obtiene los detalles de un ejemplar por id (para vistas/diálogos).
      *
-     * @param idEjemplar
+     * @param idEjemplar ID del ejemplar
      * @return arreglo con {id, id_publicacion, num_ejemplar, fecha_adquisicion,
      *         estado} o null
      */
-    public EstadoEjemplarDTO obtenerDetallesEjemplar(int idEjemplar) {
+    public EstadoEjemplarDTO obtenerDetallesEjemplar(final int idEjemplar) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");

@@ -51,7 +51,7 @@ public class EliminarPublicacionDialog extends JDialog {
      * @param controlador
      * @param idPublicacion
      */
-    public EliminarPublicacionDialog(JFrame parent, Controlador controlador, int idPublicacion) {
+    public EliminarPublicacionDialog(final JFrame parent, final Controlador controlador, final int idPublicacion) {
         super(parent, "Eliminar Publicación", true);
         this.controlador = controlador;
         this.parentFrame = parent;
@@ -62,12 +62,12 @@ public class EliminarPublicacionDialog extends JDialog {
 
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosed(WindowEvent e) {
+            public void windowClosed(final WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -132,8 +132,12 @@ public class EliminarPublicacionDialog extends JDialog {
         getContentPane().add(botones, BorderLayout.SOUTH);
     }
 
+    /**
+     * Sobrescribe setVisible para instalar un overlay semitransparente en el frame
+     * padre mientras el diálogo está abierto.
+     */
     @Override
-    public void setVisible(boolean b) {
+    public void setVisible(final boolean b) {
         if (b) {
             installOverlay();
         }
@@ -147,8 +151,9 @@ public class EliminarPublicacionDialog extends JDialog {
      * Instala un overlay semitransparente en el frame padre
      */
     private void installOverlay() {
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Guardar el componente previo del glass pane para restaurarlo después
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
@@ -174,8 +179,9 @@ public class EliminarPublicacionDialog extends JDialog {
      * Quita el overlay del frame padre
      */
     private void removeOverlay() {
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Restaurar el componente previo del glass pane
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;

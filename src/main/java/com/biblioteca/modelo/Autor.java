@@ -22,7 +22,7 @@ public class Autor {
     /**
      * Obtiene el id del autor
      * 
-     * @return
+     * @return el id del autor
      */
     public int getId() {
         return id;
@@ -31,16 +31,16 @@ public class Autor {
     /**
      * Permite recuperar el id del autor de la bd y establecerlo en el objeto
      * 
-     * @param id
+     * @param id el id del autor
      */
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
     /**
      * Obtiene el nombre del autor
      * 
-     * @return
+     * @return el nombre del autor
      */
     public String getNombre() {
         return nombre;
@@ -49,9 +49,9 @@ public class Autor {
     /**
      * Establece el nombre del autor
      * 
-     * @param nombre
+     * @param nombre el nombre del autor
      */
-    public void setNombre(String nombre) {
+    public void setNombre(final String nombre) {
         if (nombre != null) {
             this.nombre = nombre;
         } else {
@@ -62,7 +62,7 @@ public class Autor {
     /**
      * Obtiene la nacionalidad del autor
      * 
-     * @return
+     * @return la nacionalidad del autor
      */
     public String getNacionalidad() {
         return nacionalidad;
@@ -71,9 +71,9 @@ public class Autor {
     /**
      * Establece la nacionalidad del autor
      * 
-     * @param nacionalidad
+     * @param nacionalidad la nacionalidad del autor
      */
-    public void setNacionalidad(String nacionalidad) {
+    public void setNacionalidad(final String nacionalidad) {
         if (nacionalidad != null) {
             this.nacionalidad = nacionalidad;
         } else {
@@ -88,7 +88,7 @@ public class Autor {
      * @param nombre
      * @param nacionalidad
      */
-    public Autor(String nombre, String nacionalidad) {
+    public Autor(final String nombre, final String nacionalidad) {
         this.setNombre(nombre);
         this.setNacionalidad(nacionalidad);
     }
@@ -100,12 +100,10 @@ public class Autor {
      * @param nombre
      * @param nacionalidad
      */
-    public Autor(int id, String nombre, String nacionalidad) {
+    public Autor(final int id, final String nombre, final String nacionalidad) {
         this.id = id;
         this.nombre = nombre;
         this.nacionalidad = nacionalidad;
     }
-
-    
 
 }

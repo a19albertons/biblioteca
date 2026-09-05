@@ -9,6 +9,11 @@ import java.sql.Connection;
 
 public interface DBConnection {
 
+    /**
+     * Obtiene la conexión a la base de datos.
+     *
+     * @return la conexión a la base de datos
+     */
     Connection getConnection();
 
 } 

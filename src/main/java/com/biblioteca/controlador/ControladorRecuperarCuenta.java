@@ -18,7 +18,7 @@ public class ControladorRecuperarCuenta {
      * 
      * @param dbConnection
      */
-    public ControladorRecuperarCuenta(DBConnection dbConnection) {
+    public ControladorRecuperarCuenta(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -28,10 +28,10 @@ public class ControladorRecuperarCuenta {
     /**
      * Recupera la cuenta del usuario basado en el identificador proporcionado
      * 
-     * @param trim
-     * @return
+     * @param trim Identificador del usuario
+     * @return Usuario recuperado o null si no se encuentra
      */
-    public Usuario recuperarCuenta(String trim) {
+    public Usuario recuperarCuenta(final String trim) {
         try (var conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");

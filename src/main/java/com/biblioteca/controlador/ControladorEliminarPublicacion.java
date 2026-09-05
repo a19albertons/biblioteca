@@ -24,7 +24,7 @@ public class ControladorEliminarPublicacion {
      * 
      * @param dbConnection
      */
-    public ControladorEliminarPublicacion(DBConnection dbConnection) {
+    public ControladorEliminarPublicacion(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -38,7 +38,7 @@ public class ControladorEliminarPublicacion {
      * @return true si la baja fue satisfactoria, false si hay préstamos activos o
      *         error
      */
-    public boolean eliminarPublicacion(int idPublicacion) {
+    public boolean eliminarPublicacion(final int idPublicacion) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");

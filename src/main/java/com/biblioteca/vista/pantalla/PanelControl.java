@@ -28,23 +28,26 @@ public class PanelControl {
     /**
      * Controlador de la aplicación
      */
-    Controlador controlador;
+    private final Controlador controlador;
+
+    /**
+     * Obtiene el controlador de la aplicación
+     *
+     * @return el controlador principal
+     */
+    public Controlador getControlador() {
+        return controlador;
+    }
 
     /**
      * Constructor de la vista PanelControl
      *
-     * @param controlador controlador principal
+     * @param controlador controlador principal (final)
      */
-    public PanelControl(Controlador controlador) {
+    public PanelControl(final Controlador controlador) {
         this.controlador = controlador;
     }
 
-    /**
-     * Muestra la pantalla del panel de control con tarjetas y resúmenes
-     *
-     * @return JPanel con el panel de control
-     */
-    // Componentes que deben mantenerse para refresco
     /**
      * Etiqueta valor 1 (préstamos hoy)
      */
@@ -66,27 +69,74 @@ public class PanelControl {
      */
     private DefaultTableModel model;
 
+    /**
+     * Nombres de las columnas de la tabla
+     */
+    private String[] columnNames = { "ID EJEMPLAR", "LIBRO", "ESTADO" };
+
+    /**
+     * Renderer para la columna estado
+     */
+    private DefaultTableCellRenderer estadoRenderer;
+
+    /**
+     * Muestra la pantalla del panel de control con tarjetas y resúmenes
+     *
+     * @return JPanel con el panel de control
+     */
     public JPanel pantalla() {
-        // Panel principal
+        JPanel panel = crearPanelPrincipal();
+        panel.add(crearEncabezado());
+        panel.add(crearCardPrestamosHoy());
+        panel.add(crearCardPendientes());
+        panel.add(crearCardSociosActivos());
+        panel.add(crearPanelMovimientos());
+
+        JLabel ultimos = new JLabel("Últimos movimientos");
+        ultimos.setFont(ultimos.getFont().deriveFont(18f));
+        ultimos.setBounds(30, 220, 200, 30);
+        panel.add(ultimos);
+        return panel;
+    }
+
+    /**
+     * Crea el panel principal del control
+     *
+     * @return JPanel principal
+     */
+    private JPanel crearPanelPrincipal() {
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(600, 600));
         panel.setBackground(Color.decode("#EDF3F6"));
         panel.setLayout(null);
+        return panel;
+    }
 
-        // Panel de encabezado con título
+    /**
+     * Crea el encabezado del panel
+     *
+     * @return JPanel con el título
+     */
+    private JPanel crearEncabezado() {
         JPanel encabezado = new JPanel();
         encabezado.setSize(new Dimension(600, 60));
         encabezado.setBackground(Color.white);
         encabezado.setLayout(null);
         encabezado.setBounds(0, 0, 600, 60);
 
-        // Titulo
         JLabel titulo = new JLabel("Panel de Control");
         titulo.setFont(titulo.getFont().deriveFont(24f));
         titulo.setBounds(10, 10, 200, 40);
         encabezado.add(titulo);
+        return encabezado;
+    }
 
-        // Card 1 - Prestamos hoy (fondo blanco, borde superior azul)
+    /**
+     * Crea la tarjeta de préstamos hoy
+     *
+     * @return JPanel con la tarjeta
+     */
+    private JPanel crearCardPrestamosHoy() {
         JPanel card1 = new JPanel();
         card1.setSize(170, 100);
         card1.setLayout(null);
@@ -94,41 +144,50 @@ public class PanelControl {
         card1.setBounds(30, 100, 170, 100);
         card1.setBorder(BorderFactory.createMatteBorder(5, 0, 0, 0, Color.decode("#468DAE")));
 
-        // Card 1 - tema
         JLabel tema1 = new JLabel("Prestamos hoy");
         tema1.setBounds(10, 10, 150, 30);
         tema1.setFont(new Font("Open Sans", Font.PLAIN, 12));
         card1.add(tema1);
 
-        // Valor de préstamos hoy (se carga en background)
         valor1 = new JLabel("...");
         valor1.setFont(valor1.getFont().deriveFont(36f));
         valor1.setBounds(10, 40, 150, 50);
         card1.add(valor1);
-        // Cargar en background
+
+        cargarCardPrestamosHoy();
+        return card1;
+    }
+
+    /**
+     * Carga los datos de la tarjeta de préstamos hoy
+     */
+    private void cargarCardPrestamosHoy() {
         BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().obtenerPrestamosHoy(),
-            // Actualizar UI con resultados
-            result -> {
-                // Manejo de errores y actualización del label
-                if ("-1".equals(result)) {
+                () -> controlador.getControladorPanelControl().obtenerPrestamosHoy(),
+                result -> {
+                    if ("-1".equals(result)) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando número de préstamos de hoy. Compruebe la conexión a la base de datos.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                        valor1.setText("—");
+                    } else {
+                        valor1.setText(result);
+                    }
+                },
+                ex -> {
                     JOptionPane.showMessageDialog(null,
                             "Error cargando número de préstamos de hoy. Compruebe la conexión a la base de datos.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     valor1.setText("—");
-                } else {
-                    valor1.setText(result);
-                }
-            },
-            ex -> {
-                JOptionPane.showMessageDialog(null,
-                        "Error cargando número de préstamos de hoy. Compruebe la conexión a la base de datos.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                valor1.setText("—");
-            }
-        );
+                });
+    }
 
-        // Card 2 (central) - Pendientes (fondo blanco, borde superior naranja)
+    /**
+     * Crea la tarjeta de pendientes
+     *
+     * @return JPanel con la tarjeta
+     */
+    private JPanel crearCardPendientes() {
         JPanel card2 = new JPanel();
         card2.setSize(170, 100);
         card2.setLayout(null);
@@ -138,40 +197,49 @@ public class PanelControl {
 
         JLabel tema2 = new JLabel("Pendientes");
         tema2.setBounds(10, 10, 150, 30);
-        // Fuente Open Sans, texto normal
         tema2.setFont(Fonts.openSans(12f));
         card2.add(tema2);
 
-        // Valor de préstamos pendientes (se carga en background)
         valor2 = new JLabel("...");
         valor2.setFont(valor2.getFont().deriveFont(36f));
         valor2.setBounds(10, 40, 150, 50);
         valor2.setForeground(Color.decode("#F4791B"));
         card2.add(valor2);
-        // Cargar en background
+
+        cargarCardPendientes();
+        return card2;
+    }
+
+    /**
+     * Carga los datos de la tarjeta de pendientes
+     */
+    private void cargarCardPendientes() {
         BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().obtenerPrestamosPendientes(),
-            // Actualizar UI con resultados
-            result -> {
-                // Manejo de errores y actualización del label
-                if ("-1".equals(result)) {
+                () -> controlador.getControladorPanelControl().obtenerPrestamosPendientes(),
+                result -> {
+                    if ("-1".equals(result)) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando número de préstamos pendientes. Compruebe la conexión a la base de datos.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                        valor2.setText("—");
+                    } else {
+                        valor2.setText(result);
+                    }
+                },
+                ex -> {
                     JOptionPane.showMessageDialog(null,
                             "Error cargando número de préstamos pendientes. Compruebe la conexión a la base de datos.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     valor2.setText("—");
-                } else {
-                    valor2.setText(result);
-                }
-            },
-            ex -> {
-                JOptionPane.showMessageDialog(null,
-                        "Error cargando número de préstamos pendientes. Compruebe la conexión a la base de datos.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                valor2.setText("—");
-            }
-        );
+                });
+    }
 
-        // Card 3 (última) - Socios activos (fondo blanco, borde superior verde)
+    /**
+     * Crea la tarjeta de socios activos
+     *
+     * @return JPanel con la tarjeta
+     */
+    private JPanel crearCardSociosActivos() {
         JPanel card3 = new JPanel();
         card3.setSize(170, 100);
         card3.setLayout(null);
@@ -181,64 +249,63 @@ public class PanelControl {
 
         JLabel tema3 = new JLabel("Socios activos");
         tema3.setBounds(10, 10, 150, 30);
-        // Fuente Open Sans, texto normal
         tema3.setFont(Fonts.openSans(12f));
         card3.add(tema3);
 
-        // Valor de socios activos (se carga en background)
         valor3 = new JLabel("...");
         valor3.setFont(valor3.getFont().deriveFont(36f));
         valor3.setBounds(10, 40, 150, 50);
         card3.add(valor3);
-        // Cargar en background
+
+        cargarCardSociosActivos();
+        return card3;
+    }
+
+    /**
+     * Carga los datos de la tarjeta de socios activos
+     */
+    private void cargarCardSociosActivos() {
         BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().obtenerTotalSociosActivos(),
-            // Actualizar UI con resultados
-            result -> {
-                // Manejo de errores y actualización del label
-                if ("-1".equals(result)) {
+                () -> controlador.getControladorPanelControl().obtenerTotalSociosActivos(),
+                result -> {
+                    if ("-1".equals(result)) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando número de socios activos. Compruebe la conexión a la base de datos.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                        valor3.setText("—");
+                    } else {
+                        valor3.setText(result);
+                    }
+                },
+                ex -> {
                     JOptionPane.showMessageDialog(null,
                             "Error cargando número de socios activos. Compruebe la conexión a la base de datos.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     valor3.setText("—");
-                } else {
-                    valor3.setText(result);
-                }
-            },
-            ex -> {
-                JOptionPane.showMessageDialog(null,
-                        "Error cargando número de socios activos. Compruebe la conexión a la base de datos.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                valor3.setText("—");
-            }
-        );
+                });
+    }
 
-        // Ultimos movimientos
-        JLabel ultimos = new JLabel("Últimos movimientos");
-        ultimos.setFont(ultimos.getFont().deriveFont(18f));
-        ultimos.setBounds(30, 220, 200, 30);
-        panel.add(ultimos);
-
+    /**
+     * Crea el panel de últimos movimientos con tabla
+     *
+     * @return JPanel con la tabla
+     */
+    private JPanel crearPanelMovimientos() {
         JPanel movimientosPanel = new JPanel();
         movimientosPanel.setBackground(Color.white);
         movimientosPanel.setLayout(null);
         movimientosPanel.setBounds(30, 260, 540, 300);
         movimientosPanel.setBorder(BorderFactory.createLineBorder(Color.decode("#E6ECEF")));
 
-        // Tabla de últimos movimientos
-        // Encabezado y datos (se cargan en background)
-        String[] columnNames = new String[] { "ID EJEMPLAR", "LIBRO", "ESTADO" };
+        // Datos vacios de inicio para la tabla
         String[][] initialData = new String[0][0];
-
-        // Modificación del modelo para que no sea editable
         model = new DefaultTableModel(initialData, columnNames) {
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(final int row, final int column) {
                 return false;
             }
         };
-        // Establece una serie de modificadores sobre la tabla como colores, fuentes,
-        // etc
+
         table = new JTable(model);
         table.setRowHeight(28);
         table.setShowGrid(false);
@@ -247,14 +314,13 @@ public class PanelControl {
         table.setBackground(Color.white);
         table.setForeground(Color.decode("#666666"));
         table.setFont(Fonts.openSans(12f));
-        // Header style
+
         JTableHeader header = table.getTableHeader();
         header.setBackground(Color.white);
         header.setForeground(Color.decode("#468DAE"));
         header.setFont(header.getFont().deriveFont(Font.BOLD, 12f));
         header.setReorderingAllowed(false);
 
-        // Ajustar anchos (si la tabla tiene columnas)
         table.setModel(model);
         if (table.getColumnModel().getColumnCount() > 0) {
             table.getColumnModel().getColumn(0).setPreferredWidth(80);
@@ -262,12 +328,11 @@ public class PanelControl {
             table.getColumnModel().getColumn(2).setPreferredWidth(80);
         }
 
-        // Renderer para columna estado
-        // Customiza como se ven las celdas de la columna estado
-        DefaultTableCellRenderer estadoRenderer = new DefaultTableCellRenderer() {
+        estadoRenderer = new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                    boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(final JTable table, final Object value,
+                    final boolean isSelected,
+                    final boolean hasFocus, final int row, final int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 String s = (value != null) ? value.toString().toUpperCase() : "";
                 setHorizontalAlignment(SwingConstants.CENTER);
@@ -287,51 +352,46 @@ public class PanelControl {
             }
         };
 
-        // Hace que se pueda hacer scroll en la tabla. Esto sucede si hay 10 o más filas
-        // de la consutla a la bd actualmente limitado a 9 para evitarlo
         JScrollPane scroll = new JScrollPane(table);
         scroll.setBounds(10, 10, 520, 280);
         scroll.setBorder(null);
         movimientosPanel.add(scroll);
 
-        // Cargar datos en background
-        BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().obtenerUltimosMovimientos(),
-            // Actualizar UI con resultados
-            result -> {
-                // Manejo de errores y populación de la tabla
-                String[][] data = result;
-                if (data == null) {
-                    JOptionPane.showMessageDialog(null,
-                            "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    data = new String[0][0];
-                } else if (data.length == 0) {
-                    JOptionPane.showMessageDialog(null,
-                            "No hay movimientos para mostrar.", "Información",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    data = new String[0][0];
-                }
-                model.setDataVector(data, columnNames);
-                // Reaplicar el renderer a la columna estado (porque cambiar model puede resetearla en algunas LAF)
-                if (table.getColumnModel().getColumnCount() > 2) {
-                    table.getColumnModel().getColumn(2).setCellRenderer(estadoRenderer);
-                }
-            },
-            ex -> {
-                JOptionPane.showMessageDialog(null,
-                        "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        );
+        cargarTablaMovimientos();
+        return movimientosPanel;
+    }
 
-        // Añade todo al panel principal
-        panel.add(encabezado);
-        panel.add(card1);
-        panel.add(card2);
-        panel.add(card3);
-        panel.add(movimientosPanel);
-        return panel;
+    /**
+     * Carga los datos de la tabla de movimientos
+     */
+    private void cargarTablaMovimientos() {
+        BackgroundWorker.run(
+                () -> controlador.getControladorPanelControl().obtenerUltimosMovimientos(),
+                result -> {
+                    String[][] data = result;
+                    if (data == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        data = new String[0][0];
+                    } else if (data.length == 0) {
+                        JOptionPane.showMessageDialog(null,
+                                "No hay movimientos para mostrar.", "Información",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        data = new String[0][0];
+                    }
+                    model.setDataVector(data, columnNames);
+                    if (table.getColumnModel().getColumnCount() > 2) {
+                        table.getColumnModel().getColumn(2).setCellRenderer(estadoRenderer);
+                    }
+                },
+                ex -> {
+                    JOptionPane.showMessageDialog(null,
+                            "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                });
     }
 
     /**
@@ -342,129 +402,129 @@ public class PanelControl {
         // Actualizar tarjetas asíncronamente
         valor1.setText("...");
         BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().obtenerPrestamosHoy(),
-            // Actualizar UI con resultados
-            result -> {
-                // Manejo de errores y actualización del label
-                if ("-1".equals(result)) {
+                () -> controlador.getControladorPanelControl().obtenerPrestamosHoy(),
+                // Actualizar UI con resultados
+                result -> {
+                    // Manejo de errores y actualización del label
+                    if ("-1".equals(result)) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando número de préstamos de hoy. Compruebe la conexión a la base de datos.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                        valor1.setText("—");
+                    } else {
+                        valor1.setText(result);
+                    }
+                },
+                ex -> {
                     JOptionPane.showMessageDialog(null,
                             "Error cargando número de préstamos de hoy. Compruebe la conexión a la base de datos.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     valor1.setText("—");
-                } else {
-                    valor1.setText(result);
-                }
-            },
-            ex -> {
-                JOptionPane.showMessageDialog(null,
-                        "Error cargando número de préstamos de hoy. Compruebe la conexión a la base de datos.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                valor1.setText("—");
-            }
-        );
+                });
 
         valor2.setText("...");
         BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().obtenerPrestamosPendientes(),
-            // Actualizar UI con resultados
-            result -> {
-                // Manejo de errores y actualización del label
-                if ("-1".equals(result)) {
+                () -> controlador.getControladorPanelControl().obtenerPrestamosPendientes(),
+                // Actualizar UI con resultados
+                result -> {
+                    // Manejo de errores y actualización del label
+                    if ("-1".equals(result)) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando número de préstamos pendientes. Compruebe la conexión a la base de datos.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                        valor2.setText("—");
+                    } else {
+                        valor2.setText(result);
+                    }
+                },
+                ex -> {
                     JOptionPane.showMessageDialog(null,
                             "Error cargando número de préstamos pendientes. Compruebe la conexión a la base de datos.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     valor2.setText("—");
-                } else {
-                    valor2.setText(result);
-                }
-            },
-            ex -> {
-                JOptionPane.showMessageDialog(null,
-                        "Error cargando número de préstamos pendientes. Compruebe la conexión a la base de datos.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                valor2.setText("—");
-            }
-        );
+                });
 
         valor3.setText("...");
         com.biblioteca.utilities.BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().obtenerTotalSociosActivos(),
-            // Actualizar UI con resultados
-            result -> {
-                // Manejo de errores y actualización del label
-                if ("-1".equals(result)) {
+                () -> controlador.getControladorPanelControl().obtenerTotalSociosActivos(),
+                // Actualizar UI con resultados
+                result -> {
+                    // Manejo de errores y actualización del label
+                    if ("-1".equals(result)) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando número de socios activos. Compruebe la conexión a la base de datos.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                        valor3.setText("—");
+                    } else {
+                        valor3.setText(result);
+                    }
+                },
+                ex -> {
                     JOptionPane.showMessageDialog(null,
                             "Error cargando número de socios activos. Compruebe la conexión a la base de datos.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     valor3.setText("—");
-                } else {
-                    valor3.setText(result);
-                }
-            },
-            ex -> {
-                JOptionPane.showMessageDialog(null,
-                        "Error cargando número de socios activos. Compruebe la conexión a la base de datos.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                valor3.setText("—");
-            }
-        );
+                });
 
         // Actualizar tabla en background
         com.biblioteca.utilities.BackgroundWorker.run(
-            () -> controlador.getControladorPanelControl().obtenerUltimosMovimientos(),
-            // Actualizar UI con resultados
-            result -> {
-                // Manejo de errores y populación de la tabla
-                String[][] data = result;
-                // Manejo de errores y populación de la tabla
-                if (data == null) {
-                    JOptionPane.showMessageDialog(null,
-                            "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    data = new String[0][0];
-                } else if (data.length == 0) {
-                    JOptionPane.showMessageDialog(null,
-                            "No hay movimientos para mostrar.", "Información",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    data = new String[0][0];
-                }
-                // Manejo de errores y populación de la tabla
-                model.setDataVector(data, new String[] { "ID EJEMPLAR", "LIBRO", "ESTADO" });
-                // Reaplicar renderer a la columna estado si existe
-                DefaultTableCellRenderer estadoRenderer = new DefaultTableCellRenderer() {
-                    @Override
-                    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                            boolean hasFocus, int row, int column) {
-                        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                        String s = (value != null) ? value.toString().toUpperCase() : "";
-                        setHorizontalAlignment(SwingConstants.CENTER);
-                        setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
-                        // Cambia colores según estado
-                        if ("DEVUELTO".equals(s)) {
-                            setBackground(Color.decode("#E6FFF0"));
-                            setForeground(Color.decode("#2BC187"));
-                        } else if ("PRESTADO".equals(s)) {
-                            setBackground(Color.decode("#FFF4E6"));
-                            setForeground(Color.decode("#F4791B"));
-                        } else {
-                            setBackground(Color.white);
-                            setForeground(Color.decode("#666666"));
-                        }
-                        setOpaque(true);
-                        return this;
+                () -> controlador.getControladorPanelControl().obtenerUltimosMovimientos(),
+                // Actualizar UI con resultados
+                result -> {
+                    // Manejo de errores y populación de la tabla
+                    String[][] data = result;
+                    // Manejo de errores y populación de la tabla
+                    if (data == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        data = new String[0][0];
+                    } else if (data.length == 0) {
+                        JOptionPane.showMessageDialog(null,
+                                "No hay movimientos para mostrar.", "Información",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        data = new String[0][0];
                     }
-                };
-                // Reaplicar el renderer a la columna estado (porque cambiar model puede resetearla en algunas LAF)
-                if (table.getColumnModel().getColumnCount() > 2) {
-                    table.getColumnModel().getColumn(2).setCellRenderer(estadoRenderer);
-                }
-            },
-            ex -> {
-                JOptionPane.showMessageDialog(null,
-                        "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        );
+                    // Manejo de errores y populación de la tabla
+                    model.setDataVector(data, new String[] { "ID EJEMPLAR", "LIBRO", "ESTADO" });
+                    // Reaplicar renderer a la columna estado si existe
+                    DefaultTableCellRenderer estadoRenderer = new DefaultTableCellRenderer() {
+                        @Override
+                        public Component getTableCellRendererComponent(final JTable table, final Object value,
+                                final boolean isSelected,
+                                final boolean hasFocus, final int row, final int column) {
+                            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                            String s = (value != null) ? value.toString().toUpperCase() : "";
+                            setHorizontalAlignment(SwingConstants.CENTER);
+                            setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
+                            // Cambia colores según estado
+                            if ("DEVUELTO".equals(s)) {
+                                setBackground(Color.decode("#E6FFF0"));
+                                setForeground(Color.decode("#2BC187"));
+                            } else if ("PRESTADO".equals(s)) {
+                                setBackground(Color.decode("#FFF4E6"));
+                                setForeground(Color.decode("#F4791B"));
+                            } else {
+                                setBackground(Color.white);
+                                setForeground(Color.decode("#666666"));
+                            }
+                            setOpaque(true);
+                            return this;
+                        }
+                    };
+                    // Reaplicar el renderer a la columna estado (porque cambiar model puede
+                    // resetearla en algunas LAF)
+                    if (table.getColumnModel().getColumnCount() > 2) {
+                        table.getColumnModel().getColumn(2).setCellRenderer(estadoRenderer);
+                    }
+                },
+                ex -> {
+                    JOptionPane.showMessageDialog(null,
+                            "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                });
     }
 
 }

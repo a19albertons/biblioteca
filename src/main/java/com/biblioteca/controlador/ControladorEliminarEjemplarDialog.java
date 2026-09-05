@@ -21,9 +21,9 @@ public class ControladorEliminarEjemplarDialog {
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
      * 
-     * @param dbConnection
+     * @param dbConnection conexión a la base de datos
      */
-    public ControladorEliminarEjemplarDialog(DBConnection dbConnection) {
+    public ControladorEliminarEjemplarDialog(final DBConnection dbConnection) {
         if (dbConnection == null) {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
@@ -33,11 +33,11 @@ public class ControladorEliminarEjemplarDialog {
     /**
      * Elimina (marca como baja) un ejemplar si no tiene préstamos activos.
      *
-     * @param idEjemplar
+     * @param idEjemplar identificador del ejemplar a eliminar
      * @return true si la baja fue satisfactoria, false si hay préstamos activos o
      *         error
      */
-    public boolean eliminarEjemplar(int idEjemplar) {
+    public boolean eliminarEjemplar(final int idEjemplar) {
         // Realizar baja dentro de una transacción
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {

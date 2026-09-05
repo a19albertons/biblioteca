@@ -14,19 +14,53 @@ import com.biblioteca.dto.RegistroDevolucionDTO;
  */
 public class PrestamoDAO {
     /**
-     * conexion para la base de datos
+     * Conexión a la base de datos para operaciones SQL.
      */
     private final Connection conexion;
 
-    // SQL constants 🔧
+    /**
+     * Constante SQL para contar préstamos realizados hoy.
+     */
     private static final String SQL_PRESTAMOS_HOY = "SELECT COUNT(*) AS total FROM prestamos WHERE DATE(fecha_inicio) = ?";
+
+    /**
+     * Constante SQL para contar préstamos pendientes.
+     */
     private static final String SQL_PRESTAMOS_PENDIENTES = "SELECT COUNT(*) AS TOTAL FROM prestamos WHERE ? > fecha_fin AND estado = TRUE";
+
+    /**
+     * Constante SQL para obtener los últimos movimientos de préstamos.
+     */
     private static final String SQL_ULTIMOS_MOVIMIENTOS = "SELECT p.estado, e.id AS id_ejemplar, pub.titulo FROM prestamos p JOIN ejemplares e ON p.id_ejemplar = e.id JOIN publicaciones pub ON e.id_publicacion = pub.id ORDER BY p.fecha_inicio DESC LIMIT 9";
+
+    /**
+     * Constante SQL para insertar un nuevo préstamo.
+     */
     private static final String SQL_INSERT_PRESTAMO = "INSERT INTO prestamos (id_usuario, id_ejemplar, fecha_inicio, fecha_fin, estado) VALUES (?, ?, ?, ?, TRUE)";
+
+    /**
+     * Constante SQL para contar préstamos de un usuario por tipo de publicación.
+     */
     private static final String SQL_CNT_PRESTAMO_TIPO = "SELECT COUNT(*) AS cnt FROM prestamos p JOIN ejemplares e ON p.id_ejemplar = e.id JOIN publicaciones pub ON e.id_publicacion = pub.id WHERE p.id_usuario = ? AND p.estado = TRUE AND pub.tipo = ?";
+
+    /**
+     * Constante SQL para comprobar préstamo activo entre usuario y ejemplar.
+     */
     private static final String SQL_CNT_PRESTAMO_USUARIO_EJEMPLAR = "SELECT COUNT(*) AS cnt FROM prestamos WHERE id_usuario = ? AND id_ejemplar = ? AND estado = TRUE";
+
+    /**
+     * Constante SQL para actualizar el estado de un préstamo devuelto.
+     */
     private static final String SQL_UPDATE_DEVOLVER = "UPDATE prestamos SET estado = FALSE WHERE id_usuario = ? AND id_ejemplar = ? AND estado = TRUE";
+
+    /**
+     * Constante SQL para obtener el préstamo activo de un usuario por ejemplar.
+     */
     private static final String SQL_SELECT_PRESTAMO_ACTIVO_POR_USUARIO_EJEMPLAR = "SELECT id, fecha_inicio, fecha_fin FROM prestamos WHERE id_usuario = ? AND id_ejemplar = ? AND estado = TRUE";
+
+    /**
+     * Constante SQL para obtener el último préstamo por ejemplar.
+     */
     private static final String SQL_SELECT_ULTIMO_PRESTAMO_POR_EJEMPLAR = "SELECT id, id_usuario, fecha_inicio, fecha_fin, estado FROM prestamos WHERE id_ejemplar = ? ORDER BY fecha_inicio DESC, id DESC LIMIT 1";
 
     /**
@@ -34,7 +68,7 @@ public class PrestamoDAO {
      * 
      * @param conexion
      */
-    public PrestamoDAO(Connection conexion) {
+    public PrestamoDAO(final Connection conexion) {
         if (conexion == null) {
             throw new IllegalArgumentException("Connection cannot be null");
         }
@@ -42,9 +76,9 @@ public class PrestamoDAO {
     }
 
     /**
-     * Obtiene el número de préstamos realizados hoy
+     * Obtiene el número de préstamos realizados hoy.
      * 
-     * @return
+     * @return número de préstamos realizados hoy como string
      */
     public String prestamosHoy() {
         // Obtener la fecha actual
@@ -70,9 +104,9 @@ public class PrestamoDAO {
     }
 
     /**
-     * Obtiene el número de préstamos pendientes
+     * Obtiene el número de préstamos pendientes.
      * 
-     * @return
+     * @return número de préstamos pendientes como string
      */
     public String prestamosPendientes() {
         LocalDate hoy = LocalDate.now();
@@ -97,9 +131,9 @@ public class PrestamoDAO {
     }
 
     /**
-     * Obtiene los últimos 9 movimientos de préstamos
+     * Obtiene los últimos 9 movimientos de préstamos.
      * 
-     * @return
+     * @return arreglo con información de los últimos movimientos
      */
     public String[][] ultimosMovimientos() {
         String[][] movimientos = new String[9][3];
@@ -130,13 +164,14 @@ public class PrestamoDAO {
     /**
      * Inserta un nuevo préstamo y devuelve true si fue insertado correctamente.
      *
-     * @param idUsuario
-     * @param idEjemplar
-     * @param fechaInicio (Date)
-     * @param fechaFin    (Date)
+     * @param idUsuario   ID del usuario que realiza el préstamo
+     * @param idEjemplar  ID del ejemplar que se presta
+     * @param fechaInicio fecha en la que comienza el préstamo
+     * @param fechaFin    fecha en la que termina el préstamo
      * @return true si se insertó correctamente
      */
-    public boolean insertarPrestamo(int idUsuario, int idEjemplar, Date fechaInicio, Date fechaFin) {
+    public boolean insertarPrestamo(final int idUsuario, final int idEjemplar, final Date fechaInicio,
+            final Date fechaFin) {
         // Consulta SQL para insertar el préstamo
         final String sql = SQL_INSERT_PRESTAMO;
         try (
@@ -160,13 +195,14 @@ public class PrestamoDAO {
 
     /**
      * Comprueba si el usuario tiene un préstamo activo de un tipo de publicación
-     * (L = libro, R = revista)
+     * (L = libro, R = revista).
      *
-     * @param idUsuario
-     * @param tipoPublicacion (char 'L' o 'R')
+     * @param idUsuario       ID del usuario
+     * @param tipoPublicacion tipo de publicación ('L' para libro o 'R' para
+     *                        revista)
      * @return true si existe al menos un préstamo activo de ese tipo
      */
-    public boolean tienePrestamoActivoTipo(int idUsuario, char tipoPublicacion) {
+    public boolean tienePrestamoActivoTipo(final int idUsuario, final char tipoPublicacion) {
         // Consulta SQL para comprobar préstamos activos por tipo
         final String sql = SQL_CNT_PRESTAMO_TIPO;
         try (
@@ -189,13 +225,13 @@ public class PrestamoDAO {
     }
 
     /**
-     * Comprueba si existe un préstamo activo entre un usuario y un ejemplar
+     * Comprueba si existe un préstamo activo entre un usuario y un ejemplar.
      *
-     * @param idUsuario
-     * @param idEjemplar
+     * @param idUsuario  ID del usuario
+     * @param idEjemplar ID del ejemplar
      * @return true si existe un préstamo activo
      */
-    public boolean existePrestamoActivoUsuarioEjemplar(int idUsuario, int idEjemplar) {
+    public boolean existePrestamoActivoUsuarioEjemplar(final int idUsuario, final int idEjemplar) {
         // Consulta SQL para comprobar préstamo activo entre usuario y ejemplar
         final String sql = SQL_CNT_PRESTAMO_USUARIO_EJEMPLAR;
         try (
@@ -219,13 +255,13 @@ public class PrestamoDAO {
 
     /**
      * Marca un préstamo activo como devuelto (estado = FALSE) para el usuario y
-     * ejemplar
+     * ejemplar.
      *
-     * @param idUsuario
-     * @param idEjemplar
+     * @param idUsuario  ID del usuario
+     * @param idEjemplar ID del ejemplar
      * @return true si se actualizó exactamente una fila
      */
-    public boolean devolverPrestamoUsuarioEjemplar(int idUsuario, int idEjemplar) {
+    public boolean devolverPrestamoUsuarioEjemplar(final int idUsuario, final int idEjemplar) {
         // Consulta SQL para actualizar el estado del préstamo
         final String sql = SQL_UPDATE_DEVOLVER;
         try (
@@ -245,10 +281,14 @@ public class PrestamoDAO {
     }
 
     /**
-     * Obtiene el préstamo activo (estado = TRUE) entre un usuario y un ejemplar
-     * Devuelve arreglo {idPrestamo, fecha_inicio, fecha_fin} o null
+     * Obtiene el préstamo activo (estado = TRUE) entre un usuario y un ejemplar.
+     * Devuelve objeto con información del préstamo o null.
+     *
+     * @param idUsuario  ID del usuario
+     * @param idEjemplar ID del ejemplar
+     * @return préstamo activo o null
      */
-    public RegistroDevolucionDTO obtenerPrestamoActivoPorUsuarioEjemplar(int idUsuario, int idEjemplar) {
+    public RegistroDevolucionDTO obtenerPrestamoActivoPorUsuarioEjemplar(final int idUsuario, final int idEjemplar) {
         // Consulta SQL para obtener el préstamo activo
         final String sql = SQL_SELECT_PRESTAMO_ACTIVO_POR_USUARIO_EJEMPLAR;
         try (
@@ -275,11 +315,14 @@ public class PrestamoDAO {
     }
 
     /**
-     * Obtiene el ultimo préstamo asociado a un ejemplar (independientemente de
-     * estado)
-     * Devuelve: idPrestamo, idUsuario, fecha_inicio, fecha_fin, estado
+     * Obtiene el último préstamo asociado a un ejemplar (independientemente de
+     * estado).
+     * Devuelve objeto con información del préstamo o null.
+     *
+     * @param idEjemplar ID del ejemplar
+     * @return último préstamo asociado al ejemplar o null
      */
-    public ObtenerUltimoPrestamoPorEjemplarDTO obtenerUltimoPrestamoPorEjemplar(int idEjemplar) {
+    public ObtenerUltimoPrestamoPorEjemplarDTO obtenerUltimoPrestamoPorEjemplar(final int idEjemplar) {
         // Consulta SQL para obtener el último préstamo por ejemplar
         final String sql = SQL_SELECT_ULTIMO_PRESTAMO_POR_EJEMPLAR;
         try (

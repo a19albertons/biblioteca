@@ -42,7 +42,7 @@ public class Ejemplares {
     /**
      * Controlador de la aplicación
      */
-    Controlador controlador;
+    private Controlador controlador;
 
     // Componentes que se actualizan cuando se selecciona una publicación
     /**
@@ -84,7 +84,7 @@ public class Ejemplares {
      *
      * @param controlador controlador principal
      */
-    public Ejemplares(Controlador controlador) {
+    public Ejemplares(final Controlador controlador) {
         this.controlador = controlador;
     }
 
@@ -95,12 +95,37 @@ public class Ejemplares {
      */
     public JPanel pantalla() {
         // Panel principal
+        JPanel panel = crearPanelPrincipal();
+        panel.add(crearEncabezado());
+        panel.add(crearPanelPublicacion());
+        JPanel ejemplares = crearPanelEjemplares();
+        panel.add(ejemplares);
+        // Pasar panel a crearBotonNuevoEjemplar
+        crearBotonNuevoEjemplar(ejemplares);
+
+        return panel;
+    }
+
+    /**
+     * Crea el panel principal de la pantalla.
+     *
+     * @return JPanel principal
+     */
+    private JPanel crearPanelPrincipal() {
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(600, 600));
         panel.setBackground(Color.decode("#EDF3F6"));
         panel.setLayout(null);
 
-        // Panel de encabezado con título
+        return panel;
+    }
+
+    /**
+     * Crea el panel de encabezado con título.
+     *
+     * @return JPanel encabezado
+     */
+    private JPanel crearEncabezado() {
         JPanel encabezado = new JPanel();
         encabezado.setSize(new Dimension(600, 60));
         encabezado.setBackground(Color.white);
@@ -128,7 +153,15 @@ public class Ejemplares {
         btnFormularioRegistrar.setToolTipText("Volver al catálogo");
         encabezado.add(btnFormularioRegistrar);
 
-        // Panel de publicacion
+        return encabezado;
+    }
+
+    /**
+     * Crea el panel de publicación seleccionada.
+     *
+     * @return JPanel publicacionPanel
+     */
+    private JPanel crearPanelPublicacion() {
         publicacionPanel = new JPanel();
         publicacionPanel.setSize(new Dimension(560, 100));
         publicacionPanel.setBackground(Color.white);
@@ -157,18 +190,29 @@ public class Ejemplares {
         publicacionPanel.add(autoresPublicacion);
 
         // Botones
+        JButton btnEditarEjemplar = crearBotonEditar();
+        publicacionPanel.add(btnEditarEjemplar);
+
+        JButton btnEliminarEjemplar = crearBotonEliminar();
+        publicacionPanel.add(btnEliminarEjemplar);
+
+        return publicacionPanel;
+    }
+
+    /**
+     * Crea el botón de editar ejemplar con su listener.
+     *
+     * @return JButton btnEditarEjemplar
+     */
+    private JButton crearBotonEditar() {
         JButton btnEditarEjemplar = new JButton() {
-            // Asegura que el color de la opacidad sea el debido
             @Override
-            protected void paintComponent(Graphics g) {
-                // paint custom background with alpha and keep icon/text on top
+            protected void paintComponent(final Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setComposite(AlphaComposite.SrcOver);
-                // fill with background color (includes alpha)
                 g2.setColor(getBackground());
                 g2.fillRect(0, 0, getWidth(), getHeight());
                 g2.dispose();
-                // let UI draw icon/text/etc
                 super.paintComponent(g);
             }
         };
@@ -189,7 +233,6 @@ public class Ejemplares {
         btnEditarEjemplar.setBorder(null);
         btnEditarEjemplar.setToolTipText("Editar ejemplar");
         btnEditarEjemplar.setMargin(new Insets(0, 0, 0, 0));
-        publicacionPanel.add(btnEditarEjemplar);
 
         // Abrir diálogo de edición al pulsar editar (si hay una publicación cargada)
         btnEditarEjemplar.addActionListener(evt -> {
@@ -206,10 +249,18 @@ public class Ejemplares {
             }
         });
 
+        return btnEditarEjemplar;
+    }
+
+    /**
+     * Crea el botón de eliminar ejemplar con su listener.
+     *
+     * @return JButton btnEliminarEjemplar
+     */
+    private JButton crearBotonEliminar() {
         JButton btnEliminarEjemplar = new JButton() {
-            // Asegura que el color de la opacidad sea el debido
             @Override
-            protected void paintComponent(Graphics g) {
+            protected void paintComponent(final Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setComposite(AlphaComposite.SrcOver);
                 g2.setColor(getBackground());
@@ -235,7 +286,6 @@ public class Ejemplares {
         btnEliminarEjemplar.setBorder(null);
         btnEliminarEjemplar.setToolTipText("Eliminar ejemplar");
         btnEliminarEjemplar.setMargin(new Insets(0, 0, 0, 0));
-        publicacionPanel.add(btnEliminarEjemplar);
 
         btnEliminarEjemplar.addActionListener(evt -> {
             if (currentPublicacionId > 0) {
@@ -251,7 +301,15 @@ public class Ejemplares {
             }
         });
 
-        // Panel de ejemplares
+        return btnEliminarEjemplar;
+    }
+
+    /**
+     * Crea el panel de ejemplares con tabla y controles.
+     *
+     * @return JPanel ejemplares
+     */
+    private JPanel crearPanelEjemplares() {
         JPanel ejemplares = new JPanel();
         ejemplares.setSize(new Dimension(560, 380));
         ejemplares.setBackground(Color.white);
@@ -264,28 +322,8 @@ public class Ejemplares {
         listadoTitulo.setFont(listadoTitulo.getFont().deriveFont(java.awt.Font.BOLD, 14f));
         ejemplares.add(listadoTitulo);
 
-        JButton btnNuevoEjemplar = new JButton("+ NUEVO EJEMPLAR");
-        btnNuevoEjemplar.setBounds(380, 8, 160, 28);
-        btnNuevoEjemplar.setBackground(Color.decode("#F4791B"));
-        btnNuevoEjemplar.setForeground(Color.white);
-        btnNuevoEjemplar.setFocusPainted(false);
-        btnNuevoEjemplar.setBorder(null);
+        JButton btnNuevoEjemplar = crearBotonNuevoEjemplar(ejemplares);
         ejemplares.add(btnNuevoEjemplar);
-
-        // Abrir diálogo de nuevo ejemplar
-        btnNuevoEjemplar.addActionListener(evt -> {
-            if (currentPublicacionId > 0) {
-                NuevoEjemplarDialog d = new NuevoEjemplarDialog(controlador.getControladorNavegacion().getVentana(),
-                        controlador, currentPublicacionId);
-                d.setVisible(true);
-                // refrescar la vista tras cerrar
-                controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
-            } else {
-                JOptionPane.showMessageDialog(ejemplares,
-                        "No hay publicación seleccionada para añadir ejemplares", "Aviso",
-                        JOptionPane.WARNING_MESSAGE);
-            }
-        });
 
         // Tabla de ejemplares (modelo dinámico, se actualizará cuando se cargue una
         // publicación)
@@ -293,7 +331,7 @@ public class Ejemplares {
 
         ejemplaresModel = new DefaultTableModel(new Object[0][0], cols) {
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(final int row, final int column) {
                 return false;
             }
         };
@@ -304,133 +342,16 @@ public class Ejemplares {
         ejemplaresTable.setIntercellSpacing(new Dimension(0, 0));
 
         // Render para estado (badges)
-        class StatusRenderer extends JLabel implements TableCellRenderer {
-            public StatusRenderer() {
-                setOpaque(true);
-                setHorizontalAlignment(SwingConstants.CENTER);
-            }
-
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                String s = (value != null) ? value.toString() : "";
-                setText(s);
-                switch (s) {
-                    case "DISPONIBLE":
-                        setBackground(Color.decode("#E6FFF0"));
-                        setForeground(Color.decode("#2BC187"));
-                        break;
-                    case "PRESTADO":
-                        setBackground(Color.decode("#FFF4E6"));
-                        setForeground(Color.decode("#F4791B"));
-                        break;
-                    case "BAJA":
-                        setBackground(Color.decode("#EAF6FF"));
-                        setForeground(Color.decode("#5FAEC7"));
-                        break;
-                    default:
-                        setBackground(Color.white);
-                        setForeground(Color.black);
-                }
-                setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
-                return this;
-            }
-        }
+        ejemplaresTable.getColumnModel().getColumn(3).setCellRenderer(new StatusRenderer());
 
         // Render para acciones (no funcionales, solo apariencia)
-        class ActionsRenderer implements TableCellRenderer {
-            private final JPanel panelCell = new JPanel();
-            private final JButton edit = new JButton();
-            private final JButton del = new JButton();
-
-            public ActionsRenderer() {
-                panelCell.setOpaque(false);
-                panelCell.setLayout(new FlowLayout(FlowLayout.RIGHT, 6, 6));
-
-                // Botón editar con fondo translúcido pintado manualmente
-                java.net.URL editarIconUrl = AppResources.editarPath();
-                final JButton editBtn = new JButton() {
-                    @Override
-                    protected void paintComponent(Graphics g) {
-                        Graphics2D g2 = (Graphics2D) g.create();
-                        g2.setComposite(AlphaComposite.SrcOver);
-                        g2.setColor(new Color(70, 141, 174, 102));
-                        g2.fillRect(0, 0, getWidth(), getHeight());
-                        g2.dispose();
-                        super.paintComponent(g);
-                    }
-                };
-                if (editarIconUrl != null) {
-                    Image img = new ImageIcon(editarIconUrl).getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
-                    editBtn.setIcon(new ImageIcon(img));
-                }
-                editBtn.setPreferredSize(new Dimension(24, 24));
-                editBtn.setToolTipText("Editar");
-                editBtn.setBorder(null);
-                editBtn.setFocusPainted(false);
-                editBtn.setContentAreaFilled(false);
-                editBtn.setOpaque(false);
-                editBtn.setMargin(new Insets(0, 0, 0, 0));
-
-                // Abrir diálogo de edición de la publicación actual (usa
-                // `currentPublicacionId`)
-                editBtn.addActionListener(evt -> {
-                    if (currentPublicacionId > 0) {
-                        EditarPublicacionDialog d = new EditarPublicacionDialog(
-                                controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
-                        d.setVisible(true);
-                        // refrescar para mostrar posibles cambios
-                        controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
-                    } else {
-                        JOptionPane.showMessageDialog(panelCell, "No hay publicación seleccionada para editar", "Aviso",
-                                JOptionPane.WARNING_MESSAGE);
-                    }
-                });
-
-                // Botón eliminar con fondo translúcido pintado manualmente
-                URL borrarIconUrl = AppResources.eliminarPath();
-                final JButton delBtn = new JButton() {
-                    @Override
-                    protected void paintComponent(Graphics g) {
-                        Graphics2D g2 = (Graphics2D) g.create();
-                        g2.setComposite(AlphaComposite.SrcOver);
-                        g2.setColor(new Color(192, 57, 43, 102));
-                        g2.fillRect(0, 0, getWidth(), getHeight());
-                        g2.dispose();
-                        super.paintComponent(g);
-                    }
-                };
-                if (borrarIconUrl != null) {
-                    Image img = new ImageIcon(borrarIconUrl).getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
-                    delBtn.setIcon(new ImageIcon(img));
-                }
-                delBtn.setPreferredSize(new Dimension(24, 24));
-                delBtn.setToolTipText("Eliminar");
-                delBtn.setBorder(null);
-                delBtn.setFocusPainted(false);
-                delBtn.setContentAreaFilled(false);
-                delBtn.setOpaque(false);
-                delBtn.setMargin(new Insets(0, 0, 0, 0));
-
-                panelCell.add(editBtn);
-                panelCell.add(delBtn);
-            }
-
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                return panelCell;
-            }
-        }
-
-        ejemplaresTable.getColumnModel().getColumn(3).setCellRenderer(new StatusRenderer());
         ejemplaresTable.getColumnModel().getColumn(4).setCellRenderer(new ActionsRenderer());
 
         // Hacer que al hacer click en la columna ACCIONES se abra el diálogo de editar
         // ejemplar
         ejemplaresTable.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(final MouseEvent e) {
                 int row = ejemplaresTable.rowAtPoint(e.getPoint());
                 int col = ejemplaresTable.columnAtPoint(e.getPoint());
                 // Si se hizo click en la columna ACCIONES (4)
@@ -475,12 +396,175 @@ public class Ejemplares {
         scroll.setBorder(null);
         ejemplares.add(scroll);
 
-        // Añadir paneles principales al panel principal
-        panel.add(encabezado);
-        panel.add(publicacionPanel);
-        panel.add(ejemplares);
+        return ejemplares;
+    }
 
-        return panel;
+    /**
+     * Crea el botón de nuevo ejemplar con su listener.
+     *
+     * @param panelPanel panel donde mostrar el mensaje de error
+     * @return JButton btnNuevoEjemplar
+     */
+    private JButton crearBotonNuevoEjemplar(final JPanel panelPanel) {
+        JButton btnNuevoEjemplar = new JButton("+ NUEVO EJEMPLAR");
+        btnNuevoEjemplar.setBounds(380, 8, 160, 28);
+        btnNuevoEjemplar.setBackground(Color.decode("#F4791B"));
+        btnNuevoEjemplar.setForeground(Color.white);
+        btnNuevoEjemplar.setFocusPainted(false);
+        btnNuevoEjemplar.setBorder(null);
+
+        // Abrir diálogo de nuevo ejemplar
+        btnNuevoEjemplar.addActionListener(evt -> {
+            if (currentPublicacionId > 0) {
+                NuevoEjemplarDialog d = new NuevoEjemplarDialog(controlador.getControladorNavegacion().getVentana(),
+                        controlador, currentPublicacionId);
+                d.setVisible(true);
+                // refrescar la vista tras cerrar
+                controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
+            } else {
+                JOptionPane.showMessageDialog(panelPanel,
+                        "No hay publicación seleccionada para añadir ejemplares", "Aviso",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
+        return btnNuevoEjemplar;
+    }
+
+    /**
+     * Renderizador para el estado de ejemplares (badges con colores).
+     */
+    private class StatusRenderer extends JLabel implements TableCellRenderer {
+        /**
+         * Constructor de StatusRenderer.
+         */
+        StatusRenderer() {
+            setOpaque(true);
+            setHorizontalAlignment(SwingConstants.CENTER);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(final JTable table, final Object value,
+                final boolean isSelected, final boolean hasFocus, final int row, final int column) {
+            String s = (value != null) ? value.toString() : "";
+            setText(s);
+            switch (s) {
+                case "DISPONIBLE":
+                    setBackground(Color.decode("#E6FFF0"));
+                    setForeground(Color.decode("#2BC187"));
+                    break;
+                case "PRESTADO":
+                    setBackground(Color.decode("#FFF4E6"));
+                    setForeground(Color.decode("#F4791B"));
+                    break;
+                case "BAJA":
+                    setBackground(Color.decode("#EAF6FF"));
+                    setForeground(Color.decode("#5FAEC7"));
+                    break;
+                default:
+                    setBackground(Color.white);
+                    setForeground(Color.black);
+            }
+            setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+            return this;
+        }
+    }
+
+    /**
+     * Renderizador para las acciones de ejemplares (botones editar/eliminar).
+     */
+    private class ActionsRenderer implements TableCellRenderer {
+        /**
+         * Panel de celda para los botones de acción.
+         */
+        private final JPanel panelCell = new JPanel();
+        /**
+         * Botón de editar dentro del renderizador.
+         */
+        private final JButton edit = new JButton();
+        /**
+         * Botón de eliminar dentro del renderizador.
+         */
+        private final JButton del = new JButton();
+
+        ActionsRenderer() {
+            panelCell.setOpaque(false);
+            panelCell.setLayout(new FlowLayout(FlowLayout.RIGHT, 6, 6));
+
+            // Botón editar con fondo translúcido pintado manualmente
+            java.net.URL editarIconUrl = AppResources.editarPath();
+            final JButton editBtn = new JButton() {
+                @Override
+                protected void paintComponent(final Graphics g) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setComposite(AlphaComposite.SrcOver);
+                    g2.setColor(new Color(70, 141, 174, 102));
+                    g2.fillRect(0, 0, getWidth(), getHeight());
+                    g2.dispose();
+                    super.paintComponent(g);
+                }
+            };
+            if (editarIconUrl != null) {
+                Image img = new ImageIcon(editarIconUrl).getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
+                editBtn.setIcon(new ImageIcon(img));
+            }
+            editBtn.setPreferredSize(new Dimension(24, 24));
+            editBtn.setToolTipText("Editar");
+            editBtn.setBorder(null);
+            editBtn.setFocusPainted(false);
+            editBtn.setContentAreaFilled(false);
+            editBtn.setOpaque(false);
+            editBtn.setMargin(new Insets(0, 0, 0, 0));
+
+            // Abrir diálogo de edición de la publicación actual (usa
+            // `currentPublicacionId`)
+            editBtn.addActionListener(evt -> {
+                if (currentPublicacionId > 0) {
+                    EditarPublicacionDialog d = new EditarPublicacionDialog(
+                            controlador.getControladorNavegacion().getVentana(), controlador, currentPublicacionId);
+                    d.setVisible(true);
+                    // refrescar para mostrar posibles cambios
+                    controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(currentPublicacionId);
+                } else {
+                    JOptionPane.showMessageDialog(panelCell, "No hay publicación seleccionada para editar", "Aviso",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+            });
+
+            // Botón eliminar con fondo translúcido pintado manualmente
+            URL borrarIconUrl = AppResources.eliminarPath();
+            final JButton delBtn = new JButton() {
+                @Override
+                protected void paintComponent(final Graphics g) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setComposite(AlphaComposite.SrcOver);
+                    g2.setColor(new Color(192, 57, 43, 102));
+                    g2.fillRect(0, 0, getWidth(), getHeight());
+                    g2.dispose();
+                    super.paintComponent(g);
+                }
+            };
+            if (borrarIconUrl != null) {
+                Image img = new ImageIcon(borrarIconUrl).getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
+                delBtn.setIcon(new ImageIcon(img));
+            }
+            delBtn.setPreferredSize(new Dimension(24, 24));
+            delBtn.setToolTipText("Eliminar");
+            delBtn.setBorder(null);
+            delBtn.setFocusPainted(false);
+            delBtn.setContentAreaFilled(false);
+            delBtn.setOpaque(false);
+            delBtn.setMargin(new Insets(0, 0, 0, 0));
+
+            panelCell.add(editBtn);
+            panelCell.add(delBtn);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(final JTable table, final Object value,
+                final boolean isSelected, final boolean hasFocus, final int row, final int column) {
+            return panelCell;
+        }
     }
 
     /**
@@ -490,7 +574,7 @@ public class Ejemplares {
      *
      * @param resumen arreglo: titulo,isbn,autores,ciclos,editorial,disponibles,id
      */
-    public void cargarPublicacionResumen(String[] resumen) {
+    public void cargarPublicacionResumen(final String[] resumen) {
         // Comprobación básica
         if (resumen == null) {
             return;
@@ -533,7 +617,8 @@ public class Ejemplares {
             // Cargar datos y comprobacion de nulos y vacios
             if (ejemplaresData == null) {
                 JOptionPane.showMessageDialog(null,
-                        "Error cargando ejemplares de la publicación. Compruebe la conexión a la base de datos.", "Error",
+                        "Error cargando ejemplares de la publicación. Compruebe la conexión a la base de datos.",
+                        "Error",
                         JOptionPane.ERROR_MESSAGE);
             } else if (ejemplaresData.length == 0) {
                 JOptionPane.showMessageDialog(null,

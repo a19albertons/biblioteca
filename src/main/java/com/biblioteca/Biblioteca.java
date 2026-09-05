@@ -9,10 +9,17 @@ import com.biblioteca.utilities.Fonts;
  * Hello world!
  *
  */
-public class Biblioteca 
-{
-    public static void main( String[] args )
-    {
+public final class Biblioteca {
+    private Biblioteca() {
+    }
+
+    /**
+     * Metodo que inicia la aplicacion de la biblioteca.
+     * 
+     * @param args command line arguments
+     */
+    public static void main(final String[] args) {
+
         // Aplicar Open Sans y estilo normal por defecto a etiquetas y botones
         Fonts.applyDefaultOpenSans();
 

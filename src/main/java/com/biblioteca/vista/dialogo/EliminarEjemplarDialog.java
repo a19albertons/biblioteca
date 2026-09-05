@@ -49,7 +49,7 @@ public class EliminarEjemplarDialog extends JDialog {
      * @param controlador
      * @param idEjemplar
      */
-    public EliminarEjemplarDialog(JFrame parent, Controlador controlador, int idEjemplar) {
+    public EliminarEjemplarDialog(final JFrame parent, final Controlador controlador, final int idEjemplar) {
         super(parent, "Eliminar Ejemplar", true);
         this.controlador = controlador;
         this.parentFrame = parent;
@@ -61,12 +61,12 @@ public class EliminarEjemplarDialog extends JDialog {
         // Cierra el overlay al cerrar el diálogo
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
+            public void windowClosed(final java.awt.event.WindowEvent e) {
                 removeOverlay();
             }
 
             @Override
-            public void windowClosing(java.awt.event.WindowEvent e) {
+            public void windowClosing(final java.awt.event.WindowEvent e) {
                 removeOverlay();
             }
         });
@@ -149,7 +149,7 @@ public class EliminarEjemplarDialog extends JDialog {
      * padre.
      */
     @Override
-    public void setVisible(boolean b) {
+    public void setVisible(final boolean b) {
         if (b) {
             installOverlay();
         }
@@ -164,8 +164,9 @@ public class EliminarEjemplarDialog extends JDialog {
      */
     private void installOverlay() {
         // Controla si el frame padre es nulo
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Guardar el componente previo del glass pane para restaurarlo después
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;
@@ -192,8 +193,9 @@ public class EliminarEjemplarDialog extends JDialog {
      */
     private void removeOverlay() {
         // Controla si el frame padre es nulo
-        if (parentFrame == null)
+        if (parentFrame == null) {
             return;
+        }
         try {
             // Restaurar el componente previo del glass pane
             RootPaneContainer rpc = (RootPaneContainer) parentFrame;

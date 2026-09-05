@@ -21,7 +21,7 @@ public class BarraLateral {
     /**
      * Controlador de la aplicación
      */
-    Controlador controlador;
+    private Controlador controlador;
 
     // Botones de la barra lateral expuestos para poder marcar estado activo desde
     // fuera
@@ -51,14 +51,14 @@ public class BarraLateral {
      * 
      * @param controlador
      */
-    public BarraLateral(Controlador controlador) {
+    public BarraLateral(final Controlador controlador) {
         this.controlador = controlador;
     }
 
     /**
      * Muestra la pantalla de la barra lateral con opciones de navegación
      * 
-     * @return
+     * @return panel con la barra lateral
      */
     public JPanel pantalla() {
         JPanel panel = new JPanel();
@@ -169,7 +169,7 @@ public class BarraLateral {
      * @param nombrePantalla nombre del key usado en ControladorNavegacion (ej:
      *                       "panelControl", "publicaciones")
      */
-    public void marcarPantallaActiva(String nombrePantalla) {
+    public void marcarPantallaActiva(final String nombrePantalla) {
         // si es null, marcar inicio
         if (nombrePantalla == null) {
             setActiveButton(btnInicio, btnInicio, btnCatalogoLibros, btnPrestamos, btnSocios, btnSanciones);
@@ -204,7 +204,7 @@ public class BarraLateral {
      * @param active  botón que debe quedar marcado como activo
      * @param buttons lista completa de botones a evaluar y actualizar
      */
-    private void setActiveButton(JButton active, JButton... buttons) {
+    private void setActiveButton(final JButton active, final JButton... buttons) {
         for (JButton b : buttons) {
             if (b == active) {
                 b.setBackground(Color.decode("#444444"));
