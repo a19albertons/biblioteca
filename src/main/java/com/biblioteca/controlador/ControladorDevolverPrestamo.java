@@ -1,6 +1,10 @@
 package com.biblioteca.controlador;
 
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 import com.biblioteca.conexiones.DBConnection;
@@ -11,18 +15,14 @@ import com.biblioteca.dao.SancionDAO;
 import com.biblioteca.dao.UsuarioDAO;
 import com.biblioteca.dto.EjemplarConTituloDTO;
 import com.biblioteca.dto.EjemplarTipoPublicacionDTO;
+import com.biblioteca.dto.EstadoEjemplarDTO;
+import com.biblioteca.dto.ObtenerPublicacionDetallesPorIdDTO;
 import com.biblioteca.dto.RegistroDevolucionDTO;
 import com.biblioteca.dto.UsuarioEstadoPorDNIOID;
 import com.biblioteca.dto.UsuarioFinSancionDTO;
 import com.biblioteca.dto.UsuarioTipoDTO;
-import com.biblioteca.dto.EstadoEjemplarDTO;
-import com.biblioteca.dto.ObtenerPublicacionDetallesPorIdDTO;
 import com.biblioteca.modelo.TipoPublicacion;
 import com.biblioteca.modelo.TipoUsuario;
-
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.SQLException;
 
 /**
  * Controlador para la lógica de devolución de préstamos
@@ -76,12 +76,6 @@ public class ControladorDevolverPrestamo {
         } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
-        } catch (Throwable t) {
-            // Evitar que errores de compilación/Classpath propaguen una excepción no
-            // controlada
-            System.out.println("Error buscando usuario por DNI/ID: " + t.getMessage());
-            t.printStackTrace();
-            return null;
         }
     }
 
@@ -125,7 +119,7 @@ public class ControladorDevolverPrestamo {
                     titulo,
                     Integer.parseInt(numEdicion),
                     TipoPublicacion.valueOf(tipo));
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }
@@ -141,11 +135,11 @@ public class ControladorDevolverPrestamo {
      * registra en la base de datos. Si ya existe una sanción activa, se acumulan
      * los días y se desactiva la sanción previa.
      * 
-     * @param conexion conexión a la base de datos (abierta)
-     * @param idUsuario id del usuario que devuelve el ejemplar
+     * @param conexion   conexión a la base de datos (abierta)
+     * @param idUsuario  id del usuario que devuelve el ejemplar
      * @param idEjemplar id del ejemplar que se devuelve
      * @param idPrestamo id del préstamo que se devuelve
-     * @param fechaFin fecha de fin del préstamo
+     * @param fechaFin   fecha de fin del préstamo
      * @return null si éxito o mensaje de error si fallo
      */
     private String aplicarSancion(final Connection conexion, final int idUsuario, final int idEjemplar,
@@ -209,29 +203,19 @@ public class ControladorDevolverPrestamo {
                         descripcion = descripcionBase + " (Acumulativa: sanción activa hasta " + finAct
                                 + "; se añaden " + diasSancion + " días)";
 
-                        try {
-                            int idPrev = sancionActiva.getIdSancion();
-                            previaDesactivada = sancionDAO.desactivarSancionPorId(idPrev);
+                        int idPrev = sancionActiva.getIdSancion();
+                        previaDesactivada = sancionDAO.desactivarSancionPorId(idPrev);
 
-                            if (!previaDesactivada) {
-                                return "Error al desactivar la sanción previa para aplicar la sanción acumulativa.";
-                            }
-                        } catch (Exception ex2) {
-                            // registrar el error al intentar desactivar la sanción previa
-                            System.out
-                                    .println("Error desactivando sanción previa (id="
-                                            + sancionActiva.getIdSancion()
-                                            + "): " + ex2.getMessage());
-                            ex2.printStackTrace();
+                        if (!previaDesactivada) {
                             return "Error al desactivar la sanción previa para aplicar la sanción acumulativa.";
                         }
 
-                    } catch (Exception e) {
+                    } catch (DateTimeParseException ex) {
                         // control de errores de conversion.
                         System.out
                                 .println("Error al sumar la nueva sanción a la sanción activa: "
-                                        + e.getMessage());
-                        e.printStackTrace();
+                                        + ex.getMessage());
+                        ex.printStackTrace();
                         return "Error al calcular la fecha de fin de sanción acumulativa.";
                     }
                     // Calculo para cuando no hay sancion previa
@@ -267,7 +251,7 @@ public class ControladorDevolverPrestamo {
                     } else {
                         ultimaNotificacionSancion = "Se ha aplicado una nueva sanción hasta " + finSancion;
                     }
-                } catch (Exception e) {
+                } catch (DateTimeParseException e) {
                     System.out
                             .println("Error preparando notificación de sanción automática: " + e.getMessage());
                     e.printStackTrace();
@@ -350,7 +334,8 @@ public class ControladorDevolverPrestamo {
                     conexion.setAutoCommit(true);
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    return "Error al restaurar el modo de auto-commit de la base de datos: " + e.getMessage();
+                    System.out.println(
+                            "Error al restaurar el modo de auto-commit de la base de datos: " + e.getMessage());
                 }
             }
         } catch (SQLException e) {

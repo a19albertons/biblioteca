@@ -2,6 +2,7 @@ package com.biblioteca.controlador;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 import com.biblioteca.conexiones.DBConnection;
@@ -51,7 +52,7 @@ public class ControladorConcederPrestamo {
             }
             UsuarioDAO dao = new UsuarioDAO(conexion);
             return dao.obtenerUsuarioYEstadoPorDniOId(dniOrId == null ? "" : dniOrId.trim());
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }
@@ -92,7 +93,7 @@ public class ControladorConcederPrestamo {
             int numEdicion;
             try {
                 numEdicion = Integer.parseInt(detallesPub.getNumEdicion());
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 numEdicion = 0; // si no hay numEdicion, poner 0
             }
             resultado = new EjemplarConTituloDTO(
@@ -103,7 +104,7 @@ public class ControladorConcederPrestamo {
                     titulo,
                     numEdicion,
                     TipoPublicacion.valueOf(tipo));
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }
@@ -231,7 +232,7 @@ public class ControladorConcederPrestamo {
                     try {
                         conexion.rollback();
                         conexion.setAutoCommit(true);
-                    } catch (Exception ex) {
+                    } catch (SQLException ex) {
                         System.out
                                 .println("Error al hacer rollback o al restablecer el auto-commit: " + ex.getMessage());
                     }
@@ -239,7 +240,7 @@ public class ControladorConcederPrestamo {
 
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             return "Error al obtener conexión a BD: " + e.getMessage();
         }
 

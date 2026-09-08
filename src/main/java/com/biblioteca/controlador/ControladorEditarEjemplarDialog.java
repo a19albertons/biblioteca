@@ -47,7 +47,7 @@ public class ControladorEditarEjemplarDialog {
             }
             EjemplarDAO dao = new EjemplarDAO(conexion);
             return dao.obtenerEjemplarPorId(idEjemplar);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }
@@ -93,11 +93,11 @@ public class ControladorEditarEjemplarDialog {
                 // Confirma la transacción
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 // En caso de error, revierte la transacción
                 try {
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -107,9 +107,8 @@ public class ControladorEditarEjemplarDialog {
                 try {
                     // Restaura el modo auto-commit y cierra la conexión
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error al restaurar auto-commit: " + ex.getMessage());
                 }
             }
         } catch (SQLException e1) {
