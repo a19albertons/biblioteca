@@ -244,23 +244,19 @@ public class NuevoUsuarioDialog extends JDialog {
         if (parentFrame == null) {
             return;
         }
-        try {
-            // Obtener el RootPaneContainer del frame padre
-            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-            Component current = rpc.getRootPane().getGlassPane();
-            // Guardar la referencia previa en el campo para restaurarla al cerrar
-            this.previousGlassPane = current;
-            JPanel overlay = new JPanel();
-            overlay.setOpaque(true);
-            overlay.setBackground(new Color(217, 217, 217, 153));
-            overlay.addMouseListener(new MouseAdapter() {
-            });
-            // Asignar el overlay como glass pane
-            rpc.getRootPane().setGlassPane(overlay);
-            overlay.setVisible(true);
-        } catch (Exception e) {
-            System.out.println("No se pudo instalar overlay: " + e.getMessage());
-        }
+        // Obtener el RootPaneContainer del frame padre
+        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+        Component current = rpc.getRootPane().getGlassPane();
+        // Guardar la referencia previa en el campo para restaurarla al cerrar
+        this.previousGlassPane = current;
+        JPanel overlay = new JPanel();
+        overlay.setOpaque(true);
+        overlay.setBackground(new Color(217, 217, 217, 153));
+        overlay.addMouseListener(new MouseAdapter() {
+        });
+        // Asignar el overlay como glass pane
+        rpc.getRootPane().setGlassPane(overlay);
+        overlay.setVisible(true);
     }
 
     /**
@@ -271,18 +267,14 @@ public class NuevoUsuarioDialog extends JDialog {
         if (parentFrame == null) {
             return;
         }
-        try {
-            // Restaurar el glass pane previo (si lo tenemos)
-            javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
-            if (this.previousGlassPane != null) {
-                rpc.getRootPane().setGlassPane(this.previousGlassPane);
-                this.previousGlassPane.setVisible(false);
-                this.previousGlassPane = null;
-            } else {
-                rpc.getRootPane().getGlassPane().setVisible(false);
-            }
-        } catch (Exception e) {
-            System.out.println("No se pudo quitar overlay: " + e.getMessage());
+        // Restaurar el glass pane previo (si lo tenemos)
+        javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
+        if (this.previousGlassPane != null) {
+            rpc.getRootPane().setGlassPane(this.previousGlassPane);
+            this.previousGlassPane.setVisible(false);
+            this.previousGlassPane = null;
+        } else {
+            rpc.getRootPane().getGlassPane().setVisible(false);
         }
     }
 }

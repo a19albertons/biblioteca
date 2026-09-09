@@ -245,33 +245,29 @@ public class EditarUsuarioDialog extends JDialog {
      * Carga los datos del usuario a editar en el formulario
      */
     private void cargarDatos() {
-        try {
-            // Obtener datos del usuario
-            String[] datos = controlador.getControladorEditarUsuarioDialog().obtenerDetallesUsuario(idUsuario);
-            // No hay datos acaba el metodo
-            if (datos == null) {
-                return;
+        // Obtener datos del usuario
+        String[] datos = controlador.getControladorEditarUsuarioDialog().obtenerDetallesUsuario(idUsuario);
+        // No hay datos acaba el metodo
+        if (datos == null) {
+            return;
+        }
+        // Rellenar campos
+        dniField.setText(datos.length > 0 ? datos[0] : "");
+        nombreField.setText(datos.length > 1 ? datos[1] : "");
+        // Rellenar apellidos (apellido1 [apellido2])
+        if (datos.length > 2) {
+            apellidosField.setText(datos[2] + (datos.length > 3 && datos[3] != null ? " " + datos[3] : ""));
+        } else {
+            apellidosField.setText("");
+        }
+        emailField.setText(datos.length > 4 ? datos[4] : "");
+        String tipoCode = datos.length > 5 ? datos[5] : "";
+        // Select by matching TipoUsuario name
+        for (int i = 0; i < TipoUsuario.values().length; i++) {
+            if (TipoUsuario.values()[i].name().equals(tipoCode)) {
+                tipoBox.setSelectedIndex(i);
+                break;
             }
-            // Rellenar campos
-            dniField.setText(datos.length > 0 ? datos[0] : "");
-            nombreField.setText(datos.length > 1 ? datos[1] : "");
-            // Rellenar apellidos (apellido1 [apellido2])
-            if (datos.length > 2) {
-                apellidosField.setText(datos[2] + (datos.length > 3 && datos[3] != null ? " " + datos[3] : ""));
-            } else {
-                apellidosField.setText("");
-            }
-            emailField.setText(datos.length > 4 ? datos[4] : "");
-            String tipoCode = datos.length > 5 ? datos[5] : "";
-            // Select by matching TipoUsuario name
-            for (int i = 0; i < TipoUsuario.values().length; i++) {
-                if (TipoUsuario.values()[i].name().equals(tipoCode)) {
-                    tipoBox.setSelectedIndex(i);
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Error cargando datos usuario: " + e.getMessage());
         }
     }
 
@@ -298,21 +294,17 @@ public class EditarUsuarioDialog extends JDialog {
         if (parentFrame == null) {
             return;
         }
-        try {
-            // Recordar el glass pane previo
-            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-            Component current = rpc.getRootPane().getGlassPane();
-            previousGlassPane = current;
-            JPanel overlay = new JPanel();
+        // Recordar el glass pane previo
+        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+        Component current = rpc.getRootPane().getGlassPane();
+        previousGlassPane = current;
+        JPanel overlay = new JPanel();
 
-            // Hacerlo translúcido
-            overlay.setOpaque(true);
-            overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
-            rpc.getRootPane().setGlassPane(overlay);
-            overlay.setVisible(true);
-        } catch (Exception e) {
-            System.out.println("No se pudo instalar overlay: " + e.getMessage());
-        }
+        // Hacerlo translúcido
+        overlay.setOpaque(true);
+        overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
+        rpc.getRootPane().setGlassPane(overlay);
+        overlay.setVisible(true);
     }
 
     /**
@@ -323,19 +315,15 @@ public class EditarUsuarioDialog extends JDialog {
         if (parentFrame == null) {
             return;
         }
-        try {
-            // Restaurar el glass pane previo (si lo teníamos)
-            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-            if (previousGlassPane != null) {
-                rpc.getRootPane().setGlassPane(previousGlassPane);
-                previousGlassPane.setVisible(false);
-                previousGlassPane = null;
-            } else {
-                // Si no tenemos referencia previa, simplemente ocultar el glass pane actual
-                rpc.getRootPane().getGlassPane().setVisible(false);
-            }
-        } catch (Exception e) {
-            System.out.println("No se pudo quitar overlay: " + e.getMessage());
+        // Restaurar el glass pane previo (si lo teníamos)
+        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+        if (previousGlassPane != null) {
+            rpc.getRootPane().setGlassPane(previousGlassPane);
+            previousGlassPane.setVisible(false);
+            previousGlassPane = null;
+        } else {
+            // Si no tenemos referencia previa, simplemente ocultar el glass pane actual
+            rpc.getRootPane().getGlassPane().setVisible(false);
         }
     }
 }
