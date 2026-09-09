@@ -223,8 +223,6 @@ public class ControladorNavegacion {
             cambiarPantallaHijo("ejemplares");
         } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("Error inesperado: " + e.getMessage());
         }
 
     }
