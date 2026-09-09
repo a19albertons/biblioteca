@@ -3,6 +3,7 @@ package com.biblioteca.utilities;
 import javax.swing.SwingWorker;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Pequeña utilidad para ejecutar tareas en background usando SwingWorker.
@@ -49,7 +50,7 @@ public final class BackgroundWorker {
                     if (onDone != null) {
                         onDone.accept(result);
                     }
-                } catch (Exception e) {
+                } catch (InterruptedException | ExecutionException e) {
                     if (onError != null) {
                         onError.accept(e);
                     }
