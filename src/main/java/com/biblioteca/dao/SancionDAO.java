@@ -3,6 +3,7 @@ package com.biblioteca.dao;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import com.biblioteca.dto.UsuarioFinSancionDTO;
 
@@ -67,9 +68,9 @@ public class SancionDAO {
             // ejecutar
             int rows = ps.executeUpdate();
             return rows == 1;
-        } catch (Throwable t) {
-            System.out.println("Error insertando sanción: " + t.getMessage());
-            t.printStackTrace();
+        } catch (SQLException e) {
+            System.out.println("Error insertando sanción: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
@@ -97,12 +98,12 @@ public class SancionDAO {
                             rs.getInt("id"),
                             rs.getString("fin_sancion"));
                 }
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 System.out.println("Error obteniendo sanción activa: " + e.getMessage());
                 System.out.println(e.getCause());
                 dto = null;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Evitar que errores de compilación/Classpath propaguen una excepción no
             // controlada
             System.out.println("Error obteniendo sanción activa: " + e.getMessage());
@@ -127,10 +128,10 @@ public class SancionDAO {
             // ejecutar
             int rows = ps.executeUpdate();
             return rows == 1;
-        } catch (Throwable t) {
+        } catch (SQLException e) {
             // registrar el error
-            System.out.println("Error desactivando sanción: " + t.getMessage());
-            t.printStackTrace();
+            System.out.println("Error desactivando sanción: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
