@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -183,7 +184,7 @@ public class PublicacionDAO {
                     devolver.add(rs.getString("editorial"));
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             devolver = new ArrayList<>();
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -221,7 +222,7 @@ public class PublicacionDAO {
                     return rs.getInt(1);
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -247,7 +248,7 @@ public class PublicacionDAO {
             // ejecutar
             ps.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -273,7 +274,7 @@ public class PublicacionDAO {
             // ejecutar
             ps.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -297,7 +298,7 @@ public class PublicacionDAO {
             // ejecutar
             ps.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -321,7 +322,7 @@ public class PublicacionDAO {
             // ejecutar
             ps.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -345,7 +346,7 @@ public class PublicacionDAO {
             // ejecutar
             ps.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -369,7 +370,7 @@ public class PublicacionDAO {
             // ejecutar
             ps.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -391,7 +392,7 @@ public class PublicacionDAO {
                     return rs.getInt("m") + 1;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -445,7 +446,7 @@ public class PublicacionDAO {
                     lista.add(fila);
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             lista = new ArrayList<>();
             System.out.println(e.getMessage());
@@ -493,7 +494,7 @@ public class PublicacionDAO {
                     return new String[] { titulo, isbn, autores, ciclos, editorial, disponibles, String.valueOf(id) };
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -553,7 +554,7 @@ public class PublicacionDAO {
                             estado);
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -586,7 +587,7 @@ public class PublicacionDAO {
             // ejecutar
             int updated = ps.executeUpdate();
             return updated >= 0;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -616,7 +617,7 @@ public class PublicacionDAO {
                 return insertarLibro(idPublicacion, numEdicion, fechaPublicacion);
             }
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
             return false;
@@ -644,7 +645,7 @@ public class PublicacionDAO {
                 return insertarRevista(idPublicacion, periodicidad, numRev);
             }
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -675,7 +676,7 @@ public class PublicacionDAO {
             ps4.setInt(1, idPublicacion);
             ps4.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
             return false;
@@ -701,10 +702,11 @@ public class PublicacionDAO {
                     return rs.getInt("cnt") > 0;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
+            return false;
         }
         return false;
     }
@@ -725,7 +727,7 @@ public class PublicacionDAO {
             ps2.setInt(1, idPublicacion);
             ps2.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,7 +92,7 @@ public class EjemplarDAO {
                     lista.add(new String[] { id, num, fechaStr, estado });
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             lista = new ArrayList<>();
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -116,7 +117,7 @@ public class EjemplarDAO {
                     return rs.getInt("siguiente");
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener siguiente num_ejemplar: " + e.getMessage());
             System.out.println(e.getCause());
         }
@@ -143,7 +144,7 @@ public class EjemplarDAO {
             // Ejecutar inserción
             int rows = ps.executeUpdate();
             return rows == 1;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Error
             System.out.println("Error insertando ejemplar: " + e.getMessage());
             System.out.println(e.getCause());
@@ -181,7 +182,7 @@ public class EjemplarDAO {
                             fechaStr, estadoStr);
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Error
             System.out.println("Error obteniendo ejemplar: " + e.getMessage());
             System.out.println(e.getCause());
@@ -210,7 +211,7 @@ public class EjemplarDAO {
             // Ejecutar actualización
             int rows = ps.executeUpdate();
             return rows == 1;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Error
             System.out.println("Error actualizando ejemplar: " + e.getMessage());
             System.out.println(e.getCause());
@@ -236,7 +237,7 @@ public class EjemplarDAO {
                     return rs.getInt("cnt") > 0;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error comprobando préstamos activos: " + e.getMessage());
             System.out.println(e.getCause());
         }
@@ -258,7 +259,7 @@ public class EjemplarDAO {
             // Ejecutar actualización
             int rows = ps.executeUpdate();
             return rows == 1;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error marcando ejemplar como baja: " + e.getMessage());
             System.out.println(e.getCause());
             return false;
@@ -287,12 +288,12 @@ public class EjemplarDAO {
                     TipoPublicacion tipoPublicacion = TipoPublicacion.valueOf(tipoPublicacionStr);
                     dto = new EjemplarTipoPublicacionDTO(numEjemplar, tipoPublicacion);
                 }
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 System.out.println("Error obteniendo EjemplarTipoPublicacionDTO: " + e.getMessage());
                 System.out.println(e.getCause());
                 dto = null;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error obteniendo EjemplarTipoPublicacionDTO: " + e.getMessage());
             System.out.println(e.getCause());
             dto = null;

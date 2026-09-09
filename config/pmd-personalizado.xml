@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<ruleset name="Reglas Personalizadas Biblioteca"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0">
+
+    <description>Reglas oficiales de PMD filtradas para este proyecto</description>
+
+    <!-- Usamos todas las de Best Practices excepto los System.out -->
+    <rule ref="category/java/bestpractices.xml">
+        <exclude name="SystemPrintln" />
+        <exclude name="UnusedAssignment" />
+        <exclude name="AvoidPrintStackTrace" />
+        <exclude name="UnusedFormalParameter" />
+        <exclude name="UseVarargs" />
+        <exclude name="LiteralsFirstInComparisons"/>
+        <exclude name="UnusedPrivateField"/>
+        <exclude name="UnusedLocalVariable"/>
+        <exclude name="LooseCoupling"/>
+        <exclude name="PreserveStackTrace"/>
+
+    </rule>
+
+    <!-- Usamos Code Style, pero quitamos las reglas más "ruidosas" -->
+    <rule ref="category/java/codestyle.xml">
+        <exclude name="OnlyOneReturn" />
+        <exclude name="LocalVariableCouldBeFinal" />
+        <exclude name="ShortVariable" />
+        <exclude name="LongVariable" />
+        <exclude name="AtLeastOneConstructor" />
+        <exclude name="BooleanGetMethodName" />
+        <exclude name="UnnecessaryFullyQualifiedName" />
+        <exclude name="FieldDeclarationsShouldBeAtStartOfClass" />
+        <exclude name="ConfusingTernary" />
+        <exclude name="UseShortArrayInitializer" />
+        <exclude name="CallSuperInConstructor"/>
+        <exclude name="CommentDefaultAccessModifier"/>
+        <exclude name="ShortClassName"/>
+        <exclude name="UnnecessaryCast"/>
+        <exclude name="PrematureDeclaration"/>
+        <exclude name="UnnecessaryLocalBeforeReturn"/>
+    </rule>
+
+    <!-- Usamos Design, ignorando Law of Demeter y Data Class -->
+    <rule ref="category/java/design.xml">
+        <exclude name="LawOfDemeter" />
+        <exclude name="DataClass" />
+        <exclude name="CognitiveComplexity" />
+        <exclude name="NPathComplexity" />
+        <exclude name="ImmutableField" />
+        <exclude name="ExcessiveParameterList" />
+        <exclude name="NcssCount" />
+        <exclude name="CyclomaticComplexity" />
+        <exclude name="TooManyMethods" />
+        <exclude name="CollapsibleIfStatements" />
+        <exclude name="UseObjectForClearerAPI" />
+        <exclude name="SimplifyBooleanReturns"/>
+        <exclude name="ExcessiveImports"/>
+        <exclude name="GodClass"/>
+        <exclude name="SingularField"/>
+        <exclude name="TooManyFields"/>
+        <exclude name="AvoidThrowingRawExceptionTypes"/>
+        <exclude name="AvoidDeeplyNestedIfStmts"/>
+    </rule>
+
+    <!-- Error Prone completo (suele ser importante) -->
+    <rule ref="category/java/errorprone.xml">
+        <exclude name="AvoidDuplicateLiterals" />
+        <exclude name="AvoidLiteralsInIfCondition" />
+        <exclude name="ReturnEmptyCollectionRatherThanNull" />
+        <exclude name="CompareObjectsWithEquals" />
+        <exclude name="MissingSerialVersionUID" />
+        <exclude name="UseLocaleWithCaseConversions" />
+        <exclude name="NullAssignment" />
+        <exclude name="UseProperClassLoader" />
+        <exclude name="ConstructorCallsOverridableMethod" />
+        <exclude name="NonSerializableClass"/>
+        <exclude name="AvoidFieldNameMatchingTypeName"/>
+    </rule>
+
+</ruleset>

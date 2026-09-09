@@ -184,27 +184,23 @@ public class NuevaPublicacionDialog extends JDialog {
         if (parentFrame == null) {
             return;
         }
-        try {
-            // Guardar el glass pane previo para restaurarlo después
-            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-            Component current = rpc.getRootPane().getGlassPane();
-            previousGlassPane = current;
+        // Guardar el glass pane previo para restaurarlo después
+        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+        Component current = rpc.getRootPane().getGlassPane();
+        previousGlassPane = current;
 
-            // Crear el overlay
-            JPanel overlay = new JPanel();
-            overlay.setOpaque(true);
-            // Color D9D9D9 con alpha 60% -> rgba(217,217,217,153)
-            overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
-            // Consumir eventos para que el overlay bloquee interacción con la ventana
-            overlay.addMouseListener(new java.awt.event.MouseAdapter() {
-            });
+        // Crear el overlay
+        JPanel overlay = new JPanel();
+        overlay.setOpaque(true);
+        // Color D9D9D9 con alpha 60% -> rgba(217,217,217,153)
+        overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
+        // Consumir eventos para que el overlay bloquee interacción con la ventana
+        overlay.addMouseListener(new java.awt.event.MouseAdapter() {
+        });
 
-            // Asignar el overlay como glass pane
-            rpc.getRootPane().setGlassPane(overlay);
-            overlay.setVisible(true);
-        } catch (Exception e) {
-            System.out.println("No se pudo instalar overlay: " + e.getMessage());
-        }
+        // Asignar el overlay como glass pane
+        rpc.getRootPane().setGlassPane(overlay);
+        overlay.setVisible(true);
     }
 
     /**
@@ -215,18 +211,14 @@ public class NuevaPublicacionDialog extends JDialog {
         if (parentFrame == null) {
             return;
         }
-        try {
-            // Restaurar el glass pane previo
-            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-            if (previousGlassPane != null) {
-                rpc.getRootPane().setGlassPane(previousGlassPane);
-                previousGlassPane.setVisible(false);
-                previousGlassPane = null;
-            } else {
-                rpc.getRootPane().getGlassPane().setVisible(false);
-            }
-        } catch (Exception e) {
-            System.out.println("No se pudo quitar overlay: " + e.getMessage());
+        // Restaurar el glass pane previo
+        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+        if (previousGlassPane != null) {
+            rpc.getRootPane().setGlassPane(previousGlassPane);
+            previousGlassPane.setVisible(false);
+            previousGlassPane = null;
+        } else {
+            rpc.getRootPane().getGlassPane().setVisible(false);
         }
     }
 
@@ -429,33 +421,28 @@ public class NuevaPublicacionDialog extends JDialog {
             if (!validarPasoLibro()) {
                 return;
             }
-            try {
-                // Intentar crear la publicación
-                boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionLibro(
-                        isbnField.getText().trim(),
-                        tituloField.getText().trim(),
-                        idiomaField.getText().trim(),
-                        temasField.getText().trim(),
-                        modulosField.getText().trim(),
-                        ciclosField.getText().trim(),
-                        editorialField.getText().trim(),
-                        Integer.parseInt(numeroEdicionField.getText().trim()),
-                        LocalDate.parse(fechaPublicacionField.getText().trim()),
-                        autoresField.getText().trim());
-                // Mostrar resultado
-                if (ok) {
-                    JOptionPane.showMessageDialog(this, "Publicación tipo Libro añadida", "Éxito",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    // Refrescar vista de publicaciones y panel de control
-                    controlador.getControladorNavegacion().refrescarPublicaciones();
-                    controlador.getControladorNavegacion().refrescarPanelControl();
-                    dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Error añadiendo la publicación en la base de datos", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error",
+            // Intentar crear la publicación
+            boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionLibro(
+                    isbnField.getText().trim(),
+                    tituloField.getText().trim(),
+                    idiomaField.getText().trim(),
+                    temasField.getText().trim(),
+                    modulosField.getText().trim(),
+                    ciclosField.getText().trim(),
+                    editorialField.getText().trim(),
+                    Integer.parseInt(numeroEdicionField.getText().trim()),
+                    LocalDate.parse(fechaPublicacionField.getText().trim()),
+                    autoresField.getText().trim());
+            // Mostrar resultado
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "Publicación tipo Libro añadida", "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+                // Refrescar vista de publicaciones y panel de control
+                controlador.getControladorNavegacion().refrescarPublicaciones();
+                controlador.getControladorNavegacion().refrescarPanelControl();
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error añadiendo la publicación en la base de datos", "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -519,31 +506,26 @@ public class NuevaPublicacionDialog extends JDialog {
             if (!validarPasoRevista()) {
                 return;
             }
-            try {
-                // Intentar crear la publicación
-                boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionRevista(
-                        isbnField.getText().trim(),
-                        tituloField.getText().trim(),
-                        idiomaField.getText().trim(),
-                        temasField.getText().trim(),
-                        modulosField.getText().trim(),
-                        ciclosField.getText().trim(),
-                        editorialField.getText().trim(),
-                        periodicidadField.getText().trim());
-                // Mostrar resultado
-                if (ok) {
-                    JOptionPane.showMessageDialog(this, "Publicación tipo Revista añadida", "Éxito",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    // Refrescar vista de publicaciones y panel de control
-                    controlador.getControladorNavegacion().refrescarPublicaciones();
-                    controlador.getControladorNavegacion().refrescarPanelControl();
-                    dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Error añadiendo la publicación en la base de datos", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error",
+            // Intentar crear la publicación
+            boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionRevista(
+                    isbnField.getText().trim(),
+                    tituloField.getText().trim(),
+                    idiomaField.getText().trim(),
+                    temasField.getText().trim(),
+                    modulosField.getText().trim(),
+                    ciclosField.getText().trim(),
+                    editorialField.getText().trim(),
+                    periodicidadField.getText().trim());
+            // Mostrar resultado
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "Publicación tipo Revista añadida", "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+                // Refrescar vista de publicaciones y panel de control
+                controlador.getControladorNavegacion().refrescarPublicaciones();
+                controlador.getControladorNavegacion().refrescarPanelControl();
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error añadiendo la publicación en la base de datos", "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         });

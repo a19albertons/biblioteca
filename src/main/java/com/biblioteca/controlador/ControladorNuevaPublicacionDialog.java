@@ -2,6 +2,7 @@ package com.biblioteca.controlador;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 import com.biblioteca.conexiones.DBConnection;
@@ -174,10 +175,10 @@ public class ControladorNuevaPublicacionDialog {
                 // Si hemos llegado hasta aquí, confirmar
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 try {
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -186,12 +187,11 @@ public class ControladorNuevaPublicacionDialog {
             } finally {
                 try {
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error habilitando el modo autocommit de la base de datos: " + ex.getMessage());
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return false;
         }
@@ -304,10 +304,10 @@ public class ControladorNuevaPublicacionDialog {
 
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 try {
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -316,12 +316,11 @@ public class ControladorNuevaPublicacionDialog {
             } finally {
                 try {
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error habilitando el modo autocommit de la base de datos: " + ex.getMessage());
                 }
             }
-        } catch (Exception e1) {
+        } catch (SQLException e1) {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }

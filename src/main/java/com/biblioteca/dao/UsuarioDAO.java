@@ -3,6 +3,7 @@ package com.biblioteca.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import com.biblioteca.dto.UsuarioEstadoPorDNIOID;
 import com.biblioteca.dto.UsuarioTipoDTO;
@@ -151,18 +152,12 @@ public class UsuarioDAO {
                             TipoUsuario.valueOf(resultado.getString("tipo")),
                             resultado.getBoolean("estado"));
                 }
-                // Si no hay resultados, devolver sigue siendo null. Si saltase excepción
-                // tendrías que abrir esto desde una linea de comandos para ver errores critico
-                // o todos los detalles
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 devolver = null;
                 System.out.println(e.getMessage());
                 System.out.println(e.getCause());
             }
-            // Si no hay resultados, devolver sigue siendo null. Si saltase excepción
-            // tendrías que abrir esto desde una linea de comandos para ver errores critico
-            // o todos los detalles
-        } catch (Exception e) {
+        } catch (SQLException e) {
             devolver = null;
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -200,18 +195,12 @@ public class UsuarioDAO {
                             TipoUsuario.valueOf(resultado.getString("tipo")),
                             resultado.getBoolean("estado"));
                 }
-                // Si no hay resultados, devolver sigue siendo null. Si saltase excepción
-                // tendrías que abrir esto desde una linea de comandos para ver errores critico
-                // o todos los detalles
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 devolver = null;
                 System.out.println(e.getMessage());
                 System.out.println(e.getCause());
             }
-            // Si no hay resultados, devolver sigue siendo null. Si saltase excepción
-            // tendrías que abrir esto desde una linea de comandos para ver errores critico
-            // o todos los detalles
-        } catch (Exception e) {
+        } catch (SQLException e) {
             devolver = null;
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -237,7 +226,7 @@ public class UsuarioDAO {
                 }
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -284,7 +273,7 @@ public class UsuarioDAO {
                 // Convert list to array for return
                 devolver = rows.toArray(new String[0][0]);
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             devolver = new String[0][0];
             System.out.println(e.getMessage());
@@ -328,7 +317,7 @@ public class UsuarioDAO {
             // Ejecutar inserción
             int rows = ps.executeUpdate();
             return rows == 1;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Error insertando usuario: " + e.getMessage());
             System.out.println(e.getCause());
@@ -364,7 +353,7 @@ public class UsuarioDAO {
                     devolver[6] = rs.getString("id");
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Error obteniendo detalles de usuario: " + e.getMessage());
             System.out.println(e.getCause());
@@ -406,7 +395,7 @@ public class UsuarioDAO {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (NumberFormatException | SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Error buscando usuario por DNI/ID: " + e.getMessage());
             System.out.println(e.getCause());
@@ -444,7 +433,7 @@ public class UsuarioDAO {
             ps.setInt(7, idUsuario);
             int rows = ps.executeUpdate();
             return rows == 1;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Error actualizando usuario: " + e.getMessage());
             System.out.println(e.getCause());
@@ -468,7 +457,7 @@ public class UsuarioDAO {
             // Ejecutar actualización
             int rows = ps.executeUpdate();
             return rows == 1;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Error dando de baja usuario: " + e.getMessage());
             System.out.println(e.getCause());
@@ -496,7 +485,7 @@ public class UsuarioDAO {
                     return rs.getInt("total") > 0;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Error comprobando prestamos activos usuario: " + e.getMessage());
             System.out.println(e.getCause());
@@ -527,7 +516,7 @@ public class UsuarioDAO {
                 fila[3] = rs.getString("tipo");
                 rows.add(fila);
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error obteniendo usuarios sancionables: " + e.getMessage());
             System.out.println(e.getCause());
         }
@@ -553,13 +542,13 @@ public class UsuarioDAO {
                             resultado.getInt("id"),
                             TipoUsuario.valueOf(resultado.getString("tipo")));
                 }
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 // Manejo de excepciones. Se ve en consola
                 System.out.println("Error obteniendo UsuarioTipoDTO: " + e.getMessage());
                 System.out.println(e.getCause());
                 usuarioTipoDTO = null;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Ha surgido un error inesperado: " + e.getMessage());
             System.out.println(e.getCause());
@@ -583,7 +572,7 @@ public class UsuarioDAO {
                     return rs.getInt("total");
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error consultando número de usuarios por usuario: " + e.getMessage());
             System.out.println(e.getCause());
         }

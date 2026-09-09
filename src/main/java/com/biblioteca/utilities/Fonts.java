@@ -47,11 +47,15 @@ public final class Fonts {
             Font f = Font.createFont(Font.TRUETYPE_FONT, is);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(f);
-            LOGGER.log(Level.INFO, "Fuente registrada: {0}", resourceName);
+            if (LOGGER.isLoggable(Level.INFO)) {
+                LOGGER.log(Level.INFO, "Fuente registrada: {0}", resourceName);
+            }
             return f;
         } catch (IOException | FontFormatException e) {
-            LOGGER.log(Level.WARNING, "No se pudo cargar la fuente {0}: {1}",
-                    new Object[] { resourceName, e.getMessage() });
+            if (LOGGER.isLoggable(Level.WARNING)) {
+                LOGGER.log(Level.WARNING, "No se pudo cargar la fuente {0}: {1}",
+                        new Object[] { resourceName, e.getMessage() });
+            }
             return null;
         }
     }

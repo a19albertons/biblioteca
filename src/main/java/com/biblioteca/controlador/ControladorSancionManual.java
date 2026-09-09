@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 import javax.swing.JOptionPane;
@@ -58,7 +59,7 @@ public class ControladorSancionManual {
         LocalDate finSancion;
         try {
             finSancion = LocalDate.parse(finSancionString);
-        } catch (Exception ex) {
+        } catch (DateTimeParseException ex) {
             return "Error: Fecha fin inválida (formato YYYY-MM-DD)";
         }
         boolean exito = false;

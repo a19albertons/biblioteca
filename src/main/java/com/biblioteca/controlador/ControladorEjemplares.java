@@ -1,6 +1,7 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.EjemplarDAO;
@@ -41,7 +42,7 @@ public class ControladorEjemplares {
             }
             EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
             return ejemplarDAO.listaEjemplaresPorPublicacion(idPublicacion);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }
@@ -62,7 +63,7 @@ public class ControladorEjemplares {
             }
             EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
             return ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }

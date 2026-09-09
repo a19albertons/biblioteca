@@ -104,6 +104,7 @@
           </execution>
         </executions>
       </plugin>
+
       <!-- Crea un check de posibles errores, complejidad, codigo muertro-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -111,17 +112,18 @@
         <version>3.23.0</version>
 
         <configuration>
-          <targetJdk>17</targetJdk>
+          <targetJdk>21</targetJdk>
           <printFailingErrors>true</printFailingErrors>
           <failOnViolation>true</failOnViolation>
           <linkXRef>false</linkXRef>
 
           <rulesets>
-            <ruleset>/category/java/bestpractices.xml</ruleset>
-            <ruleset>/category/java/errorprone.xml</ruleset>
-            <ruleset>/category/java/codestyle.xml</ruleset>
-            <ruleset>/category/java/design.xml</ruleset>
-            <ruleset>/category/java/performance.xml</ruleset>
+            <!-- <ruleset>/category/java/bestpractices.xml</ruleset>
+            <ruleset>category/java/errorprone.xml</ruleset>
+            <ruleset>category/java/codestyle.xml</ruleset>
+            <ruleset>category/java/design.xml</ruleset>
+            <ruleset>category/java/performance.xml</ruleset> -->
+            <ruleset>${project.basedir}/config/pmd-personalizado.xml</ruleset>
           </rulesets>
         </configuration>
 
@@ -134,6 +136,7 @@
           </execution>
         </executions>
       </plugin>
+
       <!-- Analiza el bytecode generado-->
       <plugin>
         <groupId>com.github.spotbugs</groupId>

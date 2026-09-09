@@ -64,11 +64,11 @@ public class ControladorEliminarPublicacion {
                 // Commit de la transacción si todo fue bien
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 try {
                     // Si hay error, rollback
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -78,9 +78,8 @@ public class ControladorEliminarPublicacion {
                 try {
                     // Revierte los cambios inicales
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error habilitado el modo autocommit de la base de datos: " + ex.getMessage());
                 }
             }
         } catch (SQLException e1) {

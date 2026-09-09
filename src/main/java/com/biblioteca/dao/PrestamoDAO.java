@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 import com.biblioteca.dto.ObtenerUltimoPrestamoPorEjemplarDTO;
@@ -94,7 +95,7 @@ public class PrestamoDAO {
                     totalPrestamos = rs.getString("total");
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -121,7 +122,7 @@ public class PrestamoDAO {
                     totalPendientes = rs.getString("TOTAL");
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -152,7 +153,7 @@ public class PrestamoDAO {
                     index++;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             movimientos = new String[0][0];
             System.out.println(e.getMessage());
@@ -185,7 +186,7 @@ public class PrestamoDAO {
             // Ejecutar inserción
             int rows = ps.executeUpdate();
             return rows == 1;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Error insertando préstamo: " + e.getMessage());
             System.out.println(e.getCause());
@@ -216,7 +217,7 @@ public class PrestamoDAO {
                     return rs.getInt("cnt") > 0;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Error comprobando préstamo activo por tipo: " + e.getMessage());
             System.out.println(e.getCause());
@@ -245,7 +246,7 @@ public class PrestamoDAO {
                     return rs.getInt("cnt") > 0;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Error comprobando préstamo activo usuario-ejemplar: " + e.getMessage());
             System.out.println(e.getCause());
@@ -272,7 +273,7 @@ public class PrestamoDAO {
             // Ejecutar actualización
             int rows = ps.executeUpdate();
             return rows == 1;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Error marcando devolución de préstamo: " + e.getMessage());
             System.out.println(e.getCause());
@@ -306,7 +307,7 @@ public class PrestamoDAO {
                     return new RegistroDevolucionDTO(idPrestamo, fechaInicio, fechaFin);
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Error obteniendo préstamo activo: " + e.getMessage());
             System.out.println(e.getCause());
@@ -340,7 +341,7 @@ public class PrestamoDAO {
                     return new ObtenerUltimoPrestamoPorEjemplarDTO(id, idUsuario, fechaInicio, fechaFin, estado);
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Manejo de excepciones. Se ve en consola
             System.out.println("Error obteniendo ultimo prestamo por ejemplar: " + e.getMessage());
             System.out.println(e.getCause());

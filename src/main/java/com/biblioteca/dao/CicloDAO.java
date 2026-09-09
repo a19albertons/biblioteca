@@ -3,6 +3,7 @@ package com.biblioteca.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -57,7 +58,7 @@ public class CicloDAO {
                     devolver.add(rs.getString("nombre"));
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             devolver = new ArrayList<>();
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -93,7 +94,7 @@ public class CicloDAO {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
         }

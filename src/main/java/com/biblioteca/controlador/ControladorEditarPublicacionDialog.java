@@ -190,7 +190,7 @@ public class ControladorEditarPublicacionDialog {
             }
             PublicacionDAO dao = new PublicacionDAO(conexion);
             return dao.obtenerPublicacionDetallesPorId(id);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }
@@ -264,10 +264,10 @@ public class ControladorEditarPublicacionDialog {
 
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 try {
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -276,9 +276,8 @@ public class ControladorEditarPublicacionDialog {
             } finally {
                 try {
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error al restaurar auto-commit: " + ex.getMessage());
                 }
             }
         } catch (SQLException e1) {
@@ -339,7 +338,7 @@ public class ControladorEditarPublicacionDialog {
                         .prepareStatement("DELETE FROM libros WHERE id_publicacion = ?")) {
                     delLib.setInt(1, idPublicacion);
                     delLib.executeUpdate();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error eliminando fila libro anterior: " + ex.getMessage());
                 }
 
@@ -411,11 +410,11 @@ public class ControladorEditarPublicacionDialog {
 
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 try {
                     // Rollback en caso de error
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -424,9 +423,8 @@ public class ControladorEditarPublicacionDialog {
             } finally {
                 try {
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error al restaurar auto-commit: " + ex.getMessage());
                 }
             }
 

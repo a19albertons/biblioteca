@@ -155,21 +155,17 @@ public class EliminarUsuarioDialog extends JDialog {
         if (parentFrame == null) {
             return;
         }
-        try {
-            // Recordar el glass pane previo
-            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-            Component current = rpc.getRootPane().getGlassPane();
-            previousGlassPane = current;
-            JPanel overlay = new JPanel();
+        // Recordar el glass pane previo
+        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+        Component current = rpc.getRootPane().getGlassPane();
+        previousGlassPane = current;
+        JPanel overlay = new JPanel();
 
-            // Panel translúcido gris
-            overlay.setOpaque(true);
-            overlay.setBackground(new Color(217, 217, 217, 153));
-            rpc.getRootPane().setGlassPane(overlay);
-            overlay.setVisible(true);
-        } catch (Exception e) {
-            System.out.println("No se pudo instalar overlay: " + e.getMessage());
-        }
+        // Panel translúcido gris
+        overlay.setOpaque(true);
+        overlay.setBackground(new Color(217, 217, 217, 153));
+        rpc.getRootPane().setGlassPane(overlay);
+        overlay.setVisible(true);
     }
 
     /**
@@ -180,18 +176,14 @@ public class EliminarUsuarioDialog extends JDialog {
         if (parentFrame == null) {
             return;
         }
-        try {
-            // Restaurar el glass pane previo (si lo teníamos)
-            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-            if (previousGlassPane != null) {
-                rpc.getRootPane().setGlassPane(previousGlassPane);
-                previousGlassPane.setVisible(false);
-                previousGlassPane = null;
-            } else {
-                rpc.getRootPane().getGlassPane().setVisible(false);
-            }
-        } catch (Exception e) {
-            System.out.println("No se pudo quitar overlay: " + e.getMessage());
+        // Restaurar el glass pane previo (si lo teníamos)
+        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+        if (previousGlassPane != null) {
+            rpc.getRootPane().setGlassPane(previousGlassPane);
+            previousGlassPane.setVisible(false);
+            previousGlassPane = null;
+        } else {
+            rpc.getRootPane().getGlassPane().setVisible(false);
         }
     }
 }

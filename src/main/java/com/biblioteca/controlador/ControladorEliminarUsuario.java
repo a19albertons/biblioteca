@@ -1,6 +1,7 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
@@ -46,7 +47,7 @@ public class ControladorEliminarUsuario {
                 return false;
             }
             return usuarioDAO.bajaUsuario(idUsuario);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return false;
         }

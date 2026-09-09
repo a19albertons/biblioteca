@@ -61,11 +61,11 @@ public class ControladorEliminarEjemplarDialog {
                 }
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 // Si hay error, rollback
                 try {
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -75,9 +75,8 @@ public class ControladorEliminarEjemplarDialog {
                 try {
                     // Restaurar auto-commit y cerrar conexión
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error al restaurar auto-commit: " + ex.getMessage());
                 }
             }
         } catch (SQLException e1) {

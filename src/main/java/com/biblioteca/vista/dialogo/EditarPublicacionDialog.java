@@ -191,54 +191,49 @@ public class EditarPublicacionDialog extends JDialog {
      * num_edicion, fecha_publicacion, autoresCSV, periodicidad, id
      */
     private void cargarDatos() {
-        try {
-            ObtenerPublicacionDetallesPorIdDTO datos = controlador.getControladorEditarPublicacionDialog()
-                    .obtenerDetallesPublicacion(idPublicacion);
-            if (datos == null) {
-                return;
-            }
-            // datos: tipo, titulo, codigo_isbn, idioma, temasCSV, modulosCSV, ciclosCSV,
-            // editorial, num_edicion, fecha_publicacion, autoresCSV, periodicidad, id
-            String tipo = datos.getTipoPublicacion() != null ? datos.getTipoPublicacion().name() : "";
-            String titulo = datos.getTitulo() != null ? datos.getTitulo() : "";
-            String isbn = datos.getCodigoISBN() != null ? datos.getCodigoISBN() : "";
-            String idioma = datos.getIdioma() != null ? datos.getIdioma() : "";
-            String temas = datos.getTemas() != null ? datos.getTemas() : "";
-            String modulos = datos.getModulos() != null ? datos.getModulos() : "";
-            String ciclos = datos.getCiclos() != null ? datos.getCiclos() : "";
-            String editorial = datos.getEditorial() != null ? datos.getEditorial() : "";
-            String numEd = datos.getNumEdicion() != null ? datos.getNumEdicion() : "";
-            String fecha = datos.getFechaPublicacion() != null ? datos.getFechaPublicacion() : "";
-            String autores = datos.getAutores() != null ? datos.getAutores() : "";
-            String periodicidad = datos.getPeriodicidad() != null ? datos.getPeriodicidad() : "";
-
-            tituloField.setText(titulo);
-            isbnField.setText(isbn);
-            idiomaField.setText(idioma);
-            temasField.setText(temas);
-            modulosField.setText(modulos);
-            ciclosField.setText(ciclos);
-            editorialField.setText(editorial);
-
-            // seleccionar tipo y rellenar campos específicos, pero mantener el
-            // diálogo en el paso 1 para que el usuario vea primero los datos comunes.
-            if ("L".equalsIgnoreCase(tipo)) {
-                tipoCombo.setSelectedItem("Libro");
-                // Rellenar campos de libro (no mostramos la tarjeta aún)
-                numeroEdicionField.setText(numEd == null ? "" : numEd);
-                fechaPublicacionField.setText(fecha == null ? "" : fecha);
-                autoresField.setText(autores == null ? "" : autores);
-            } else {
-                tipoCombo.setSelectedItem("Revista");
-                // Rellenar campos de revista (no mostramos la tarjeta aún)
-                periodicidadField.setText(periodicidad == null ? "" : periodicidad);
-            }
-            // Mostrar paso 1 por defecto al abrir el modal
-            cardLayout.show(cardPanel, "paso1");
-
-        } catch (Exception e) {
-            System.out.println("Error cargando datos: " + e.getMessage());
+        ObtenerPublicacionDetallesPorIdDTO datos = controlador.getControladorEditarPublicacionDialog()
+                .obtenerDetallesPublicacion(idPublicacion);
+        if (datos == null) {
+            return;
         }
+        // datos: tipo, titulo, codigo_isbn, idioma, temasCSV, modulosCSV, ciclosCSV,
+        // editorial, num_edicion, fecha_publicacion, autoresCSV, periodicidad, id
+        String tipo = datos.getTipoPublicacion() != null ? datos.getTipoPublicacion().name() : "";
+        String titulo = datos.getTitulo() != null ? datos.getTitulo() : "";
+        String isbn = datos.getCodigoISBN() != null ? datos.getCodigoISBN() : "";
+        String idioma = datos.getIdioma() != null ? datos.getIdioma() : "";
+        String temas = datos.getTemas() != null ? datos.getTemas() : "";
+        String modulos = datos.getModulos() != null ? datos.getModulos() : "";
+        String ciclos = datos.getCiclos() != null ? datos.getCiclos() : "";
+        String editorial = datos.getEditorial() != null ? datos.getEditorial() : "";
+        String numEd = datos.getNumEdicion() != null ? datos.getNumEdicion() : "";
+        String fecha = datos.getFechaPublicacion() != null ? datos.getFechaPublicacion() : "";
+        String autores = datos.getAutores() != null ? datos.getAutores() : "";
+        String periodicidad = datos.getPeriodicidad() != null ? datos.getPeriodicidad() : "";
+
+        tituloField.setText(titulo);
+        isbnField.setText(isbn);
+        idiomaField.setText(idioma);
+        temasField.setText(temas);
+        modulosField.setText(modulos);
+        ciclosField.setText(ciclos);
+        editorialField.setText(editorial);
+
+        // seleccionar tipo y rellenar campos específicos, pero mantener el
+        // diálogo en el paso 1 para que el usuario vea primero los datos comunes.
+        if ("L".equalsIgnoreCase(tipo)) {
+            tipoCombo.setSelectedItem("Libro");
+            // Rellenar campos de libro (no mostramos la tarjeta aún)
+            numeroEdicionField.setText(numEd == null ? "" : numEd);
+            fechaPublicacionField.setText(fecha == null ? "" : fecha);
+            autoresField.setText(autores == null ? "" : autores);
+        } else {
+            tipoCombo.setSelectedItem("Revista");
+            // Rellenar campos de revista (no mostramos la tarjeta aún)
+            periodicidadField.setText(periodicidad == null ? "" : periodicidad);
+        }
+        // Mostrar paso 1 por defecto al abrir el modal
+        cardLayout.show(cardPanel, "paso1");
     }
 
     /**
@@ -249,22 +244,18 @@ public class EditarPublicacionDialog extends JDialog {
         if (parentFrame == null) {
             return;
         }
-        try {
-            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-            Component current = rpc.getRootPane().getGlassPane();
-            previousGlassPane = current;
+        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+        Component current = rpc.getRootPane().getGlassPane();
+        previousGlassPane = current;
 
-            JPanel overlay = new JPanel();
-            overlay.setOpaque(true);
-            overlay.setBackground(new Color(217, 217, 217, 153));
-            overlay.addMouseListener(new MouseAdapter() {
-            });
+        JPanel overlay = new JPanel();
+        overlay.setOpaque(true);
+        overlay.setBackground(new Color(217, 217, 217, 153));
+        overlay.addMouseListener(new MouseAdapter() {
+        });
 
-            rpc.getRootPane().setGlassPane(overlay);
-            overlay.setVisible(true);
-        } catch (Exception e) {
-            System.out.println("No se pudo instalar overlay: " + e.getMessage());
-        }
+        rpc.getRootPane().setGlassPane(overlay);
+        overlay.setVisible(true);
     }
 
     /**
@@ -274,17 +265,13 @@ public class EditarPublicacionDialog extends JDialog {
         if (parentFrame == null) {
             return;
         }
-        try {
-            RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-            if (previousGlassPane != null) {
-                rpc.getRootPane().setGlassPane(previousGlassPane);
-                previousGlassPane.setVisible(false);
-                previousGlassPane = null;
-            } else {
-                rpc.getRootPane().getGlassPane().setVisible(false);
-            }
-        } catch (Exception e) {
-            System.out.println("No se pudo quitar overlay: " + e.getMessage());
+        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+        if (previousGlassPane != null) {
+            rpc.getRootPane().setGlassPane(previousGlassPane);
+            previousGlassPane.setVisible(false);
+            previousGlassPane = null;
+        } else {
+            rpc.getRootPane().getGlassPane().setVisible(false);
         }
     }
 
@@ -472,36 +459,29 @@ public class EditarPublicacionDialog extends JDialog {
             if (!validarPasoLibro()) {
                 return;
             }
-            try {
-                // llamar al controlador para actualizar la publicación
-                boolean ok = controlador.getControladorEditarPublicacionDialog().editarPublicacionLibro(
-                        idPublicacion,
-                        isbnField.getText().trim(),
-                        tituloField.getText().trim(),
-                        idiomaField.getText().trim(),
-                        temasField.getText().trim(),
-                        modulosField.getText().trim(),
-                        ciclosField.getText().trim(),
-                        editorialField.getText().trim(),
-                        Integer.parseInt(numeroEdicionField.getText().trim()),
-                        LocalDate.parse(fechaPublicacionField.getText().trim()),
-                        autoresField.getText().trim());
-                // devuelve true si se actualizó correctamente
-                if (ok) {
-                    JOptionPane.showMessageDialog(this, "Publicación actualizada", "Éxito",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    controlador.getControladorNavegacion().refrescarPublicaciones();
-                    controlador.getControladorNavegacion().refrescarPanelControl();
-                    dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Error actualizando la publicación en la base de datos",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-                // cerrar diálogo
-            } catch (Exception ex) {
-                // mostrar error
-                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error",
+            // llamar al controlador para actualizar la publicación
+            boolean ok = controlador.getControladorEditarPublicacionDialog().editarPublicacionLibro(
+                    idPublicacion,
+                    isbnField.getText().trim(),
+                    tituloField.getText().trim(),
+                    idiomaField.getText().trim(),
+                    temasField.getText().trim(),
+                    modulosField.getText().trim(),
+                    ciclosField.getText().trim(),
+                    editorialField.getText().trim(),
+                    Integer.parseInt(numeroEdicionField.getText().trim()),
+                    LocalDate.parse(fechaPublicacionField.getText().trim()),
+                    autoresField.getText().trim());
+            // devuelve true si se actualizó correctamente
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "Publicación actualizada", "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+                controlador.getControladorNavegacion().refrescarPublicaciones();
+                controlador.getControladorNavegacion().refrescarPanelControl();
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error actualizando la publicación en la base de datos",
+                        "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -564,33 +544,27 @@ public class EditarPublicacionDialog extends JDialog {
             if (!validarPasoRevista()) {
                 return;
             }
-            try {
-                // llamar al controlador para actualizar la publicación
-                boolean ok = controlador.getControladorEditarPublicacionDialog().editarPublicacionRevista(
-                        idPublicacion,
-                        isbnField.getText().trim(),
-                        tituloField.getText().trim(),
-                        idiomaField.getText().trim(),
-                        temasField.getText().trim(),
-                        modulosField.getText().trim(),
-                        ciclosField.getText().trim(),
-                        editorialField.getText().trim(),
-                        periodicidadField.getText().trim());
-                // devuelve true si se actualizó correctamente
-                if (ok) {
-                    JOptionPane.showMessageDialog(this, "Publicación actualizada", "Éxito",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    controlador.getControladorNavegacion().refrescarPublicaciones();
-                    controlador.getControladorNavegacion().refrescarPanelControl();
-                    dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Error actualizando la publicación en la base de datos",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (Exception ex) {
-                // mostrar error
-                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error",
+            // llamar al controlador para actualizar la publicación
+            boolean ok = controlador.getControladorEditarPublicacionDialog().editarPublicacionRevista(
+                    idPublicacion,
+                    isbnField.getText().trim(),
+                    tituloField.getText().trim(),
+                    idiomaField.getText().trim(),
+                    temasField.getText().trim(),
+                    modulosField.getText().trim(),
+                    ciclosField.getText().trim(),
+                    editorialField.getText().trim(),
+                    periodicidadField.getText().trim());
+            // devuelve true si se actualizó correctamente
+            if (ok) {
+                JOptionPane.showMessageDialog(this, "Publicación actualizada", "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+                controlador.getControladorNavegacion().refrescarPublicaciones();
+                controlador.getControladorNavegacion().refrescarPanelControl();
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error actualizando la publicación en la base de datos",
+                        "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         });
