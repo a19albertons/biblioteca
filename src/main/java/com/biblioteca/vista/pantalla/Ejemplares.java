@@ -602,7 +602,7 @@ public class Ejemplares {
         int id = -1;
         try {
             id = Integer.parseInt(idStr);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             id = -1;
         }
         if (id > 0) {

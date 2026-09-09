@@ -375,7 +375,7 @@ public class CatalogoLibros {
                 int disponiblesNum = 0;
                 try {
                     disponiblesNum = Integer.parseInt(fila[5]);
-                } catch (Exception ex) {
+                } catch (NumberFormatException ex) {
                     disponiblesNum = 0;
                 }
                 String idPub = fila[6] != null ? fila[6] : "";
