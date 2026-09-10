@@ -382,6 +382,7 @@ public class PanelControl {
                         data = new String[0][0];
                     }
                     model.setDataVector(data, columnNames);
+                    // Reaplicar renderer a la columna estado
                     if (table.getColumnModel().getColumnCount() > 2) {
                         table.getColumnModel().getColumn(2).setCellRenderer(estadoRenderer);
                     }
@@ -399,6 +400,9 @@ public class PanelControl {
      * movimientos).
      */
     public void refrescarPanel() {
+        // Cargar tabla de movimientos
+        cargarTablaMovimientos();
+
         // Actualizar tarjetas asíncronamente
         valor1.setText("...");
         BackgroundWorker.run(
@@ -466,65 +470,6 @@ public class PanelControl {
                     valor3.setText("—");
                 });
 
-        // Actualizar tabla en background
-        com.biblioteca.utilities.BackgroundWorker.run(
-                () -> controlador.getControladorPanelControl().obtenerUltimosMovimientos(),
-                // Actualizar UI con resultados
-                result -> {
-                    // Manejo de errores y populación de la tabla
-                    String[][] data = result;
-                    // Manejo de errores y populación de la tabla
-                    if (data == null) {
-                        JOptionPane.showMessageDialog(null,
-                                "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.",
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE);
-                        data = new String[0][0];
-                    } else if (data.length == 0) {
-                        JOptionPane.showMessageDialog(null,
-                                "No hay movimientos para mostrar.", "Información",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        data = new String[0][0];
-                    }
-                    // Manejo de errores y populación de la tabla
-                    model.setDataVector(data, new String[] { "ID EJEMPLAR", "LIBRO", "ESTADO" });
-                    // Reaplicar renderer a la columna estado si existe
-                    DefaultTableCellRenderer estadoRenderer = new DefaultTableCellRenderer() {
-                        @Override
-                        public Component getTableCellRendererComponent(final JTable table, final Object value,
-                                final boolean isSelected,
-                                final boolean hasFocus, final int row, final int column) {
-                            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                            String s = (value != null) ? value.toString().toUpperCase() : "";
-                            setHorizontalAlignment(SwingConstants.CENTER);
-                            setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
-                            // Cambia colores según estado
-                            if ("DEVUELTO".equals(s)) {
-                                setBackground(Color.decode("#E6FFF0"));
-                                setForeground(Color.decode("#2BC187"));
-                            } else if ("PRESTADO".equals(s)) {
-                                setBackground(Color.decode("#FFF4E6"));
-                                setForeground(Color.decode("#F4791B"));
-                            } else {
-                                setBackground(Color.white);
-                                setForeground(Color.decode("#666666"));
-                            }
-                            setOpaque(true);
-                            return this;
-                        }
-                    };
-                    // Reaplicar el renderer a la columna estado (porque cambiar model puede
-                    // resetearla en algunas LAF)
-                    if (table.getColumnModel().getColumnCount() > 2) {
-                        table.getColumnModel().getColumn(2).setCellRenderer(estadoRenderer);
-                    }
-                },
-                ex -> {
-                    JOptionPane.showMessageDialog(null,
-                            "Error cargando los últimos movimientos. Compruebe la conexión a la base de datos.",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                });
     }
 
 }
