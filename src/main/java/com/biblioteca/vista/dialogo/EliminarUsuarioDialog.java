@@ -2,44 +2,31 @@ package com.biblioteca.vista.dialogo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.RootPaneContainer;
 
 import com.biblioteca.controlador.Controlador;
 
 /**
  * Diálogo para confirmar la eliminación (desactivación) de un usuario
  */
-public class EliminarUsuarioDialog extends JDialog {
+public class EliminarUsuarioDialog extends OverlayDialog {
     /**
      * Controlador principal de la aplicación
      */
-    private Controlador controlador;
-    /**
-     * Frame padre para overlays
-     */
-    private JFrame parentFrame;
+    private final Controlador controlador;
     /**
      * ID del usuario a eliminar
      */
-    private int idUsuario;
-    /**
-     * Glass pane previo del frame padre
-     */
-    private Component previousGlassPane;
+    private final int idUsuario;
 
     /**
      * Constructor
@@ -49,29 +36,14 @@ public class EliminarUsuarioDialog extends JDialog {
      * @param idUsuario
      */
     public EliminarUsuarioDialog(final JFrame parent, final Controlador controlador, final int idUsuario) {
-        // Diálogo modal
-        super(parent, "Eliminar Usuario", true);
+        super(parent, "Eliminar Usuario");
         this.controlador = controlador;
-        this.parentFrame = parent;
         this.idUsuario = idUsuario;
 
         // Inicializar interfaz de usuario
         initUI();
         setSize(new Dimension(360, 140));
         setLocationRelativeTo(parent);
-
-        // Añadir listener para quitar overlay al cerrar
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(final WindowEvent e) {
-                removeOverlay();
-            }
-
-            @Override
-            public void windowClosing(final WindowEvent e) {
-                removeOverlay();
-            }
-        });
     }
 
     /**
@@ -130,60 +102,5 @@ public class EliminarUsuarioDialog extends JDialog {
 
         getContentPane().add(contenido, BorderLayout.CENTER);
         getContentPane().add(botones, BorderLayout.SOUTH);
-    }
-
-    /**
-     * Muestra u oculta el diálogo, instalando o quitando el overlay en el frame
-     * padre
-     */
-    @Override
-    public void setVisible(final boolean b) {
-        if (b) {
-            installOverlay();
-        }
-        super.setVisible(b);
-        if (!b) {
-            removeOverlay();
-        }
-    }
-
-    /**
-     * Instala un overlay translúcido en el frame padre
-     */
-    private void installOverlay() {
-        // Añadir listener para quitar overlay al cerrar
-        if (parentFrame == null) {
-            return;
-        }
-        // Recordar el glass pane previo
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        Component current = rpc.getRootPane().getGlassPane();
-        previousGlassPane = current;
-        JPanel overlay = new JPanel();
-
-        // Panel translúcido gris
-        overlay.setOpaque(true);
-        overlay.setBackground(new Color(217, 217, 217, 153));
-        rpc.getRootPane().setGlassPane(overlay);
-        overlay.setVisible(true);
-    }
-
-    /**
-     * Quita el overlay del frame padre
-     */
-    private void removeOverlay() {
-        // Quitar overlay
-        if (parentFrame == null) {
-            return;
-        }
-        // Restaurar el glass pane previo (si lo teníamos)
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        if (previousGlassPane != null) {
-            rpc.getRootPane().setGlassPane(previousGlassPane);
-            previousGlassPane.setVisible(false);
-            previousGlassPane = null;
-        } else {
-            rpc.getRootPane().getGlassPane().setVisible(false);
-        }
     }
 }
