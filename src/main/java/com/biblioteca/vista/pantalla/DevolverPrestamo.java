@@ -29,13 +29,24 @@ public class DevolverPrestamo {
     private final Controlador controlador;
 
     /**
+     * Instancia de la clase base para validaciones y utilidades
+     */
+    private final VistaBase vistaBase;
+
+    /**
      * Constructor de la vista DevolverPrestamo
      *
      * @param controlador controlador principal
      */
     public DevolverPrestamo(final Controlador controlador) {
         this.controlador = controlador;
+        this.vistaBase = new VistaBase();
     }
+
+    /**
+     * Almacena el ID del usuario seleccionado.
+     */
+    private int[] usuarioSeleccionado = new int[] { -1 };
 
     /**
      * Getter para el controlador
@@ -158,7 +169,6 @@ public class DevolverPrestamo {
         resultadoSocio.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
         contenido.add(resultadoSocio);
 
-        final int[] usuarioSeleccionado = new int[] { -1 };
         btnBuscarSocio.addActionListener(e -> {
             String input = txtDniID.getText().trim();
             if (input.isEmpty()) {
@@ -280,8 +290,8 @@ public class DevolverPrestamo {
     /**
      * Configura los botones de acción
      *
-     * @param contenido     el panel de contenido
-     * @param txtIdEjemplar campo de texto para el ID del ejemplar
+     * @param contenido           el panel de contenido
+     * @param txtIdEjemplar       campo de texto para el ID del ejemplar
      */
     private void configurarBotonesAccion(final JPanel contenido, final JTextField txtIdEjemplar) {
         JButton btnCancelar = new JButton("Cancelar");
@@ -306,29 +316,11 @@ public class DevolverPrestamo {
         });
 
         btnDevolverPrestamo.addActionListener(e -> {
-            final int[] usuarioSeleccionado = new int[] { -1 };
-            if (usuarioSeleccionado[0] == -1) {
-                JOptionPane.showMessageDialog(null, "Seleccione primero un usuario válido", "Error",
-                        JOptionPane.ERROR_MESSAGE);
+            if (!vistaBase.validarUsuarioYEjemplar(usuarioSeleccionado, txtIdEjemplar)) {
                 return;
             }
-            String idEjStr = txtIdEjemplar.getText().trim();
-            if (idEjStr.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            int idEj;
-            try {
-                idEj = Integer.parseInt(idEjStr);
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            String err = getControlador().getControladorDevolverPrestamo().devolverPrestamo(usuarioSeleccionado[0],
-                    idEj);
+            String err = getControlador().getControladorDevolverPrestamo()
+                    .devolverPrestamo(usuarioSeleccionado[0], Integer.parseInt(txtIdEjemplar.getText()));
             if (err == null) {
                 JOptionPane.showMessageDialog(null, "Devolución registrada correctamente", "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);

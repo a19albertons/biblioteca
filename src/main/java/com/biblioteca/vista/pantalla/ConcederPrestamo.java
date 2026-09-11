@@ -29,6 +29,11 @@ public class ConcederPrestamo {
     private final Controlador controlador;
 
     /**
+     * Instancia de la clase base para validaciones y utilidades
+     */
+    private final VistaBase vistaBase;
+
+    /**
      * Botón de encabezado para dar de baja
      */
     private JButton btnFormularioDevolver;
@@ -40,6 +45,7 @@ public class ConcederPrestamo {
      */
     public ConcederPrestamo(final Controlador controlador) {
         this.controlador = controlador;
+        this.vistaBase = new VistaBase();
     }
 
     /**
@@ -393,30 +399,12 @@ public class ConcederPrestamo {
 
         btnRegistrarPrestamo.addActionListener(e -> {
             // Validar datos
-            if (usuarioSeleccionado[0] == -1) {
-                JOptionPane.showMessageDialog(null, "Seleccione primero un usuario válido", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            // validar id ejemplar
-            String idEjStr = txtIdEjemplar.getText().trim();
-            if (idEjStr.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            int idEj;
-            try {
-                // convertir a entero
-                idEj = Integer.parseInt(idEjStr);
-            } catch (NumberFormatException ex) {
-                // mostrar error
-                JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
-                        JOptionPane.ERROR_MESSAGE);
+            if (!vistaBase.validarUsuarioYEjemplar(usuarioSeleccionado, txtIdEjemplar)) {
                 return;
             }
             // registrar préstamo
-            String err = controlador.getControladorConcederPrestamo().registrarPrestamo(usuarioSeleccionado[0], idEj);
+            String err = controlador.getControladorConcederPrestamo()
+                    .registrarPrestamo(usuarioSeleccionado[0], Integer.parseInt(txtIdEjemplar.getText()));
             // mostrar resultado
             if (err == null) {
                 JOptionPane.showMessageDialog(null, "Préstamo registrado correctamente", "Éxito",
