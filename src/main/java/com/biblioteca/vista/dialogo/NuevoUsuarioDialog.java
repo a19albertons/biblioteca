@@ -2,27 +2,21 @@ package com.biblioteca.vista.dialogo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.MouseAdapter;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.RootPaneContainer;
 
 import com.biblioteca.controlador.Controlador;
 import com.biblioteca.modelo.TipoUsuario;
@@ -31,19 +25,11 @@ import com.biblioteca.modelo.TipoUsuario;
  * Diálogo para crear un nuevo usuario/socio.
  * La contraseña inicial se fijará al valor del DNI suministrado.
  */
-public class NuevoUsuarioDialog extends JDialog {
+public class NuevoUsuarioDialog extends OverlayDialog {
     /**
      * Controlador principal de la aplicación
      */
     private Controlador controlador;
-    /**
-     * Ventana padre
-     */
-    private JFrame parentFrame;
-    /**
-     * Guardar glass pane previo para restaurarlo
-     */
-    private Component previousGlassPane;
 
     /**
      * Constructor
@@ -52,26 +38,11 @@ public class NuevoUsuarioDialog extends JDialog {
      * @param controlador
      */
     public NuevoUsuarioDialog(final JFrame parent, final Controlador controlador) {
-        // Llamar al constructor de JDialog con el padre, título y modalidad
-        super(parent, "Nuevo Usuario", true);
+        super(parent, "Nuevo Usuario");
         this.controlador = controlador;
-        this.parentFrame = parent;
         initUI();
         setSize(new Dimension(420, 360));
         setLocationRelativeTo(parent);
-
-        // Añadir listener para quitar overlay al cerrar
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(final WindowEvent e) {
-                removeOverlay();
-            }
-
-            @Override
-            public void windowClosing(final WindowEvent e) {
-                removeOverlay();
-            }
-        });
     }
 
     /**
@@ -224,57 +195,8 @@ public class NuevoUsuarioDialog extends JDialog {
      * Muestra u oculta el diálogo, instalando o quitando el overlay en el frame
      * padre
      */
-    @Override
-    public void setVisible(final boolean b) {
-        if (b) {
-            installOverlay();
-        }
-        super.setVisible(b);
-        if (!b) {
-            removeOverlay();
-        }
-    }
-
-    /**
-     * Instala un overlay translúcido en el frame padre para deshabilitar
-     * interacciones
-     */
-    private void installOverlay() {
-        // Comprobar que el parentFrame existe
-        if (parentFrame == null) {
-            return;
-        }
-        // Obtener el RootPaneContainer del frame padre
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        Component current = rpc.getRootPane().getGlassPane();
-        // Guardar la referencia previa en el campo para restaurarla al cerrar
-        this.previousGlassPane = current;
-        JPanel overlay = new JPanel();
-        overlay.setOpaque(true);
-        overlay.setBackground(new Color(217, 217, 217, 153));
-        overlay.addMouseListener(new MouseAdapter() {
-        });
-        // Asignar el overlay como glass pane
-        rpc.getRootPane().setGlassPane(overlay);
-        overlay.setVisible(true);
-    }
-
-    /**
-     * Quita el overlay del frame padre
-     */
-    private void removeOverlay() {
-        // Comprobar que el parentFrame existe
-        if (parentFrame == null) {
-            return;
-        }
-        // Restaurar el glass pane previo (si lo tenemos)
-        javax.swing.RootPaneContainer rpc = (javax.swing.RootPaneContainer) parentFrame;
-        if (this.previousGlassPane != null) {
-            rpc.getRootPane().setGlassPane(this.previousGlassPane);
-            this.previousGlassPane.setVisible(false);
-            this.previousGlassPane = null;
-        } else {
-            rpc.getRootPane().getGlassPane().setVisible(false);
-        }
-    }
+     @Override
+     public void setVisible(final boolean b) {
+         super.setVisible(b);
+     }
 }
