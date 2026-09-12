@@ -1,5 +1,6 @@
 package com.biblioteca.vista.dialogo;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -59,7 +60,7 @@ public abstract class OverlayDialog extends JDialog {
 
         // Panel translúcido gris
         overlay.setOpaque(true);
-        overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
+        overlay.setBackground(new Color(217, 217, 217, 153));
         rpc.getRootPane().setGlassPane(overlay);
         overlay.setVisible(true);
     }

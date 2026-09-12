@@ -2,20 +2,16 @@ package com.biblioteca.vista.dialogo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.MouseAdapter;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.RootPaneContainer;
 
 import com.biblioteca.controlador.Controlador;
 import com.biblioteca.dto.EstadoEjemplarDTO;
@@ -24,23 +20,15 @@ import com.biblioteca.dto.EstadoEjemplarDTO;
  * Diálogo de confirmación para eliminar (marcar como baja) un ejemplar.
  * Comprueba que no haya préstamos activos antes de marcar la baja.
  */
-public class EliminarEjemplarDialog extends JDialog {
+public class EliminarEjemplarDialog extends OverlayDialog {
     /**
      * Controlador de la aplicación
      */
-    private Controlador controlador;
-    /**
-     * Frame padre (para overlay)
-     */
-    private JFrame parentFrame;
+    private final Controlador controlador;
     /**
      * ID del ejemplar a eliminar
      */
-    private int idEjemplar;
-    /**
-     * Componente previo del glass pane (para restaurar al cerrar el diálogo)
-     */
-    private Component previousGlassPane;
+    private final int idEjemplar;
 
     /**
      * Constructor del diálogo
@@ -50,26 +38,12 @@ public class EliminarEjemplarDialog extends JDialog {
      * @param idEjemplar
      */
     public EliminarEjemplarDialog(final JFrame parent, final Controlador controlador, final int idEjemplar) {
-        super(parent, "Eliminar Ejemplar", true);
+        super(parent, "Eliminar Ejemplar");
         this.controlador = controlador;
-        this.parentFrame = parent;
         this.idEjemplar = idEjemplar;
         initUI();
         setSize(new Dimension(420, 160));
         setLocationRelativeTo(parent);
-
-        // Cierra el overlay al cerrar el diálogo
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosed(final java.awt.event.WindowEvent e) {
-                removeOverlay();
-            }
-
-            @Override
-            public void windowClosing(final java.awt.event.WindowEvent e) {
-                removeOverlay();
-            }
-        });
     }
 
     /**
@@ -78,19 +52,19 @@ public class EliminarEjemplarDialog extends JDialog {
     private void initUI() {
         // Layout y contenido
         getContentPane().setLayout(new BorderLayout());
-        JPanel content = new JPanel(new BorderLayout());
-        content.setBackground(Color.white);
-        content.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        JPanel contenido = new JPanel(new BorderLayout());
+        contenido.setBackground(Color.white);
+        contenido.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
         // Título y mensaje
-        JLabel title = new JLabel("Eliminar Ejemplar");
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
-        content.add(title, BorderLayout.NORTH);
+        JLabel titulo = new JLabel("Eliminar Ejemplar");
+        titulo.setFont(titulo.getFont().deriveFont(Font.BOLD, 16f));
+        contenido.add(titulo, BorderLayout.NORTH);
 
         // Mensaje de confirmación
         JLabel texto = new JLabel("Seguro que quieres eliminar el ejemplar?");
         texto.setBorder(BorderFactory.createEmptyBorder(12, 6, 12, 6));
-        content.add(texto, BorderLayout.CENTER);
+        contenido.add(texto, BorderLayout.CENTER);
 
         // Botones
         JPanel botones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -140,66 +114,7 @@ public class EliminarEjemplarDialog extends JDialog {
         botones.add(cancelar);
         botones.add(eliminar);
 
-        getContentPane().add(content, BorderLayout.CENTER);
+        getContentPane().add(contenido, BorderLayout.CENTER);
         getContentPane().add(botones, BorderLayout.SOUTH);
-    }
-
-    /**
-     * Muestra u oculta el diálogo, instalando o quitando el overlay en el frame
-     * padre.
-     */
-    @Override
-    public void setVisible(final boolean b) {
-        if (b) {
-            installOverlay();
-        }
-        super.setVisible(b);
-        if (!b) {
-            removeOverlay();
-        }
-    }
-
-    /**
-     * Instala un overlay semitransparente en el frame padre
-     */
-    private void installOverlay() {
-        // Controla si el frame padre es nulo
-        if (parentFrame == null) {
-            return;
-        }
-        // Guardar el componente previo del glass pane para restaurarlo después
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        Component current = rpc.getRootPane().getGlassPane();
-        previousGlassPane = current;
-
-        // Crear un panel semitransparente para el overlay
-        JPanel overlay = new JPanel();
-        overlay.setOpaque(true);
-        overlay.setBackground(new Color(217, 217, 217, 153));
-        overlay.addMouseListener(new MouseAdapter() {
-        });
-
-        // Asignar el overlay como glass pane
-        rpc.getRootPane().setGlassPane(overlay);
-        overlay.setVisible(true);
-    }
-
-    /**
-     * Quita el overlay del frame padre
-     */
-    private void removeOverlay() {
-        // Controla si el frame padre es nulo
-        if (parentFrame == null) {
-            return;
-        }
-        // Restaurar el componente previo del glass pane
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        if (previousGlassPane != null) {
-            rpc.getRootPane().setGlassPane(previousGlassPane);
-            previousGlassPane.setVisible(false);
-            previousGlassPane = null;
-        } else {
-            rpc.getRootPane().getGlassPane().setVisible(false);
-        }
     }
 }
