@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.biblioteca.dto.ObtenerPublicacionDetallesPorIdDTO;
 import com.biblioteca.modelo.TipoPublicacion;
+import com.biblioteca.utilities.RelacionPublicacionHelperEnum;
 
 /**
  * DAO para Publicacion
@@ -351,6 +352,29 @@ public class PublicacionDAO {
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
             return false;
+        }
+    }
+
+    /**
+     * Inserta relación publicacion <-> relación (modulos, ciclos, temas).
+     * Método genérico para evitar duplicación de código.
+     *
+     * @param idPublicacion id de la publicación
+     * @param idRelacion    id de la relación
+     * @param tipoRelacion  tipo de relación: 'M' para modulos, 'C' para ciclos, 'T' para temas
+     * @return true si ok
+     */
+    public boolean insertarPublicacionRelacion(final int idPublicacion, final int idRelacion, final RelacionPublicacionHelperEnum tipoRelacion) {
+        switch (tipoRelacion) {
+            case MODULO:
+                return insertarPublicacionModulo(idPublicacion, idRelacion);
+            case CICLO:
+                return insertarPublicacionCiclo(idPublicacion, idRelacion);
+            case TEMA:
+                return insertarPublicacionTema(idPublicacion, idRelacion);
+            default:
+                System.out.println("Tipo de relación no válido: " + tipoRelacion);
+                return false;
         }
     }
 
