@@ -3,7 +3,6 @@ package com.biblioteca.vista.dialogo;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -16,13 +15,11 @@ import java.time.LocalDate;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.RootPaneContainer;
 
 import com.biblioteca.controlador.Controlador;
 import com.biblioteca.utilities.Fonts;
@@ -32,15 +29,11 @@ import com.biblioteca.utilities.Fonts;
  * Implementa un pequeño wizard: paso 1 (datos comunes) → paso 2 (datos por
  * tipo)
  */
-public class NuevaPublicacionDialog extends JDialog {
+public class NuevaPublicacionDialog extends OverlayDialog {
     /**
      * Controlador principal de la aplicación
      */
     private Controlador controlador;
-    /**
-     * Referencia al frame padre (para overlay)
-     */
-    private javax.swing.JFrame parentFrame;
     /**
      * Panel de tarjetas para el wizard
      */
@@ -49,11 +42,6 @@ public class NuevaPublicacionDialog extends JDialog {
      * Layout de tarjetas
      */
     private CardLayout cardLayout;
-
-    /**
-     * Overlay (glass pane) previo, para restaurarlo al cerrar el modal
-     */
-    private Component previousGlassPane;
 
     // Step 1 fields
     /**
@@ -116,9 +104,8 @@ public class NuevaPublicacionDialog extends JDialog {
      * @param controlador
      */
     public NuevaPublicacionDialog(final JFrame parent, final Controlador controlador) {
-        super(parent, "Nueva Publicación", true);
+        super(parent, "Nueva Publicación");
         this.controlador = controlador;
-        this.parentFrame = parent;
         initUI();
         setSize(new Dimension(340, 500));
         setLocationRelativeTo(parent);
@@ -159,67 +146,6 @@ public class NuevaPublicacionDialog extends JDialog {
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(cardPanel, BorderLayout.CENTER);
-    }
-
-    /**
-     * Sobrescribe setVisible para instalar/quitar overlay en el padre.
-     */
-    @Override
-    public void setVisible(final boolean b) {
-        if (b) {
-            installOverlay();
-        }
-        super.setVisible(b);
-        if (!b) {
-            removeOverlay();
-        }
-    }
-
-    /**
-     * Instala un overlay semi-transparente en el glass pane del padre.
-     * Color: #D9D9D9 con 60% opacidad.
-     */
-    private void installOverlay() {
-        // Comprobar que el parentFrame no es nulo
-        if (parentFrame == null) {
-            return;
-        }
-        // Guardar el glass pane previo para restaurarlo después
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        Component current = rpc.getRootPane().getGlassPane();
-        previousGlassPane = current;
-
-        // Crear el overlay
-        JPanel overlay = new JPanel();
-        overlay.setOpaque(true);
-        // Color D9D9D9 con alpha 60% -> rgba(217,217,217,153)
-        overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
-        // Consumir eventos para que el overlay bloquee interacción con la ventana
-        overlay.addMouseListener(new java.awt.event.MouseAdapter() {
-        });
-
-        // Asignar el overlay como glass pane
-        rpc.getRootPane().setGlassPane(overlay);
-        overlay.setVisible(true);
-    }
-
-    /**
-     * Restaura el glass pane previo del frame padre.
-     */
-    private void removeOverlay() {
-        // Comprobar que el parentFrame no es nulo
-        if (parentFrame == null) {
-            return;
-        }
-        // Restaurar el glass pane previo
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        if (previousGlassPane != null) {
-            rpc.getRootPane().setGlassPane(previousGlassPane);
-            previousGlassPane.setVisible(false);
-            previousGlassPane = null;
-        } else {
-            rpc.getRootPane().getGlassPane().setVisible(false);
-        }
     }
 
     /**

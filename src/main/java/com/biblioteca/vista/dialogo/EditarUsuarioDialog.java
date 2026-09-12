@@ -2,7 +2,6 @@ package com.biblioteca.vista.dialogo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -13,13 +12,11 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.RootPaneContainer;
 
 import com.biblioteca.controlador.Controlador;
 import com.biblioteca.modelo.TipoUsuario;
@@ -27,23 +24,15 @@ import com.biblioteca.modelo.TipoUsuario;
 /**
  * Diálogo para editar un usuario existente
  */
-public class EditarUsuarioDialog extends JDialog {
+public class EditarUsuarioDialog extends OverlayDialog {
     /**
      * Controlador principal de la aplicación
      */
     private Controlador controlador;
     /**
-     * Frame padre (para el overlay)
-     */
-    private JFrame parentFrame;
-    /**
      * Id del usuario a editar
      */
     private int idUsuario;
-    /**
-     * Componente glass pane previo (para restaurar al cerrar el diálogo)
-     */
-    private java.awt.Component previousGlassPane;
 
     /**
      * Campos de texto del formulario
@@ -75,9 +64,8 @@ public class EditarUsuarioDialog extends JDialog {
      */
     public EditarUsuarioDialog(final JFrame parent, final Controlador controlador, final int idUsuario) {
         // Inicializar diálogo
-        super(parent, "Editar Usuario", true);
+        super(parent, "Editar Usuario");
         this.controlador = controlador;
-        this.parentFrame = parent;
         this.idUsuario = idUsuario;
 
         // Inicializar UI
@@ -271,59 +259,4 @@ public class EditarUsuarioDialog extends JDialog {
         }
     }
 
-    /**
-     * Muestra u oculta el diálogo, gestionando el overlay
-     */
-    @Override
-    public void setVisible(final boolean b) {
-        if (b) {
-            installOverlay();
-        }
-        super.setVisible(b);
-        if (!b) {
-            removeOverlay();
-        }
-    }
-
-    /**
-     * Instala un overlay translúcido en el frame padre
-     */
-    private void installOverlay() {
-        // Instala un panel translúcido sobre el frame padre para deshabilitar la
-        // interacción
-        if (parentFrame == null) {
-            return;
-        }
-        // Recordar el glass pane previo
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        Component current = rpc.getRootPane().getGlassPane();
-        previousGlassPane = current;
-        JPanel overlay = new JPanel();
-
-        // Hacerlo translúcido
-        overlay.setOpaque(true);
-        overlay.setBackground(new java.awt.Color(217, 217, 217, 153));
-        rpc.getRootPane().setGlassPane(overlay);
-        overlay.setVisible(true);
-    }
-
-    /**
-     * Quita el overlay del frame padre
-     */
-    private void removeOverlay() {
-        // Restaura el glass pane previo
-        if (parentFrame == null) {
-            return;
-        }
-        // Restaurar el glass pane previo (si lo teníamos)
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        if (previousGlassPane != null) {
-            rpc.getRootPane().setGlassPane(previousGlassPane);
-            previousGlassPane.setVisible(false);
-            previousGlassPane = null;
-        } else {
-            // Si no tenemos referencia previa, simplemente ocultar el glass pane actual
-            rpc.getRootPane().getGlassPane().setVisible(false);
-        }
-    }
 }
