@@ -357,19 +357,9 @@ public class GestionUsuarios {
                     JOptionPane.INFORMATION_MESSAGE);
         }
 
-        // Limpiar modelo y rellenar
-        for (int i = usuariosModel.getRowCount() - 1; i >= 0; i--) {
-            usuariosModel.removeRow(i);
-        }
-        // Rellenar con datos nuevos
-        for (String[] r : rawData) {
-            String dni = (r.length > 1 && r[1] != null) ? r[1] : "";
-            String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
-            String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
-            String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
-            usuariosModel
-                    .addRow(new Object[] { (r.length > 0 ? r[0] : ""), dni, nombre, tipo, sancion, "" });
-        }
+        // Usar método del controlador
+        controlador.getControladorGestionUsuarios().cargarDatosEnTabla(rawData, usuariosModel);
+        
         // Asegurarse de refrescar la tabla si está disponible
         if (this.usuariosTable != null) {
             this.usuariosTable.revalidate();
@@ -402,19 +392,9 @@ public class GestionUsuarios {
                         rawData = new String[0][0];
                     }
 
-                    // Limpiar modelo
-                    for (int i = usuariosModel.getRowCount() - 1; i >= 0; i--) {
-                        usuariosModel.removeRow(i);
-                    }
-                    // Rellenar con datos nuevos
-                    for (String[] r : rawData) {
-                        String dni = (r.length > 1 && r[1] != null) ? r[1] : "";
-                        String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
-                        String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
-                        String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
-                        usuariosModel
-                                .addRow(new Object[] { (r.length > 0 ? r[0] : ""), dni, nombre, tipo, sancion, "" });
-                    }
+                    // Usar método del controlador
+                    controlador.getControladorGestionUsuarios().cargarDatosEnTabla(rawData, usuariosModel);
+                    
                     // Asegurarse de refrescar la tabla si está disponible
                     if (this.usuariosTable != null) {
                         this.usuariosTable.revalidate();
