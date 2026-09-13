@@ -19,7 +19,6 @@ public class NuevaPublicacionDialog extends BasePublicacionDialog {
      */
     private Controlador controlador;
 
-
     /**
      * Constructor
      * 
@@ -37,8 +36,6 @@ public class NuevaPublicacionDialog extends BasePublicacionDialog {
         setLocationRelativeTo(parent);
     }
 
-
-
     /**
      * Configura los eventos de los botones de añadir publicación
      */
@@ -51,16 +48,16 @@ public class NuevaPublicacionDialog extends BasePublicacionDialog {
             }
             // Intentar crear la publicación
             boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionLibro(
-                    getIsbnField().getText().trim(),
-                    getTituloField().getText().trim(),
-                    getIdiomaField().getText().trim(),
-                    getTemasField().getText().trim(),
-                    getModulosField().getText().trim(),
-                    getCiclosField().getText().trim(),
-                    getEditorialField().getText().trim(),
-                    Integer.parseInt(getNumeroEdicionField().getText().trim()),
-                    LocalDate.parse(getFechaPublicacionField().getText().trim()),
-                    getAutoresField().getText().trim());
+                    getIsbnTexto(),
+                    getTituloTexto(),
+                    getIdiomaTexto(),
+                    getTemasTexto(),
+                    getModulosTexto(),
+                    getCiclosTexto(),
+                    getEditorialTexto(),
+                    Integer.parseInt(getNumeroEdicionTexto()),
+                    LocalDate.parse(getFechaPublicacionTexto()),
+                    getAutoresTexto());
             // Mostrar resultado
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Publicación tipo Libro añadida", "Éxito",
@@ -83,14 +80,14 @@ public class NuevaPublicacionDialog extends BasePublicacionDialog {
             }
             // Intentar crear la publicación
             boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionRevista(
-                    getIsbnField().getText().trim(),
-                    getTituloField().getText().trim(),
-                    getIdiomaField().getText().trim(),
-                    getTemasField().getText().trim(),
-                    getModulosField().getText().trim(),
-                    getCiclosField().getText().trim(),
-                    getEditorialField().getText().trim(),
-                    getPeriodicidadField().getText().trim());
+                    getIsbnTexto(),
+                    getTituloTexto(),
+                    getIdiomaTexto(),
+                    getTemasTexto(),
+                    getModulosTexto(),
+                    getCiclosTexto(),
+                    getEditorialTexto(),
+                    getPeriodicidadTexto());
             // Mostrar resultado
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Publicación tipo Revista añadida", "Éxito",

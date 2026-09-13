@@ -117,16 +117,17 @@ public class EditarPublicacionDialog extends BasePublicacionDialog {
             // llamar al controlador para actualizar la publicación
             boolean ok = controlador.getControladorEditarPublicacionDialog().editarPublicacionLibro(
                     idPublicacion,
-                    getIsbnField().getText().trim(),
-                    getTituloField().getText().trim(),
-                    getIdiomaField().getText().trim(),
-                    getTemasField().getText().trim(),
-                    getModulosField().getText().trim(),
-                    getCiclosField().getText().trim(),
-                    getEditorialField().getText().trim(),
-                    Integer.parseInt(getNumeroEdicionField().getText().trim()),
-                    LocalDate.parse(getFechaPublicacionField().getText().trim()),
-                    getAutoresField().getText().trim());
+                    getIsbnTexto(),
+                    getTituloTexto(),
+                    getIdiomaTexto(),
+                    getTemasTexto(),
+                    getModulosTexto(),
+                    getCiclosTexto(),
+                    getEditorialTexto(),
+                    Integer.parseInt(getNumeroEdicionTexto()),
+                    LocalDate.parse(getFechaPublicacionTexto()),
+                    getAutoresTexto());
+
             // devuelve true si se actualizó correctamente
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Publicación actualizada", "Éxito",
@@ -150,14 +151,14 @@ public class EditarPublicacionDialog extends BasePublicacionDialog {
             // llamar al controlador para actualizar la publicación
             boolean ok = controlador.getControladorEditarPublicacionDialog().editarPublicacionRevista(
                     idPublicacion,
-                    getIsbnField().getText().trim(),
-                    getTituloField().getText().trim(),
-                    getIdiomaField().getText().trim(),
-                    getTemasField().getText().trim(),
-                    getModulosField().getText().trim(),
-                    getCiclosField().getText().trim(),
-                    getEditorialField().getText().trim(),
-                    getPeriodicidadField().getText().trim());
+                    getIsbnTexto(),
+                    getTituloTexto(),
+                    getIdiomaTexto(),
+                    getTemasTexto(),
+                    getModulosTexto(),
+                    getCiclosTexto(),
+                    getEditorialTexto(),
+                    getPeriodicidadTexto());
             // devuelve true si se actualizó correctamente
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Publicación actualizada", "Éxito",

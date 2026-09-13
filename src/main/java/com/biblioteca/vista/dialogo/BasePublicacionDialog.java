@@ -112,75 +112,75 @@ public abstract class BasePublicacionDialog extends OverlayDialog {
     private JButton confirmarRevista;
 
     /**
-     * Getter para el campo ISBN
+     * Getter para obtener el texto del campo ISBN
      * 
-     * @return El campo de texto para ISBN
+     * @return El texto del campo ISBN
      */
-    public JTextField getIsbnField() {
-        return isbnField;
+    public String getIsbnTexto() {
+        return isbnField.getText().trim();
     }
 
     /**
-     * Getter para el campo Titulo
+     * Getter para obtener el texto del campo Titulo
      * 
-     * @return El campo de texto para Titulo
+     * @return El texto del campo Titulo
      */
-    public JTextField getTituloField() {
-        return tituloField;
+    public String getTituloTexto() {
+        return tituloField.getText().trim();
     }
 
     /**
-     * Getter para el campo Idioma
+     * Getter para obtener el campo de texto Idioma
      * 
-     * @return El campo de texto para Idioma
+     * @return El texto para Idioma
      */
-    public JTextField getIdiomaField() {
-        return idiomaField;
+    public String getIdiomaTexto() {
+        return idiomaField.getText().trim();
     }
 
     /**
-     * Getter para el campo Temas
+     * Getter para obtener el campo de texto Temas
      * 
-     * @return El campo de texto para Temas
+     * @return El texto para Temas
      */
-    public JTextField getTemasField() {
-        return temasField;
+    public String getTemasTexto() {
+        return temasField.getText().trim();
     }
 
     /**
-     * Getter para el campo Modulos
+     * Getter para obtener el campo de texto Modulos
      * 
-     * @return El campo de texto para Modulos
+     * @return El texto para Modulos
      */
-    public JTextField getModulosField() {
-        return modulosField;
+    public String getModulosTexto() {
+        return modulosField.getText().trim();
     }
 
     /**
-     * Getter para el campo Ciclos
+     * Getter para obtener el campo de texto Ciclos
      * 
-     * @return El campo de texto para Ciclos
+     * @return El texto para Ciclos
      */
-    public JTextField getCiclosField() {
-        return ciclosField;
+    public String getCiclosTexto() {
+        return ciclosField.getText().trim();
     }
 
     /**
-     * Getter para el campo Editorial
+     * Getter para obtener el campo de texto Editorial
      * 
-     * @return El campo de texto para Editorial
+     * @return El texto para Editorial
      */
-    public JTextField getEditorialField() {
-        return editorialField;
+    public String getEditorialTexto() {
+        return editorialField.getText().trim();
     }
 
     /**
-     * Getter para el campo Número de Edición
+     * Getter para obtener el texto del campo Periodicidad
      * 
-     * @return El campo de texto para Número de Edición
+     * @return El campo de texto para Periodicidad
      */
-    public JTextField getPeriodicidadField() {
-        return periodicidadField;
+    public String getPeriodicidadTexto() {
+        return periodicidadField.getText().trim();
     }
 
     /**
@@ -202,18 +202,99 @@ public abstract class BasePublicacionDialog extends OverlayDialog {
     }
 
     /**
-     * Getter para el campo Número de Edición
+     * Getter para obtener el texto del campo Número de Edición
      * 
-     * @return El campo de texto para Número de Edición
+     * @return El texto del campo Número de Edición
      */
-    public JTextField getNumeroEdicionField() {
-        return numeroEdicionField;
+    public String getNumeroEdicionTexto() {
+        return numeroEdicionField.getText().trim();
     }
 
     /**
      * Getter para el campo Fecha de Publicación
      * 
      * @return El campo de texto para Fecha de Publicación
+     */
+    public String getFechaPublicacionTexto() {
+        return fechaPublicacionField.getText().trim();
+    }
+
+    /**
+     * Getter para obtener el texto del campo Autores
+     * 
+     * @return El texto del campo Autores
+     */
+    public String getAutoresTexto() {
+        return autoresField.getText().trim();
+    }
+
+    /**
+     * Getter para el campo ISBN
+     * 
+     * @return El campo ISBN
+     */
+    public JTextField getIsbnField() {
+        return isbnField;
+    }
+
+    /**
+     * Getter para el campo Titulo
+     * 
+     * @return El campo Titulo
+     */
+    public JTextField getTituloField() {
+        return tituloField;
+    }
+
+    /**
+     * Getter para el campo Idioma
+     * 
+     * @return El campo Idioma
+     */
+    public JTextField getIdiomaField() {
+        return idiomaField;
+    }
+
+    /**
+     * Getter para el campo Temas
+     * 
+     * @return El campo Temas
+     */
+    public JTextField getTemasField() {
+        return temasField;
+    }
+
+    /**
+     * Getter para el campo Modulos
+     * 
+     * @return El campo Modulos
+     */
+    public JTextField getModulosField() {
+        return modulosField;
+    }
+
+    /**
+     * Getter para el campo Ciclos
+     * 
+     * @return El campo Ciclos
+     */
+    public JTextField getCiclosField() {
+        return ciclosField;
+    }
+
+    /**
+     * Getter para el campo Editorial
+     * 
+     * @return El campo Editorial
+     */
+    public JTextField getEditorialField() {
+        return editorialField;
+    }
+
+    /**
+     * Getter para el campo Fecha de Publicación
+     * 
+     * @return El campo Fecha de Publicación
      */
     public JTextField getFechaPublicacionField() {
         return fechaPublicacionField;
@@ -222,10 +303,28 @@ public abstract class BasePublicacionDialog extends OverlayDialog {
     /**
      * Getter para el campo Autores
      * 
-     * @return El campo de texto para Autores
+     * @return El campo Autores
      */
     public JTextField getAutoresField() {
         return autoresField;
+    }
+
+    /**
+     * Getter para el campo Periodicidad
+     * 
+     * @return El campo Periodicidad
+     */
+    public JTextField getPeriodicidadField() {
+        return periodicidadField;
+    }
+
+        /**
+     * Getter para obtener el texto del campo Número de Edición
+     * 
+     * @return El campo Número de Edición
+     */
+    public JTextField getNumeroEdicionField() {
+        return numeroEdicionField;
     }
 
     /**
