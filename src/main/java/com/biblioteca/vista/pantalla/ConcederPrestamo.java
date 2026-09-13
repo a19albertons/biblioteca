@@ -1,27 +1,24 @@
 package com.biblioteca.vista.pantalla;
 
-import java.time.LocalDate;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.time.LocalDate;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.BorderFactory;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.biblioteca.controlador.Controlador;
 import com.biblioteca.dto.EjemplarConTituloDTO;
-import com.biblioteca.dto.UsuarioEstadoPorDNIOID;
-
-import javax.swing.event.DocumentEvent;
 
 /**
  * Clase para la vista Conceder préstamo
  */
-public class ConcederPrestamo {
+public class ConcederPrestamo extends PantallaPrestamoBase {
 
     /**
      * Controlador de la aplicación
@@ -29,14 +26,14 @@ public class ConcederPrestamo {
     private final Controlador controlador;
 
     /**
-     * Instancia de la clase base para validaciones y utilidades
+     * Botón cancelar
      */
-    private final VistaBase vistaBase;
+    private JButton btnCancelar;
 
     /**
-     * Botón de encabezado para dar de baja
+     * Botón registrar préstamo
      */
-    private JButton btnFormularioDevolver;
+    private JButton btnRegistrarPrestamo;
 
     /**
      * Constructor de la vista ConcederPrestamo
@@ -44,8 +41,10 @@ public class ConcederPrestamo {
      * @param controlador controlador principal
      */
     public ConcederPrestamo(final Controlador controlador) {
+        super(controlador, "Nuevo prestamo", "Formulario dar de baja");
         this.controlador = controlador;
-        this.vistaBase = new VistaBase();
+        super.pantalla();
+
     }
 
     /**
@@ -58,110 +57,13 @@ public class ConcederPrestamo {
     }
 
     /**
-     * Muestra la pantalla para conceder un préstamo
-     *
-     * @return JPanel con la vista de concesión de préstamos
-     */
-    public JPanel pantalla() {
-        JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(600, 600));
-        panel.setBackground(Color.decode("#EDF3F6"));
-        panel.setLayout(null);
-
-        // Crear componentes del encabezado
-        JPanel encabezado = crearEncabezado();
-        btnFormularioDevolver = (JButton) encabezado.getComponent(1);
-
-        // Crear componentes del contenido
-        JPanel contenido = crearContenido();
-
-        // Añadir los componentes al panel principal
-        panel.add(encabezado);
-        panel.add(contenido);
-
-        return panel;
-    }
-
-    /**
-     * Crea el panel de encabezado con título
-     *
-     * @return JPanel con el encabezado
-     */
-    private JPanel crearEncabezado() {
-        JPanel encabezado = new JPanel();
-        encabezado.setSize(new Dimension(600, 60));
-        encabezado.setBackground(Color.white);
-        encabezado.setLayout(null);
-        encabezado.setBounds(0, 0, 600, 60);
-
-        // Titulo
-        JLabel titulo = new JLabel("Nuevo prestamo");
-        titulo.setFont(titulo.getFont().deriveFont(24f));
-        titulo.setBounds(30, 10, 300, 40);
-        encabezado.add(titulo);
-
-        // Boton nueva publicacion
-        JButton btnFormularioDevolver = new JButton("Formulario dar de baja");
-        btnFormularioDevolver.setBounds(430, 15, 150, 30);
-        btnFormularioDevolver.setBackground(Color.white);
-        btnFormularioDevolver.setForeground(Color.decode("#468DAE"));
-        btnFormularioDevolver.setFocusPainted(false);
-        btnFormularioDevolver.setBorder(null);
-        encabezado.add(btnFormularioDevolver);
-
-        return encabezado;
-    }
-
-    /**
      * Crea el panel de contenido con todos los componentes del formulario
      *
+     * @param contenido     el panel de contenido
+     * @param txtIdEjemplar campo de texto para el ID del ejemplar
      * @return JPanel con el contenido
      */
-    private JPanel crearContenido() {
-        JPanel contenido = new JPanel();
-        contenido.setSize(540, 480);
-        contenido.setLayout(null);
-        contenido.setBackground(Color.white);
-        contenido.setBounds(30, 80, 540, 480);
-
-        // Componentes del formulario
-        // Paso 1: Identificar socio
-        JLabel paso1 = new JLabel("1. Identificar Socio (Usuario)");
-        paso1.setBounds(20, 20, 300, 30);
-        paso1.setForeground(Color.decode("#468DAE"));
-        paso1.setFont(paso1.getFont().deriveFont(16f));
-        contenido.add(paso1);
-
-        JLabel dniID = new JLabel("DNI / ID:");
-        dniID.setBounds(20, 70, 100, 25);
-        contenido.add(dniID);
-
-        JTextField txtDniID = new JTextField();
-        txtDniID.setBounds(20, 100, 300, 35);
-        contenido.add(txtDniID);
-
-        JButton btnBuscarSocio = new JButton("Buscar");
-        btnBuscarSocio.setBounds(330, 100, 90, 35);
-        btnBuscarSocio.setBackground(Color.decode("#468DAE"));
-        btnBuscarSocio.setForeground(Color.WHITE);
-        btnBuscarSocio.setFocusPainted(false);
-        btnBuscarSocio.setBorder(null);
-        contenido.add(btnBuscarSocio);
-
-        // Resultado búsqueda socio
-        JLabel resultadoSocio = new JLabel("");
-        resultadoSocio.setBounds(20, 150, 400, 40);
-        resultadoSocio.setText(
-                "<html>Usuario: Estudiante) : <span style='color:#2BC187; font-weight:bold'>Sin sanciones</span></html>");
-        resultadoSocio.setBackground(Color.decode("#EDF3F6"));
-        resultadoSocio.setOpaque(true);
-        // Pequeño margen izquierdo para separar el texto del borde (10px)
-        resultadoSocio.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
-        contenido.add(resultadoSocio);
-
-        // mutable holder para el id de usuario seleccionado (para usar desde lambdas)
-        final int[] usuarioSeleccionado = new int[] { -1 };
-
+    protected void configurarPasoEjemplar(final JPanel contenido, final JTextField txtIdEjemplar) {
         // Paso 2: Seleccionar libro
         JLabel paso2 = new JLabel("2. Seleccionar Libro");
         paso2.setBounds(20, 200, 300, 30);
@@ -174,7 +76,7 @@ public class ConcederPrestamo {
         idEjemplar.setBounds(20, 250, 100, 25);
         contenido.add(idEjemplar);
 
-        JTextField txtIdEjemplar = new JTextField();
+        // Texto id ejemplar
         txtIdEjemplar.setBounds(20, 280, 200, 35);
         contenido.add(txtIdEjemplar);
 
@@ -232,7 +134,7 @@ public class ConcederPrestamo {
         txtIdEjemplar.getDocument().addDocumentListener(listener);
 
         // Boton cancelar
-        JButton btnCancelar = new JButton("Cancelar");
+        btnCancelar = new JButton("Cancelar");
         btnCancelar.setBounds(250, 420, 100, 35);
         btnCancelar.setBackground(Color.white);
         btnCancelar.setForeground(Color.BLACK);
@@ -241,7 +143,7 @@ public class ConcederPrestamo {
         contenido.add(btnCancelar);
 
         // Boton Registar Prestamo
-        JButton btnRegistrarPrestamo = new JButton("Registrar Préstamo");
+        btnRegistrarPrestamo = new JButton("Registrar Préstamo");
         btnRegistrarPrestamo.setBounds(370, 420, 120, 35);
         btnRegistrarPrestamo.setBackground(Color.decode("#F4791B"));
         btnRegistrarPrestamo.setForeground(Color.WHITE);
@@ -249,11 +151,6 @@ public class ConcederPrestamo {
         btnRegistrarPrestamo.setBorder(null);
         contenido.add(btnRegistrarPrestamo);
 
-        // Configurar eventos de los botones
-        configurarEventos(btnFormularioDevolver, btnBuscarSocio, btnCancelar, btnRegistrarPrestamo,
-                resultadoSocio, usuarioSeleccionado, txtDniID, txtIdEjemplar);
-
-        return contenido;
     }
 
     /**
@@ -344,53 +241,13 @@ public class ConcederPrestamo {
     /**
      * Configura los eventos de los botones
      *
-     * @param btnFormularioDevolver JButton para dar de baja
-     * @param btnBuscarSocio        JButton para buscar socio
-     * @param btnCancelar           JButton para cancelar
-     * @param btnRegistrarPrestamo  JButton para registrar préstamo
-     * @param resultadoSocio        JLabel para mostrar el resultado de la búsqueda
-     * @param usuarioSeleccionado   array holder con el ID de usuario seleccionado
-     * @param txtDniID              JTextField con el DNI ingresado
-     * @param txtIdEjemplar         JTextField con el ID del ejemplar ingresado
+     * @param contenido     el panel de contenido
+     * @param txtIdEjemplar campo de texto para el ID del ejemplar
      */
-    private void configurarEventos(final JButton btnFormularioDevolver, final JButton btnBuscarSocio,
-            final JButton btnCancelar, final JButton btnRegistrarPrestamo, final JLabel resultadoSocio,
-            final int[] usuarioSeleccionado, final JTextField txtDniID, final JTextField txtIdEjemplar) {
+    protected void configurarBotonesAccion(final JPanel contenido, final JTextField txtIdEjemplar) {
         // Eventos botones
-        btnFormularioDevolver.addActionListener(e -> {
+        btnCambiarFormulario.addActionListener(e -> {
             controlador.getControladorNavegacion().cambiarPantallaHijo("devolverPrestamo");
-        });
-
-        btnBuscarSocio.addActionListener(e -> {
-            String input = txtDniID.getText().trim();
-            // si está vacío, mensaje de error
-            if (input.isEmpty()) {
-                resultadoSocio.setText("<html><span style='color:#F4791B'>Ingrese DNI o ID</span></html>");
-                usuarioSeleccionado[0] = -1;
-                return;
-            }
-            // buscar usuario y comprobar resultado
-            UsuarioEstadoPorDNIOID usuario = controlador.getControladorConcederPrestamo().buscarUsuarioPorDniOId(input);
-            if (usuario == null) {
-                resultadoSocio.setText("<html><span style='color:#F4791B'>Usuario no encontrado</span></html>");
-                usuarioSeleccionado[0] = -1;
-                return;
-            }
-            // datos: id, dni, nombre_completo, sancion_activa, tipo_desc
-            usuarioSeleccionado[0] = usuario.getId();
-            String estado = usuario.getSancionactiva();
-            String tipoDesc = usuario.getTipoUsuario().getDescripcion();
-            // mostrar resultado de estado usuario
-            if ("SANCIONADO".equalsIgnoreCase(estado)) {
-                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto() + " (" + tipoDesc
-                        + ") - <span style='color:#F4791B; font-weight:bold'>Tiene sanciones</span></html>");
-            } else if ("BAJA".equalsIgnoreCase(estado)) {
-                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto()
-                        + " - <span style='color:#F4791B; font-weight:bold'>Dado de baja</span></html>");
-            } else {
-                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto() + " (" + tipoDesc
-                        + ") - <span style='color:#2BC187; font-weight:bold'>Sin sanciones</span></html>");
-            }
         });
 
         btnCancelar.addActionListener(e -> {
@@ -399,7 +256,7 @@ public class ConcederPrestamo {
 
         btnRegistrarPrestamo.addActionListener(e -> {
             // Validar datos
-            if (!vistaBase.validarUsuarioYEjemplar(usuarioSeleccionado, txtIdEjemplar)) {
+            if (!super.validarUsuarioYEjemplar(usuarioSeleccionado, txtIdEjemplar)) {
                 return;
             }
             // registrar préstamo
