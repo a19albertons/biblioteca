@@ -21,8 +21,18 @@ import javax.swing.JTextField;
 
 import com.biblioteca.utilities.Fonts;
 
+/**
+ * Clase base para los diálogos de publicación (libro o revista)
+ * BasePublicacionDialog
+ */
 public abstract class BasePublicacionDialog extends OverlayDialog {
 
+    /**
+     * Constructor de la clase BasePublicacionDialog
+     * 
+     * @param parent El marco principal
+     * @param titulo El título del diálogo
+     */
     public BasePublicacionDialog(final JFrame parent, final String titulo) {
         super(parent, titulo);
 
@@ -31,75 +41,219 @@ public abstract class BasePublicacionDialog extends OverlayDialog {
     /**
      * Panel de tarjetas para el wizard
      */
-    protected JPanel cardPanel;
+    private JPanel cardPanel;
     /**
      * Layout de tarjetas
      */
-    protected CardLayout cardLayout;
+    private CardLayout cardLayout;
 
     // Step 1 fields
     /**
      * Campos paso 1 (isbn)
      */
-    protected JTextField isbnField;
+    private JTextField isbnField;
     /**
      * Campos paso 1 (titulo)
      */
-    protected JTextField tituloField;
+    private JTextField tituloField;
     /**
      * Campos paso 1 (idioma)
      */
-    protected JTextField idiomaField;
+    private JTextField idiomaField;
     /**
      * Campos paso 1 (temas)
      */
-    protected JTextField temasField;
+    private JTextField temasField;
     /**
      * Campos paso 1 (modulos)
      */
-    protected JTextField modulosField;
+    private JTextField modulosField;
     /**
      * Campos paso 1 (ciclos)
      */
-    protected JTextField ciclosField;
+    private JTextField ciclosField;
     /**
      * Campos paso 1 (editorial)
      */
-    protected JTextField editorialField;
+    private JTextField editorialField;
     /**
      * Campos paso 1 (tipo)
      */
-    protected JComboBox<String> tipoCombo;
+    private JComboBox<String> tipoCombo;
 
     // Step Libro
     /**
      * Campos paso Libro (número edición)
      */
-    protected JTextField numeroEdicionField;
+    private JTextField numeroEdicionField;
     /**
      * Campos paso Libro (fecha publicación)
      */
-    protected JTextField fechaPublicacionField;
+    private JTextField fechaPublicacionField;
     /**
      * Campos paso Libro (autores)
      */
-    protected JTextField autoresField;
+    private JTextField autoresField;
 
     // Step Revista
     /**
      * Campos paso Revista (periodicidad)
      */
-    protected JTextField periodicidadField;
+    private JTextField periodicidadField;
 
     // Boton comunes confirmar
     /**
      * Botón confirmar Libro
      */
-    protected JButton confirmarLibro;
+    private JButton confirmarLibro;
     /**
      * Botón confirmar Revista
      */
-    protected JButton confirmarRevista;
+    private JButton confirmarRevista;
+
+    /**
+     * Getter para el campo ISBN
+     * 
+     * @return El campo de texto para ISBN
+     */
+    public JTextField getIsbnField() {
+        return isbnField;
+    }
+
+    /**
+     * Getter para el campo Titulo
+     * 
+     * @return El campo de texto para Titulo
+     */
+    public JTextField getTituloField() {
+        return tituloField;
+    }
+
+    /**
+     * Getter para el campo Idioma
+     * 
+     * @return El campo de texto para Idioma
+     */
+    public JTextField getIdiomaField() {
+        return idiomaField;
+    }
+
+    /**
+     * Getter para el campo Temas
+     * 
+     * @return El campo de texto para Temas
+     */
+    public JTextField getTemasField() {
+        return temasField;
+    }
+
+    /**
+     * Getter para el campo Modulos
+     * 
+     * @return El campo de texto para Modulos
+     */
+    public JTextField getModulosField() {
+        return modulosField;
+    }
+
+    /**
+     * Getter para el campo Ciclos
+     * 
+     * @return El campo de texto para Ciclos
+     */
+    public JTextField getCiclosField() {
+        return ciclosField;
+    }
+
+    /**
+     * Getter para el campo Editorial
+     * 
+     * @return El campo de texto para Editorial
+     */
+    public JTextField getEditorialField() {
+        return editorialField;
+    }
+
+    /**
+     * Getter para el campo Número de Edición
+     * 
+     * @return El campo de texto para Número de Edición
+     */
+    public JTextField getPeriodicidadField() {
+        return periodicidadField;
+    }
+
+    /**
+     * Getter para el botón confirmarLibro
+     * 
+     * @return El botón confirmarLibro
+     */
+    public JButton getConfirmarLibro() {
+        return confirmarLibro;
+    }
+
+    /**
+     * Getter para el botón confirmarRevista
+     * 
+     * @return El botón confirmarRevista
+     */
+    public JButton getConfirmarRevista() {
+        return confirmarRevista;
+    }
+
+    /**
+     * Getter para el campo Número de Edición
+     * 
+     * @return El campo de texto para Número de Edición
+     */
+    public JTextField getNumeroEdicionField() {
+        return numeroEdicionField;
+    }
+
+    /**
+     * Getter para el campo Fecha de Publicación
+     * 
+     * @return El campo de texto para Fecha de Publicación
+     */
+    public JTextField getFechaPublicacionField() {
+        return fechaPublicacionField;
+    }
+
+    /**
+     * Getter para el campo Autores
+     * 
+     * @return El campo de texto para Autores
+     */
+    public JTextField getAutoresField() {
+        return autoresField;
+    }
+
+    /**
+     * Getter para el combo de tipo de publicación
+     * 
+     * @return El combo de tipo de publicación
+     */
+    public JComboBox<String> getTipoCombo() {
+        return tipoCombo;
+    }
+
+    /**
+     * Getter para el CardLayout
+     * 
+     * @return El CardLayout utilizado para el wizard
+     */
+    public CardLayout getCardLayout() {
+        return cardLayout;
+    }
+
+    /**
+     * Getter para el panel de tarjetas
+     * 
+     * @return El panel de tarjetas utilizado para el wizard
+     */
+    public JPanel getCardPanel() {
+        return cardPanel;
+    }
 
     /**
      * Inicializa la interfaz de usuario
@@ -487,4 +641,5 @@ public abstract class BasePublicacionDialog extends OverlayDialog {
                 BorderFactory.createEmptyBorder(6, 8, 6, 8)));
         field.setFont(Fonts.openSans(12f));
     }
+
 }

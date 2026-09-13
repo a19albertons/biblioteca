@@ -144,13 +144,4 @@ public class EditarEjemplarDialog extends OverlayDialog {
         getContentPane().add(content, BorderLayout.CENTER);
         getContentPane().add(footer, BorderLayout.SOUTH);
     }
-
-    /**
-     * Muestra u oculta el diálogo, instalando o quitando el overlay en el frame
-     * padre.
-     */
-     @Override
-     public void setVisible(final boolean b) {
-         super.setVisible(b);
-     }
 }

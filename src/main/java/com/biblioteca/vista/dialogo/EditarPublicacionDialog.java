@@ -40,8 +40,8 @@ public class EditarPublicacionDialog extends BasePublicacionDialog {
         this.controlador = controlador;
         this.idPublicacion = idPublicacion;
         super.initUI();
-        confirmarLibro.setText("Guardar");
-        confirmarRevista.setText("Guardar");
+        getConfirmarLibro().setText("Guardar");
+        getConfirmarRevista().setText("Guardar");
         configurarEventos();
         setSize(new Dimension(340, 500));
         setLocationRelativeTo(parent);
@@ -79,34 +79,37 @@ public class EditarPublicacionDialog extends BasePublicacionDialog {
         String autores = datos.getAutores() != null ? datos.getAutores() : "";
         String periodicidad = datos.getPeriodicidad() != null ? datos.getPeriodicidad() : "";
 
-        tituloField.setText(titulo);
-        isbnField.setText(isbn);
-        idiomaField.setText(idioma);
-        temasField.setText(temas);
-        modulosField.setText(modulos);
-        ciclosField.setText(ciclos);
-        editorialField.setText(editorial);
+        getTituloField().setText(titulo);
+        getIsbnField().setText(isbn);
+        getIdiomaField().setText(idioma);
+        getTemasField().setText(temas);
+        getModulosField().setText(modulos);
+        getCiclosField().setText(ciclos);
+        getEditorialField().setText(editorial);
 
         // seleccionar tipo y rellenar campos específicos, pero mantener el
         // diálogo en el paso 1 para que el usuario vea primero los datos comunes.
         if ("L".equalsIgnoreCase(tipo)) {
-            tipoCombo.setSelectedItem("Libro");
+            getTipoCombo().setSelectedItem("Libro");
             // Rellenar campos de libro (no mostramos la tarjeta aún)
-            numeroEdicionField.setText(numEd == null ? "" : numEd);
-            fechaPublicacionField.setText(fecha == null ? "" : fecha);
-            autoresField.setText(autores == null ? "" : autores);
+            getNumeroEdicionField().setText(numEd == null ? "" : numEd);
+            getFechaPublicacionField().setText(fecha == null ? "" : fecha);
+            getAutoresField().setText(autores == null ? "" : autores);
         } else {
-            tipoCombo.setSelectedItem("Revista");
+            getTipoCombo().setSelectedItem("Revista");
             // Rellenar campos de revista (no mostramos la tarjeta aún)
-            periodicidadField.setText(periodicidad == null ? "" : periodicidad);
+            getPeriodicidadField().setText(periodicidad == null ? "" : periodicidad);
         }
         // Mostrar paso 1 por defecto al abrir el modal
-        cardLayout.show(cardPanel, "paso1");
+        getCardLayout().show(getCardPanel(), "paso1");
     }
 
+    /**
+     * Configura los eventos de los botones de acción del diálogo.
+     */
     public void configurarEventos() {
         // Acción botón Guardar
-        confirmarLibro.addActionListener(e -> {
+        getConfirmarLibro().addActionListener(e -> {
             // Validar y guardar cambios
             if (!validarPasoLibro()) {
                 return;
@@ -114,16 +117,16 @@ public class EditarPublicacionDialog extends BasePublicacionDialog {
             // llamar al controlador para actualizar la publicación
             boolean ok = controlador.getControladorEditarPublicacionDialog().editarPublicacionLibro(
                     idPublicacion,
-                    isbnField.getText().trim(),
-                    tituloField.getText().trim(),
-                    idiomaField.getText().trim(),
-                    temasField.getText().trim(),
-                    modulosField.getText().trim(),
-                    ciclosField.getText().trim(),
-                    editorialField.getText().trim(),
-                    Integer.parseInt(numeroEdicionField.getText().trim()),
-                    LocalDate.parse(fechaPublicacionField.getText().trim()),
-                    autoresField.getText().trim());
+                    getIsbnField().getText().trim(),
+                    getTituloField().getText().trim(),
+                    getIdiomaField().getText().trim(),
+                    getTemasField().getText().trim(),
+                    getModulosField().getText().trim(),
+                    getCiclosField().getText().trim(),
+                    getEditorialField().getText().trim(),
+                    Integer.parseInt(getNumeroEdicionField().getText().trim()),
+                    LocalDate.parse(getFechaPublicacionField().getText().trim()),
+                    getAutoresField().getText().trim());
             // devuelve true si se actualizó correctamente
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Publicación actualizada", "Éxito",
@@ -139,7 +142,7 @@ public class EditarPublicacionDialog extends BasePublicacionDialog {
         });
 
         // Acción botón Guardar
-        confirmarRevista.addActionListener(e -> {
+        getConfirmarRevista().addActionListener(e -> {
             // Validar y guardar cambios
             if (!validarPasoRevista()) {
                 return;
@@ -147,14 +150,14 @@ public class EditarPublicacionDialog extends BasePublicacionDialog {
             // llamar al controlador para actualizar la publicación
             boolean ok = controlador.getControladorEditarPublicacionDialog().editarPublicacionRevista(
                     idPublicacion,
-                    isbnField.getText().trim(),
-                    tituloField.getText().trim(),
-                    idiomaField.getText().trim(),
-                    temasField.getText().trim(),
-                    modulosField.getText().trim(),
-                    ciclosField.getText().trim(),
-                    editorialField.getText().trim(),
-                    periodicidadField.getText().trim());
+                    getIsbnField().getText().trim(),
+                    getTituloField().getText().trim(),
+                    getIdiomaField().getText().trim(),
+                    getTemasField().getText().trim(),
+                    getModulosField().getText().trim(),
+                    getCiclosField().getText().trim(),
+                    getEditorialField().getText().trim(),
+                    getPeriodicidadField().getText().trim());
             // devuelve true si se actualizó correctamente
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Publicación actualizada", "Éxito",

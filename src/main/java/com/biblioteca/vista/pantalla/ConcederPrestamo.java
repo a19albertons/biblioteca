@@ -61,8 +61,8 @@ public class ConcederPrestamo extends PantallaPrestamoBase {
      *
      * @param contenido     el panel de contenido
      * @param txtIdEjemplar campo de texto para el ID del ejemplar
-     * @return JPanel con el contenido
      */
+    @Override 
     protected void configurarPasoEjemplar(final JPanel contenido, final JTextField txtIdEjemplar) {
         // Paso 2: Seleccionar libro
         JLabel paso2 = new JLabel("2. Seleccionar Libro");
@@ -113,7 +113,7 @@ public class ConcederPrestamo extends PantallaPrestamoBase {
         // Detectar automáticamente al escribir ID de ejemplar
         DocumentListener listener = new DocumentListener() {
             private void doDetect() {
-                detectarCampos(txtIdEjemplar, txtPublicacion, txtFechaInicio, txtFechaFin, usuarioSeleccionado);
+                detectarCampos(txtIdEjemplar, txtPublicacion, txtFechaInicio, txtFechaFin, getUsuarioSeleccionado());
             }
 
             @Override
@@ -244,9 +244,10 @@ public class ConcederPrestamo extends PantallaPrestamoBase {
      * @param contenido     el panel de contenido
      * @param txtIdEjemplar campo de texto para el ID del ejemplar
      */
+    @Override 
     protected void configurarBotonesAccion(final JPanel contenido, final JTextField txtIdEjemplar) {
         // Eventos botones
-        btnCambiarFormulario.addActionListener(e -> {
+        getBtnCambiarFormulario().addActionListener(e -> {
             controlador.getControladorNavegacion().cambiarPantallaHijo("devolverPrestamo");
         });
 
@@ -256,12 +257,12 @@ public class ConcederPrestamo extends PantallaPrestamoBase {
 
         btnRegistrarPrestamo.addActionListener(e -> {
             // Validar datos
-            if (!super.validarUsuarioYEjemplar(usuarioSeleccionado, txtIdEjemplar)) {
+            if (!super.validarUsuarioYEjemplar(getUsuarioSeleccionado(), txtIdEjemplar)) {
                 return;
             }
             // registrar préstamo
             String err = controlador.getControladorConcederPrestamo()
-                    .registrarPrestamo(usuarioSeleccionado[0], Integer.parseInt(txtIdEjemplar.getText()));
+                    .registrarPrestamo(getUsuarioSeleccionado()[0], Integer.parseInt(txtIdEjemplar.getText()));
             // mostrar resultado
             if (err == null) {
                 JOptionPane.showMessageDialog(null, "Préstamo registrado correctamente", "Éxito",

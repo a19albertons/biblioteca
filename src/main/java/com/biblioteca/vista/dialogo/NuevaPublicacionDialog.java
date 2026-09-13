@@ -30,8 +30,8 @@ public class NuevaPublicacionDialog extends BasePublicacionDialog {
         super(parent, "Nueva Publicación");
         this.controlador = controlador;
         super.initUI();
-        confirmarLibro.setText("Añadir");
-        confirmarRevista.setText("Añadir");
+        getConfirmarLibro().setText("Añadir");
+        getConfirmarRevista().setText("Añadir");
         configurarEventos();
         setSize(new Dimension(340, 500));
         setLocationRelativeTo(parent);
@@ -39,25 +39,28 @@ public class NuevaPublicacionDialog extends BasePublicacionDialog {
 
 
 
+    /**
+     * Configura los eventos de los botones de añadir publicación
+     */
     public void configurarEventos() {
         // Acción botón añadir
-        confirmarLibro.addActionListener(e -> {
+        getConfirmarLibro().addActionListener(e -> {
             // Validar campos
             if (!validarPasoLibro()) {
                 return;
             }
             // Intentar crear la publicación
             boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionLibro(
-                    isbnField.getText().trim(),
-                    tituloField.getText().trim(),
-                    idiomaField.getText().trim(),
-                    temasField.getText().trim(),
-                    modulosField.getText().trim(),
-                    ciclosField.getText().trim(),
-                    editorialField.getText().trim(),
-                    Integer.parseInt(numeroEdicionField.getText().trim()),
-                    LocalDate.parse(fechaPublicacionField.getText().trim()),
-                    autoresField.getText().trim());
+                    getIsbnField().getText().trim(),
+                    getTituloField().getText().trim(),
+                    getIdiomaField().getText().trim(),
+                    getTemasField().getText().trim(),
+                    getModulosField().getText().trim(),
+                    getCiclosField().getText().trim(),
+                    getEditorialField().getText().trim(),
+                    Integer.parseInt(getNumeroEdicionField().getText().trim()),
+                    LocalDate.parse(getFechaPublicacionField().getText().trim()),
+                    getAutoresField().getText().trim());
             // Mostrar resultado
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Publicación tipo Libro añadida", "Éxito",
@@ -73,21 +76,21 @@ public class NuevaPublicacionDialog extends BasePublicacionDialog {
         });
 
         // Acción botón añadir
-        confirmarRevista.addActionListener(e -> {
+        getConfirmarRevista().addActionListener(e -> {
             // Validar campos
             if (!validarPasoRevista()) {
                 return;
             }
             // Intentar crear la publicación
             boolean ok = controlador.getControladorNuevaPublicacionDialog().crearPublicacionRevista(
-                    isbnField.getText().trim(),
-                    tituloField.getText().trim(),
-                    idiomaField.getText().trim(),
-                    temasField.getText().trim(),
-                    modulosField.getText().trim(),
-                    ciclosField.getText().trim(),
-                    editorialField.getText().trim(),
-                    periodicidadField.getText().trim());
+                    getIsbnField().getText().trim(),
+                    getTituloField().getText().trim(),
+                    getIdiomaField().getText().trim(),
+                    getTemasField().getText().trim(),
+                    getModulosField().getText().trim(),
+                    getCiclosField().getText().trim(),
+                    getEditorialField().getText().trim(),
+                    getPeriodicidadField().getText().trim());
             // Mostrar resultado
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Publicación tipo Revista añadida", "Éxito",

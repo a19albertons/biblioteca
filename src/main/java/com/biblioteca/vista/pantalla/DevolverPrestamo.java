@@ -51,6 +51,7 @@ public class DevolverPrestamo extends PantallaPrestamoBase {
      * @param contenido     el panel de contenido
      * @param txtIdEjemplar campo de texto para el ID del ejemplar
      */
+    @Override 
     protected void configurarPasoEjemplar(final JPanel contenido, final JTextField txtIdEjemplar) {
         JLabel paso2 = new JLabel("2. Identificar Ejemplar");
         paso2.setBounds(20, 200, 300, 30);
@@ -139,6 +140,7 @@ public class DevolverPrestamo extends PantallaPrestamoBase {
      * @param contenido     el panel de contenido
      * @param txtIdEjemplar campo de texto para el ID del ejemplar
      */
+    @Override 
     protected void configurarBotonesAccion(final JPanel contenido, final JTextField txtIdEjemplar) {
         JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setBounds(250, 420, 100, 35);
@@ -162,11 +164,11 @@ public class DevolverPrestamo extends PantallaPrestamoBase {
         });
 
         btnDevolverPrestamo.addActionListener(e -> {
-            if (!super.validarUsuarioYEjemplar(usuarioSeleccionado, txtIdEjemplar)) {
+            if (!super.validarUsuarioYEjemplar(getUsuarioSeleccionado(), txtIdEjemplar)) {
                 return;
             }
             String err = getControlador().getControladorDevolverPrestamo()
-                    .devolverPrestamo(usuarioSeleccionado[0], Integer.parseInt(txtIdEjemplar.getText()));
+                    .devolverPrestamo(getUsuarioSeleccionado()[0], Integer.parseInt(txtIdEjemplar.getText()));
             if (err == null) {
                 JOptionPane.showMessageDialog(null, "Devolución registrada correctamente", "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
@@ -185,7 +187,7 @@ public class DevolverPrestamo extends PantallaPrestamoBase {
         });
 
         // Eventos botones
-        btnCambiarFormulario.addActionListener(e -> {
+        getBtnCambiarFormulario().addActionListener(e -> {
             controlador.getControladorNavegacion().cambiarPantallaHijo("concederPrestamo");
         });
     }

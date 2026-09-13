@@ -20,25 +20,59 @@ public abstract class PantallaPrestamoBase {
     /**
      * Jlabel para el título de la vista
      */
-    protected JLabel titulo = new JLabel();
+    private final JLabel titulo = new JLabel();
 
     /**
      * JButton para el botón de formulario de devolución
      */
-    protected JButton btnCambiarFormulario = new JButton();
+    private final JButton btnCambiarFormulario = new JButton();
 
     /** identificador del usuario seleccionado */
-    protected int[] usuarioSeleccionado = new int[] { -1 };
+    private int[] usuarioSeleccionado = new int[] { -1 };
 
     /**
      * Controlador de la aplicación
      */
     private final Controlador controlador;
 
+    /**
+     * Constructor de la clase base PantallaPrestamoBase
+     * 
+     * @param controlador controlador principal
+     * @param tituloTexto string para el título de la vista
+     * @param botonTexto  string para el texto del botón de formulario
+     */
     public PantallaPrestamoBase(final Controlador controlador, final String tituloTexto, final String botonTexto) {
         this.controlador = controlador;
         this.titulo.setText(tituloTexto);
         this.btnCambiarFormulario.setText(botonTexto);
+    }
+
+    /**
+     * Getter para el usuario seleccionado
+     * 
+     * @return array con el ID del usuario seleccionado
+     */
+    public int[] getUsuarioSeleccionado() {
+        return new int[] { usuarioSeleccionado[0] };
+    }
+
+    /**
+     * Setter para el usuario seleccionado
+     * 
+     * @param usuarioSeleccionado establece el usuario seleccionado
+     */
+    public void setUsuarioSeleccionado(final int[] usuarioSeleccionado) {
+        this.usuarioSeleccionado[0] = usuarioSeleccionado[0];
+    }
+
+    /**
+     * Getter para el botón de cambiar formulario
+     * 
+     * @return JButton para cambiar formulario
+     */
+    public JButton getBtnCambiarFormulario() {
+        return btnCambiarFormulario;
     }
 
     /**
@@ -178,9 +212,9 @@ public abstract class PantallaPrestamoBase {
         });
     }
 
-    protected abstract void configurarPasoEjemplar(final JPanel contenido, final JTextField txtIdEjemplar);
+    protected abstract void configurarPasoEjemplar(JPanel contenido, JTextField txtIdEjemplar);
 
-    protected abstract void configurarBotonesAccion(final JPanel contenido, final JTextField txtIdEjemplar);
+    protected abstract void configurarBotonesAccion(JPanel contenido, JTextField txtIdEjemplar);
 
     /**
      * Valida usuario y ejemplar
