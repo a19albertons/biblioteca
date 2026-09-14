@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
 import com.biblioteca.security.HashearContrasena;
@@ -26,10 +28,7 @@ public class ControladorNuevoUsuarioDialog {
      * 
      * @param dbConnection
      */
-    public ControladorNuevoUsuarioDialog(final DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorNuevoUsuarioDialog(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 

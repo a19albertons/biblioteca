@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
+import javax.annotation.Nonnull;
 import javax.swing.JOptionPane;
 
 import com.biblioteca.conexiones.DBConnection;
@@ -29,12 +30,9 @@ public class ControladorSancionManual {
     /**
      * Constructor con DBConnection (inyección)
      * 
-     * @param dbConnection
+     * @param dbConnection DBConnection para conexiones a la base de datos
      */
-    public ControladorSancionManual(final DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorSancionManual(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 

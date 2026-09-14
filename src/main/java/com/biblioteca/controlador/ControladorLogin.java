@@ -1,5 +1,7 @@
 package com.biblioteca.controlador;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.modelo.TipoUsuario;
 import com.biblioteca.modelo.Usuario;
 
@@ -23,11 +25,7 @@ public class ControladorLogin {
      * @param usuario el usuario a verificar
      * @return true si la cuenta está desactivada
      */
-    public boolean cuentaDesactivada(final Usuario usuario) {
-        if (usuario == null) {
-            throw new IllegalArgumentException(
-                    "Compruebe el usuario con usuarioNoValido antes de llamar a este método.");
-        }
+    public boolean cuentaDesactivada(@Nonnull final Usuario usuario) {
         return !usuario.getEstado();
     }
 

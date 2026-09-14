@@ -5,6 +5,8 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.AutorDAO;
 import com.biblioteca.dao.CicloDAO;
@@ -72,10 +74,7 @@ public class ControladorNuevaPublicacionDialog {
      * 
      * @param dbConnection DBConnection para conexiones a la base de datos
      */
-    public ControladorNuevaPublicacionDialog(final DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorNuevaPublicacionDialog(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
         this.transactionHelper = new PublicationTransactionHelper();
     }

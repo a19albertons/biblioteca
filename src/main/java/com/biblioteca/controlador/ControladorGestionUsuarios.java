@@ -3,6 +3,7 @@ package com.biblioteca.controlador;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.annotation.Nonnull;
 import javax.swing.table.DefaultTableModel;
 
 import com.biblioteca.conexiones.DBConnection;
@@ -21,12 +22,9 @@ public class ControladorGestionUsuarios {
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
      * 
-     * @param dbConnection
+     * @param dbConnection la conexión a la base de datos
      */
-    public ControladorGestionUsuarios(final DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorGestionUsuarios(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 

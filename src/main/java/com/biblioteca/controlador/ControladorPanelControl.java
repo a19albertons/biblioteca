@@ -3,6 +3,8 @@ package com.biblioteca.controlador;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.CicloDAO;
 import com.biblioteca.dao.PrestamoDAO;
@@ -21,12 +23,9 @@ public class ControladorPanelControl {
     /**
      * Constructor con DBConnection (inyección)
      * 
-     * @param dbConnection
+     * @param dbConnection DBConnection para conexiones a la base de datos
      */
-    public ControladorPanelControl(final DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorPanelControl(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 

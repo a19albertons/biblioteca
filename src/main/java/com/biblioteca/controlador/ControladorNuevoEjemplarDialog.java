@@ -5,6 +5,8 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.EjemplarDAO;
 
@@ -25,10 +27,7 @@ public class ControladorNuevoEjemplarDialog {
      *
      * @param dbConnection la conexión a la base de datos
      */
-    public ControladorNuevoEjemplarDialog(final DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorNuevoEjemplarDialog(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
