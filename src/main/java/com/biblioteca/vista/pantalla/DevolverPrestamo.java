@@ -102,6 +102,7 @@ public class DevolverPrestamo extends PantallaPrestamoBase {
                     txtPublicacion.setText("");
                     return;
                 }
+                // CPD-OFF
                 String pubTitulo = detectado.getTitulo();
                 String numEd = String.valueOf(detectado.getNumEdicion());
                 String tipoPub = detectado.getTipoPublicacion().toString();
@@ -115,6 +116,7 @@ public class DevolverPrestamo extends PantallaPrestamoBase {
                 } else {
                     txtPublicacion.setText("Detectado: " + pubTitulo);
                 }
+                // CPD-ON
             }
 
             @Override

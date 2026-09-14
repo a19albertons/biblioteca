@@ -193,6 +193,7 @@ public class ConcederPrestamo extends PantallaPrestamoBase {
         }
         // detectado: idEjemplar, idPublicacion, numEjemplar, estadoEjemplar, titulo,
         // numEdicion, tipo
+        // CPD-OFF
         String pubTitulo = detectado.getTitulo();
         String numEd = String.valueOf(detectado.getNumEdicion());
         String tipoPub = detectado.getTipoPublicacion().toString();
@@ -207,6 +208,7 @@ public class ConcederPrestamo extends PantallaPrestamoBase {
         } else {
             txtPublicacion.setText("Detectado: " + pubTitulo);
         }
+        // CPD-ON
 
         // establecer fecha inicio como hoy
         LocalDate hoy = LocalDate.now();
