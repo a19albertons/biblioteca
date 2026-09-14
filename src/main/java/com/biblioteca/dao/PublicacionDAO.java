@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.dto.ObtenerPublicacionDetallesPorIdDTO;
 import com.biblioteca.modelo.TipoPublicacion;
 import com.biblioteca.utilities.RelacionPublicacionHelperEnum;
@@ -160,11 +162,7 @@ public class PublicacionDAO {
      * 
      * @param conexion connection to the database
      */
-    public PublicacionDAO(final Connection conexion) {
-
-        if (conexion == null) {
-            throw new IllegalArgumentException("conexion cannot be null");
-        }
+    public PublicacionDAO(@Nonnull final Connection conexion) {
         this.conexion = conexion;
     }
 

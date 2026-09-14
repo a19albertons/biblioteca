@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.dto.EjemplarTipoPublicacionDTO;
 import com.biblioteca.dto.EstadoEjemplarDTO;
 import com.biblioteca.modelo.TipoPublicacion;
@@ -48,10 +50,7 @@ public class EjemplarDAO {
      * 
      * @param conexion la conexión a la base de datos
      */
-    public EjemplarDAO(final Connection conexion) {
-        if (conexion == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public EjemplarDAO(@Nonnull final Connection conexion) {
         this.conexion = conexion;
     }
 

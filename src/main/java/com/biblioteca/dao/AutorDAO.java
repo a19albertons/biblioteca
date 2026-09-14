@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.annotation.Nonnull;
+
 /**
  * DAO para la tabla `autores`.
  */
@@ -29,12 +31,9 @@ public class AutorDAO {
     /**
      * Constructor del DAO
      * 
-     * @param conexion conexión a la base de datos (no puede ser null)
+     * @param conexion conexión a la base de datos
      */
-    public AutorDAO(final Connection conexion) {
-        if (conexion == null) {
-            throw new IllegalArgumentException("Connection cannot be null");
-        }
+    public AutorDAO(@Nonnull final Connection conexion) {
         this.conexion = conexion;
     }
 

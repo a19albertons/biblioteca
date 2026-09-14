@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.annotation.Nonnull;
+
 /**
  * DAO para la tabla `temas`.
  */
@@ -31,10 +33,7 @@ public class TemaDAO {
      * @param conexion la conexión a la base de datos
      * @throws IllegalArgumentException si conexion es null
      */
-    public TemaDAO(final Connection conexion) {
-        if (conexion == null) {
-            throw new IllegalArgumentException("Connection cannot be null");
-        }
+    public TemaDAO(@Nonnull final Connection conexion) {
         this.conexion = conexion;
     }
 

@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import javax.annotation.Nonnull;
+
 /**
  * DAO para Ciclo
  */
@@ -34,12 +36,9 @@ public class CicloDAO {
     /**
      * Constructor del DAO
      * 
-     * @param conexion conexión a la base de datos (no puede ser null)
+     * @param conexion conexión a la base de datos
      */
-    public CicloDAO(final Connection conexion) {
-        if (conexion == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public CicloDAO(@Nonnull final Connection conexion) {
         this.conexion = conexion;
     }
 
