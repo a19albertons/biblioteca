@@ -113,7 +113,7 @@ public class ControladorPanelControl {
      * @return String[] con la lista de ciclos
      */
     public String[] listaCiclos() {
-        String[] listaCiclos = new String[0];
+        String[] listaCiclos;
         try (Connection conexion = this.dbConnection.getConnection()) {
             CicloDAO cicloDAO = new CicloDAO(conexion);
             listaCiclos = cicloDAO.listaCiclos();
