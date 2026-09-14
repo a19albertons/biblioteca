@@ -43,14 +43,14 @@ public class EliminarEjemplarDialog extends BaseEliminarDialog {
     protected boolean onEliminar() {
         // Antes de eliminar, obtener id_publicacion para refrescar la vista tras la
         // operación
-        EstadoEjemplarDTO detalles = controlador.getControladorEjemplares().obtenerDetallesEjemplar(idEjemplar);
+        EstadoEjemplarDTO detalles = getControlador().getControladorEjemplares().obtenerDetallesEjemplar(idEjemplar);
         // extraer id_publicacion de los detalles obtenidos
         if (detalles != null) {
-            this.idPublicacion = detalles.getIdPublicacion();
+            setIdPublicacion(detalles.getIdPublicacion());
         }
 
         // Intentar eliminar el ejemplar
-        boolean ok = controlador.getControladorEliminarEjemplarDialog().eliminarEjemplar(idEjemplar);
+        boolean ok = getControlador().getControladorEliminarEjemplarDialog().eliminarEjemplar(idEjemplar);
         return ok;
     }
 
@@ -60,16 +60,16 @@ public class EliminarEjemplarDialog extends BaseEliminarDialog {
      * @param exito true si la eliminación fue exitosa
      */
     @Override
-    protected void onExit(boolean exito) {
+    protected void onExit(final boolean exito) {
         if (exito) {
             JOptionPane.showMessageDialog(this, "Ejemplar marcado como baja", "Éxito",
                     JOptionPane.INFORMATION_MESSAGE);
             // refrescar lista de ejemplares para la publicación asociada (si se pudo
             // obtener)
-            if (idPublicacion > 0) {
-                controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(idPublicacion);
+            if (getIdPublicacion() > 0) {
+                getControlador().getControladorNavegacion().mostrarEjemplaresParaPublicacion(getIdPublicacion());
             } else {
-                controlador.getControladorNavegacion().refrescarPanelControl();
+                getControlador().getControladorNavegacion().refrescarPanelControl();
             }
             dispose();
         } else {

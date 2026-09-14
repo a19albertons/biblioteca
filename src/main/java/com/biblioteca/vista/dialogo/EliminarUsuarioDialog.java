@@ -39,7 +39,7 @@ public class EliminarUsuarioDialog extends BaseEliminarDialog {
     @Override
     protected boolean onEliminar() {
         // Intentar eliminar usuario
-        boolean ok = controlador.getControladorEliminarUsuario().eliminarUsuario(idUsuario);
+        boolean ok = getControlador().getControladorEliminarUsuario().eliminarUsuario(idUsuario);
         return ok;
     }
 
@@ -49,10 +49,10 @@ public class EliminarUsuarioDialog extends BaseEliminarDialog {
      * @param exito true si la eliminación fue exitosa
      */
     @Override
-    protected void onExit(boolean exito) {
+    protected void onExit(final boolean exito) {
         if (exito) {
             JOptionPane.showMessageDialog(this, "Usuario desactivado", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            controlador.getControladorNavegacion().refrescarUsuarios();
+            getControlador().getControladorNavegacion().refrescarUsuarios();
             dispose();
         } else {
             JOptionPane.showMessageDialog(this,

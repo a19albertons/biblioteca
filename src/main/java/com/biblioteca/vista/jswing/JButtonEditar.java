@@ -1,4 +1,4 @@
-package com.biblioteca.vista.JSwing;
+package com.biblioteca.vista.jswing;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -15,6 +15,9 @@ import javax.swing.JButton;
 import com.biblioteca.utilities.AppResources;
 
 public class JButtonEditar extends JButton {
+    /**
+     * Constructor del botón de editar con fondo translúcido pintado manualmente
+     */
     public JButtonEditar() {
         // Botón editar con fondo translúcido pintado manualmente
         URL editarIconUrl = AppResources.editarPath();
@@ -31,6 +34,9 @@ public class JButtonEditar extends JButton {
         setMargin(new Insets(0, 0, 0, 0));
     }
 
+    /**
+     * Pintar el botón con fondo translúcido
+     */
     @Override
     protected void paintComponent(final Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();

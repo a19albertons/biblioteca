@@ -21,11 +21,11 @@ import javax.swing.table.TableCellRenderer;
 
 import com.biblioteca.controlador.Controlador;
 import com.biblioteca.utilities.BackgroundWorker;
-import com.biblioteca.vista.JSwing.JButtonBorrar;
-import com.biblioteca.vista.JSwing.JButtonEditar;
 import com.biblioteca.vista.dialogo.EditarUsuarioDialog;
 import com.biblioteca.vista.dialogo.EliminarUsuarioDialog;
 import com.biblioteca.vista.dialogo.NuevoUsuarioDialog;
+import com.biblioteca.vista.jswing.JButtonBorrar;
+import com.biblioteca.vista.jswing.JButtonEditar;
 
 /**
  * Clase para la vista Gestión de usuarios

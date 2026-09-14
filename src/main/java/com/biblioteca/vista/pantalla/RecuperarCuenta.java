@@ -52,6 +52,26 @@ public class RecuperarCuenta {
     }
 
     /**
+     * Etiqueta para volver al inicio
+     */
+    private JLabel volver;
+
+    /**
+     * Botón enviar
+     */
+    private JButton btnEnviar;
+
+    /**
+     * Campo de texto para ingresar usuario o correo
+     */
+    private JTextField campo;
+    
+    /**
+     * Etiqueta de versión
+     */
+    private JLabel version;
+
+    /**
      * Muestra la pantalla de recuperación de cuenta
      *
      * @return JPanel con el formulario de recuperación
@@ -106,12 +126,12 @@ public class RecuperarCuenta {
         login.add(etiqueta);
 
         // Campo de entrada
-        JTextField campo = new JTextField();
+        campo = new JTextField();
         campo.setBounds(30, 70, 240, 35);
         login.add(campo);
 
         // Botón ENVIAR
-        JButton btnEnviar = new JButton("ENVIAR");
+        btnEnviar = new JButton("ENVIAR");
         btnEnviar.setBounds(30, 120, 240, 40);
         btnEnviar.setBorder(null);
         btnEnviar.setBackground(Color.decode("#F4791B"));
@@ -119,11 +139,27 @@ public class RecuperarCuenta {
         login.add(btnEnviar);
 
         // Texto con enlace a volver al inicio
-        JLabel volver = new JLabel(
+        volver = new JLabel(
                 "<html>¿Recordaste tu contraseña? <span style='color:#468DAE; font-weight:bold'>Volver al inicio</span></html>");
         volver.setBounds(30, 170, 240, 22);
         // Usar Open Sans en estilo normal
         volver.setFont(Fonts.openSans(11f));
+
+        login.add(volver);
+
+        // Versión (bajada un poco para evitar solapamiento)
+        version = new JLabel("Sistema de Gestión Académica v1.0");
+        version.setBounds(40, 195, 240, 20);
+        version.setFont(version.getFont().deriveFont(Font.PLAIN));
+        login.add(version);
+
+        panel.add(tarjeta);
+
+        configurarEventos();
+        return panel;
+    }
+
+    private void configurarEventos() {
         // Cambiar cursor y manejar click
         volver.addMouseListener(new MouseAdapter() {
             @Override
@@ -141,16 +177,6 @@ public class RecuperarCuenta {
                 volver.setCursor(Cursor.getDefaultCursor());
             }
         });
-        login.add(volver);
-
-        // Versión (bajada un poco para evitar solapamiento)
-        JLabel version = new JLabel("Sistema de Gestión Académica v1.0");
-        version.setBounds(40, 195, 240, 20);
-        version.setFont(version.getFont().deriveFont(Font.PLAIN));
-        login.add(version);
-
-        panel.add(tarjeta);
-
         // Eventos (sin lógica de backend)
         btnEnviar.addActionListener(e -> {
             // Logica de backend para iniciar sesion
@@ -177,7 +203,8 @@ public class RecuperarCuenta {
                     return;
                 }
                 // Simular envío de correo y volver al inicio de sesión
-                // Aquí se agregaría la lógica real de envío de correo electrónico (en este caso queda como placeholder)
+                // Aquí se agregaría la lógica real de envío de correo electrónico (en este caso
+                // queda como placeholder)
                 JOptionPane.showMessageDialog(version,
                         "Debería haber recibido un correo electronico con su contraseña.",
                         "Recuperar cuenta", JOptionPane.INFORMATION_MESSAGE);
@@ -205,8 +232,6 @@ public class RecuperarCuenta {
                 volver.setCursor(Cursor.getDefaultCursor());
             }
         });
-
-        return panel;
     }
 
 }

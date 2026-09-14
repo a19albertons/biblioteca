@@ -42,7 +42,7 @@ public class EliminarPublicacionDialog extends BaseEliminarDialog {
     @Override
     protected boolean onEliminar() {
         // Pedir al controlador que elimine la publicación
-        boolean ok = controlador.getControladorEliminarPublicacion().eliminarPublicacion(idPublicacion);
+        boolean ok = getControlador().getControladorEliminarPublicacion().eliminarPublicacion(idPublicacion);
         return ok;
     }
 
@@ -52,13 +52,13 @@ public class EliminarPublicacionDialog extends BaseEliminarDialog {
      * @param exito true si la eliminación fue exitosa
      */
     @Override
-    protected void onExit(boolean exito) {
+    protected void onExit(final boolean exito) {
         if (exito) {
             JOptionPane.showMessageDialog(this, "Publicación eliminada (marcada como baja)", "Éxito",
                     JOptionPane.INFORMATION_MESSAGE);
             // Refresh views
-            controlador.getControladorNavegacion().refrescarPublicaciones();
-            controlador.getControladorNavegacion().refrescarPanelControl();
+            getControlador().getControladorNavegacion().refrescarPublicaciones();
+            getControlador().getControladorNavegacion().refrescarPanelControl();
             dispose();
         } else {
                 JOptionPane.showMessageDialog(this,

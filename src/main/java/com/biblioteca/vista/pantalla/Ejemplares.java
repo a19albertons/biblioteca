@@ -28,13 +28,13 @@ import javax.swing.table.TableCellRenderer;
 
 import com.biblioteca.controlador.Controlador;
 import com.biblioteca.utilities.AppResources;
-import com.biblioteca.vista.JSwing.JButtonBorrar;
-import com.biblioteca.vista.JSwing.JButtonEditar;
 import com.biblioteca.vista.dialogo.EditarEjemplarDialog;
 import com.biblioteca.vista.dialogo.EditarPublicacionDialog;
 import com.biblioteca.vista.dialogo.EliminarEjemplarDialog;
 import com.biblioteca.vista.dialogo.EliminarPublicacionDialog;
 import com.biblioteca.vista.dialogo.NuevoEjemplarDialog;
+import com.biblioteca.vista.jswing.JButtonBorrar;
+import com.biblioteca.vista.jswing.JButtonEditar;
 
 /**
  * Clase para la vista Ejemplares

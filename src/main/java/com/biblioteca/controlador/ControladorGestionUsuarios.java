@@ -57,7 +57,7 @@ public class ControladorGestionUsuarios {
      * @param modelo DefaultTableModel donde se cargarán los datos
      * @return String[][] con los datos procesados para la vista
      */
-    public String[][] cargarDatosEnTabla(String[][] rawData, DefaultTableModel modelo) {
+    public String[][] cargarDatosEnTabla(final String[][] rawData, final DefaultTableModel modelo) {
         if (rawData == null) {
             return new String[0][0];
         }

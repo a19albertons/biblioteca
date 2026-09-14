@@ -22,38 +22,100 @@ public abstract class BaseEliminarDialog extends OverlayDialog {
     /**
      * Controlador principal de la aplicación
      */
-    protected final Controlador controlador;
+    private final Controlador controlador;
     /**
      * ID del elemento a eliminar
      */
-    protected final int id;
+    private final int id;
     /**
      * Tipo de elemento (EJEMPLAR, PUBLICACION, USUARIO)
      */
-    protected final String tipo;
+    private final String tipo;
     /**
      * Título del diálogo
      */
-    protected String titulo;
+    private String titulo;
     /**
      * Mensaje de confirmación
      */
-    protected String mensajeConfirmacion;
+    private String mensajeConfirmacion;
     /**
      * ID de la publicación asociada (solo para ejemplares)
      */
-    protected int idPublicacion;
+    private int idPublicacion;
+
+    /**
+     * Obtiene el controlador principal de la aplicación.
+     * 
+     * @return Controlador principal
+     */
+    public Controlador getControlador() {
+        return controlador;
+    }
+
+    /**
+     * Obtiene el ID del elemento a eliminar.
+     * 
+     * @return ID del elemento
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Establece el ID de la publicación asociada (solo para ejemplares).
+     * 
+     * @param idPublicacion ID de la publicación
+     */
+    public void setIdPublicacion(final int idPublicacion) {
+        this.idPublicacion = idPublicacion;
+    }
+
+    /**
+     * Obtiene el tipo de elemento.
+     * 
+     * @return Tipo de elemento
+     */
+    public String getTipo() {
+        return tipo;
+    }
+
+    /**
+     * Obtiene el título del diálogo.
+     * 
+     * @return Título del diálogo
+     */
+    public String getTitulo() {
+        return titulo;
+    }
+
+    /**
+     * Obtiene el mensaje de confirmación.
+     * 
+     * @return Mensaje de confirmación
+     */
+    public String getMensajeConfirmacion() {
+        return mensajeConfirmacion;
+    }
+
+    /**
+     * Obtiene el ID de la publicación asociada.
+     * 
+     * @return ID de la publicación
+     */
+    public int getIdPublicacion() {
+        return idPublicacion;
+    }
 
     /**
      * Constructor del diálogo con inicialización de UI
      * 
-     * @param parent
-     * @param controlador
-     * @param id
+     * @param parent              Ventana padre (puede ser null)
+     * @param controlador         Controlador principal
+     * @param id                  ID del elemento a eliminar
      * @param titulo              Título del diálogo
      * @param mensajeConfirmacion Mensaje de confirmación
      * @param tipo                Tipo de elemento (EJEMPLAR, PUBLICACION, USUARIO)
-     * @param initUI              true para inicializar la UI
      */
     public BaseEliminarDialog(final JFrame parent, final Controlador controlador, final int id, final String titulo,
             final String mensajeConfirmacion, final String tipo) {
@@ -134,7 +196,7 @@ public abstract class BaseEliminarDialog extends OverlayDialog {
      * 
      * @param exito true si la eliminación fue exitosa
      */
-    protected void onExit(boolean exito) {
+    protected void onExit(final boolean exito) {
         if (exito) {
             JOptionPane.showMessageDialog(this, "Éxito", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         }

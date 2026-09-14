@@ -17,7 +17,7 @@ public abstract class BaseUsuarioDialog extends OverlayDialog {
      * @param parent El JFrame padre del diálogo
      * @param titulo El título del diálogo
      */
-    public BaseUsuarioDialog(JFrame parent, String titulo) {
+    public BaseUsuarioDialog(final JFrame parent, final String titulo) {
         super(parent, titulo);
     }
 

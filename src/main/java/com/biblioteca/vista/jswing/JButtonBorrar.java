@@ -1,4 +1,4 @@
-package com.biblioteca.vista.JSwing;
+package com.biblioteca.vista.jswing;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -15,6 +15,9 @@ import javax.swing.JButton;
 import com.biblioteca.utilities.AppResources;
 
 public class JButtonBorrar extends JButton {
+    /**
+     * Constructor del botón de eliminar con fondo translúcido pintado manualmente
+     */
     public JButtonBorrar() {
         URL borrarIconUrl = AppResources.eliminarPath();
         if (borrarIconUrl != null) {
@@ -30,6 +33,9 @@ public class JButtonBorrar extends JButton {
         setMargin(new Insets(0, 0, 0, 0));
     }
 
+    /**
+     * Pintar el botón con fondo translúcido
+     */
     @Override
     protected void paintComponent(final Graphics g) {
         final Graphics2D g2 = (Graphics2D) g.create();
