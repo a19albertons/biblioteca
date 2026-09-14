@@ -2,6 +2,8 @@ package com.biblioteca.modelo;
 
 import java.time.LocalDate;
 
+import javax.annotation.Nonnull;
+
 /**
  * Modelo de datos para la tabla usuarios
  */
@@ -82,11 +84,7 @@ public class Usuario {
      * @param dni
      */
     public void setDni(final String dni) {
-        if (dni != null) {
-            this.dni = dni;
-        } else {
-            throw new IllegalArgumentException("El DNI no puede ser nulo");
-        }
+        this.dni = dni;
     }
 
     /**
@@ -104,12 +102,7 @@ public class Usuario {
      * @param nombre
      */
     public void setNombre(final String nombre) {
-        if (nombre != null) {
-            this.nombre = nombre;
-            setUsuario();
-        } else {
-            throw new IllegalArgumentException("El nombre no puede ser nulo");
-        }
+        this.nombre = nombre;
     }
 
     /**
@@ -127,12 +120,7 @@ public class Usuario {
      * @param apellido1
      */
     public void setApellido1(final String apellido1) {
-        if (apellido1 != null && !apellido1.isEmpty()) {
-            this.apellido1 = apellido1;
-            setUsuario();
-        } else {
-            throw new IllegalArgumentException("El primer apellido no puede ser nulo o vacío");
-        }
+        this.apellido1 = apellido1;
     }
 
     /**
@@ -192,7 +180,7 @@ public class Usuario {
         if (nombre != null) {
             sb.append(nombre);
         }
-        if (apellido1 != null && !apellido1.isEmpty()) {
+        if (!apellido1.isEmpty()) {
             sb.append(apellido1.charAt(0));
         }
         if (apellido2 != null && !apellido2.isEmpty()) {
@@ -216,11 +204,7 @@ public class Usuario {
      * @param contrasena
      */
     public void setContrasena(final String contrasena) {
-        if (contrasena != null) {
-            this.contrasena = contrasena;
-        } else {
-            throw new IllegalArgumentException("La contraseña no puede ser nula");
-        }
+        this.contrasena = contrasena;
     }
 
     /**
@@ -271,8 +255,9 @@ public class Usuario {
      * @param tipo       el tipo de usuario
      * @param estado     el estado del usuario
      */
-    public Usuario(final String dni, final String nombre, final String apellido1, final String apellido2,
-            final String email, final String contrasena,
+    public Usuario(@Nonnull final String dni, @Nonnull final String nombre, @Nonnull final String apellido1,
+            final String apellido2,
+            final String email, @Nonnull final String contrasena,
             final TipoUsuario tipo, final boolean estado) {
         setDni(dni);
         setNombre(nombre);
@@ -299,9 +284,10 @@ public class Usuario {
      * @param tipo       el tipo de usuario
      * @param estado     el estado del usuario
      */
-    public Usuario(final int id, final String dni, final String nombre, final String apellido1, final String apellido2,
+    public Usuario(final int id, @Nonnull final String dni, @Nonnull final String nombre,
+            @Nonnull final String apellido1, final String apellido2,
             final String usuario, final String email,
-            final String contrasena, final TipoUsuario tipo, final boolean estado) {
+            @Nonnull final String contrasena, final TipoUsuario tipo, final boolean estado) {
         this.id = id;
         this.dni = dni;
         this.nombre = nombre;

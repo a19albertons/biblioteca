@@ -1,5 +1,9 @@
 package com.biblioteca.modelo;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 /**
  * Modelo de datos para la tabla revistas
  */
@@ -30,11 +34,7 @@ public class Revista extends Publicacion {
      * @param periodicidad
      */
     public void setPeriodicidad(final String periodicidad) {
-        if (periodicidad != null) {
-            this.periodicidad = periodicidad;
-        } else {
-            throw new IllegalArgumentException("La periodicidad no puede ser nula");
-        }
+        this.periodicidad = periodicidad;
     }
 
     /**
@@ -73,10 +73,8 @@ public class Revista extends Publicacion {
      * @param numRevista
      */
     public Revista(final String titulo, final String editorial, final String codigoISBN, final String idioma,
-            final TipoPublicacion tipo,
-            final boolean estado, final java.util.List<Modulo> modulos, final java.util.List<Ciclo> ciclos,
-            final java.util.List<Tema> temas,
-            final String periodicidad, final int numRevista) {
+            final TipoPublicacion tipo, final boolean estado, final List<Modulo> modulos, final List<Ciclo> ciclos,
+            final List<Tema> temas, @Nonnull final String periodicidad, final int numRevista) {
         super(titulo, editorial, codigoISBN, idioma, tipo, estado, modulos, ciclos, temas);
         setPeriodicidad(periodicidad);
         setNumRevista(numRevista);
@@ -99,10 +97,9 @@ public class Revista extends Publicacion {
      * @param numRevista
      */
     public Revista(final int id, final String titulo, final String editorial, final String codigoISBN,
-            final String idioma, final TipoPublicacion tipo,
-            final boolean estado, final java.util.List<Modulo> modulos, final java.util.List<Ciclo> ciclos,
-            final java.util.List<Tema> temas,
-            final String periodicidad, final int numRevista) {
+            final String idioma, final TipoPublicacion tipo, final boolean estado, final List<Modulo> modulos,
+            final List<Ciclo> ciclos, final List<Tema> temas, @Nonnull final String periodicidad,
+            final int numRevista) {
         super(id, titulo, editorial, codigoISBN, idioma, tipo, estado, modulos, ciclos, temas);
         this.periodicidad = periodicidad;
         this.numRevista = numRevista;

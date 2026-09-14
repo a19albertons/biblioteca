@@ -1,5 +1,7 @@
 package com.biblioteca.modelo;
 
+import javax.annotation.Nonnull;
+
 /**
  * Modelo de datos para la tabla autores
  */
@@ -52,11 +54,7 @@ public class Autor {
      * @param nombre el nombre del autor
      */
     public void setNombre(final String nombre) {
-        if (nombre != null) {
-            this.nombre = nombre;
-        } else {
-            throw new IllegalArgumentException("El nombre no puede ser nulo");
-        }
+        this.nombre = nombre;
     }
 
     /**
@@ -74,11 +72,7 @@ public class Autor {
      * @param nacionalidad la nacionalidad del autor
      */
     public void setNacionalidad(final String nacionalidad) {
-        if (nacionalidad != null) {
-            this.nacionalidad = nacionalidad;
-        } else {
-            throw new IllegalArgumentException("La nacionalidad no puede ser nula");
-        }
+        this.nacionalidad = nacionalidad;
     }
 
     // Constructores
@@ -88,7 +82,7 @@ public class Autor {
      * @param nombre
      * @param nacionalidad
      */
-    public Autor(final String nombre, final String nacionalidad) {
+    public Autor(@Nonnull final String nombre, @Nonnull final String nacionalidad) {
         this.setNombre(nombre);
         this.setNacionalidad(nacionalidad);
     }
@@ -100,7 +94,7 @@ public class Autor {
      * @param nombre
      * @param nacionalidad
      */
-    public Autor(final int id, final String nombre, final String nacionalidad) {
+    public Autor(@Nonnull final int id, @Nonnull final String nombre, @Nonnull final String nacionalidad) {
         this.id = id;
         this.nombre = nombre;
         this.nacionalidad = nacionalidad;

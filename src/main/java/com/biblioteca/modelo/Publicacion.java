@@ -2,6 +2,8 @@ package com.biblioteca.modelo;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 /**
  * Modelo de datos para la tabla publicaciones
  */
@@ -85,11 +87,7 @@ public class Publicacion {
      * @param titulo
      */
     public void setTitulo(final String titulo) {
-        if (titulo != null) {
-            this.titulo = titulo;
-        } else {
-            throw new IllegalArgumentException("El título no puede ser nulo");
-        }
+        this.titulo = titulo;
     }
 
     /**
@@ -108,11 +106,7 @@ public class Publicacion {
      * @param editorial
      */
     public void setEditorial(final String editorial) {
-        if (editorial != null) {
-            this.editorial = editorial;
-        } else {
-            throw new IllegalArgumentException("La editorial no puede ser nula");
-        }
+        this.editorial = editorial;
     }
 
     /**
@@ -131,11 +125,7 @@ public class Publicacion {
      * @param codigoISBN
      */
     public void setCodigoISBN(final String codigoISBN) {
-        if (codigoISBN != null) {
-            this.codigoISBN = codigoISBN;
-        } else {
-            throw new IllegalArgumentException("El código ISBN no puede ser nulo");
-        }
+        this.codigoISBN = codigoISBN;
     }
 
     /**
@@ -154,11 +144,7 @@ public class Publicacion {
      * @param idioma
      */
     public void setIdioma(final String idioma) {
-        if (idioma != null) {
-            this.idioma = idioma;
-        } else {
-            throw new IllegalArgumentException("El idioma no puede ser nulo");
-        }
+        this.idioma = idioma;
     }
 
     /**
@@ -267,7 +253,8 @@ public class Publicacion {
      * @param ciclos
      * @param temas
      */
-    public Publicacion(final String titulo, final String editorial, final String codigoISBN, final String idioma,
+    public Publicacion(@Nonnull final String titulo, @Nonnull final String editorial, @Nonnull final String codigoISBN,
+            @Nonnull final String idioma,
             final TipoPublicacion tipo,
             final boolean estado, final List<Modulo> modulos, final List<Ciclo> ciclos, final List<Tema> temas) {
         setTitulo(titulo);
@@ -295,8 +282,9 @@ public class Publicacion {
      * @param ciclos
      * @param temas
      */
-    public Publicacion(final int id, final String titulo, final String editorial, final String codigoISBN,
-            final String idioma, final TipoPublicacion tipo,
+    public Publicacion(@Nonnull final int id, @Nonnull final String titulo, @Nonnull final String editorial,
+            @Nonnull final String codigoISBN,
+            @Nonnull final String idioma, final TipoPublicacion tipo,
             final boolean estado, final List<Modulo> modulos, final List<Ciclo> ciclos, final List<Tema> temas) {
         this.id = id;
         this.titulo = titulo;

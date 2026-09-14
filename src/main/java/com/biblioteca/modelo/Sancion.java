@@ -2,6 +2,8 @@ package com.biblioteca.modelo;
 
 import java.time.LocalDate;
 
+import javax.annotation.Nonnull;
+
 /**
  * Modelo de datos para la tabla sanciones
  */
@@ -69,9 +71,6 @@ public class Sancion {
      * @param usuario
      */
     public void setUsuario(final Usuario usuario) {
-        if (usuario == null) {
-            throw new IllegalArgumentException("El usuario no puede ser nulo");
-        }
         this.usuario = usuario;
     }
 
@@ -90,9 +89,6 @@ public class Sancion {
      * @param prestamo
      */
     public void setPrestamo(final Prestamo prestamo) {
-        if (prestamo == null) {
-            throw new IllegalArgumentException("El préstamo no puede ser nulo");
-        }
         this.prestamo = prestamo;
     }
 
@@ -111,9 +107,6 @@ public class Sancion {
      * @param inicioSancion
      */
     public void setInicioSancion(final LocalDate inicioSancion) {
-        if (inicioSancion == null) {
-            throw new IllegalArgumentException("La fecha de inicio de sanción no puede ser nula");
-        }
         this.inicioSancion = inicioSancion;
     }
 
@@ -132,13 +125,13 @@ public class Sancion {
      * @param finSancion
      */
     public void setFinSancion(final LocalDate finSancion) {
-        if (finSancion == null) {
-            throw new IllegalArgumentException("La fecha de fin de sanción no puede ser nula");
+        if (finSancion.isBefore(this.inicioSancion)) {
+            this.finSancion = this.inicioSancion;
+            this.inicioSancion = finSancion;
+        } else {
+            this.finSancion = finSancion;
         }
-        if (this.inicioSancion != null && finSancion.isBefore(this.inicioSancion)) {
-            throw new IllegalArgumentException("La fecha de fin no puede ser anterior a la fecha de inicio");
-        }
-        this.finSancion = finSancion;
+
     }
 
     /**
@@ -156,9 +149,7 @@ public class Sancion {
      * @param descripcion
      */
     public void setDescripcion(final String descripcion) {
-        if (descripcion == null || descripcion.isEmpty()) {
-            throw new IllegalArgumentException("La descripción no puede ser nula o vacía");
-        }
+
         this.descripcion = descripcion;
     }
 
@@ -191,9 +182,10 @@ public class Sancion {
      * @param descripcion   la descripción de la sanción
      * @param estado        el estado de la sanción
      */
-    public Sancion(final Usuario usuario, final Prestamo prestamo, final LocalDate inicioSancion,
-            final LocalDate finSancion,
-            final String descripcion, final boolean estado) {
+    public Sancion(@Nonnull final Usuario usuario, @Nonnull final Prestamo prestamo,
+            @Nonnull final LocalDate inicioSancion,
+            @Nonnull final LocalDate finSancion,
+            @Nonnull final String descripcion, final boolean estado) {
         setUsuario(usuario);
         setPrestamo(prestamo);
         setInicioSancion(inicioSancion);
@@ -213,9 +205,10 @@ public class Sancion {
      * @param descripcion   la descripción de la sanción
      * @param estado        el estado de la sanción
      */
-    public Sancion(final int id, final Usuario usuario, final Prestamo prestamo, final LocalDate inicioSancion,
-            final LocalDate finSancion,
-            final String descripcion, final boolean estado) {
+    public Sancion(final int id, @Nonnull final Usuario usuario, @Nonnull final Prestamo prestamo,
+            @Nonnull final LocalDate inicioSancion,
+            @Nonnull final LocalDate finSancion,
+            @Nonnull final String descripcion, final boolean estado) {
         this.id = id;
         this.usuario = usuario;
         this.prestamo = prestamo;
