@@ -437,7 +437,7 @@ public class Ejemplares {
     /**
      * Renderizador para el estado de ejemplares (badges con colores).
      */
-    private class StatusRenderer extends JLabel implements TableCellRenderer {
+    private static class StatusRenderer extends JLabel implements TableCellRenderer {
         /**
          * Constructor de StatusRenderer.
          */

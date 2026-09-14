@@ -40,7 +40,7 @@ public class GestionUsuarios {
     /**
      * Renderizador para el campo estado
      */
-    private class StatusRenderer extends JLabel implements TableCellRenderer {
+    private static class StatusRenderer extends JLabel implements TableCellRenderer {
         StatusRenderer() {
             setOpaque(true);
             setHorizontalAlignment(SwingConstants.CENTER);
@@ -309,7 +309,7 @@ public class GestionUsuarios {
 
         // Usar método del controlador
         controlador.getControladorGestionUsuarios().cargarDatosEnTabla(rawData, usuariosModel);
-        
+
         // Asegurarse de refrescar la tabla si está disponible
         if (this.usuariosTable != null) {
             this.usuariosTable.revalidate();
@@ -344,7 +344,7 @@ public class GestionUsuarios {
 
                     // Usar método del controlador
                     controlador.getControladorGestionUsuarios().cargarDatosEnTabla(rawData, usuariosModel);
-                    
+
                     // Asegurarse de refrescar la tabla si está disponible
                     if (this.usuariosTable != null) {
                         this.usuariosTable.revalidate();
