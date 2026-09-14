@@ -23,7 +23,7 @@ import com.biblioteca.modelo.TipoUsuario;
  * Diálogo para crear un nuevo usuario/socio.
  * La contraseña inicial se fijará al valor del DNI suministrado.
  */
-public class NuevoUsuarioDialog extends BaseUsuarioDialog {
+public final class NuevoUsuarioDialog extends BaseUsuarioDialog {
     /**
      * Controlador principal de la aplicación
      */

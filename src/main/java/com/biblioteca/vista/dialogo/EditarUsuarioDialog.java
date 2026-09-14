@@ -21,7 +21,7 @@ import com.biblioteca.modelo.TipoUsuario;
 /**
  * Diálogo para editar un usuario existente
  */
-public class EditarUsuarioDialog extends BaseUsuarioDialog {
+public final class EditarUsuarioDialog extends BaseUsuarioDialog {
     /**
      * Controlador principal de la aplicación
      */

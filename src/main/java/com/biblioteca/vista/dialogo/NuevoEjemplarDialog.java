@@ -23,7 +23,7 @@ import javax.swing.JOptionPane;
  * Diálogo para crear un nuevo ejemplar asociado a una publicación.
  * Muestra un campo de fecha de adquisición (YYYY-MM-DD) y un botón Añadir.
  */
-public class NuevoEjemplarDialog extends OverlayDialog {
+public final class NuevoEjemplarDialog extends OverlayDialog {
     /**
      * Controlador de la aplicación
      */
