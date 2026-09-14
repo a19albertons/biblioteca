@@ -227,7 +227,7 @@ public class ControladorConcederPrestamo {
                 return null; // null indica éxito
             } finally {
                 // Restaurar auto-commit
-                if (!exito) {
+                if (!exito && conexion != null) {
                     try {
                         conexion.rollback();
                         conexion.setAutoCommit(true);
