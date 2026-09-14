@@ -1,5 +1,7 @@
 package com.biblioteca.controlador;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.vista.navegacion.ControladorNavegacion;
 
@@ -15,85 +17,123 @@ public class Controlador {
 
     /**
      * Controlador de navegación
+     *
+     * @return controlador de navegación
      */
-    ControladorNavegacion controladorNavegacion;
+    private final ControladorNavegacion controladorNavegacion;
     /**
      * Controlador de inicio de sesión
+     *
+     * @return controlador de inicio de sesión
      */
-    ControladorInicioSesion controladorInicioSesion;
+    private final ControladorInicioSesion controladorInicioSesion;
     /**
      * Controlador de recuperación de cuenta
+     *
+     * @return controlador de recuperación de cuenta
      */
-    ControladorRecuperarCuenta controladorRecuperarCuenta;
+    private final ControladorRecuperarCuenta controladorRecuperarCuenta;
     /**
      * Controlador de login
+     *
+     * @return controlador de login
      */
-    ControladorLogin controladorLogin;
+    private final ControladorLogin controladorLogin;
     /**
      * Controlador de panel de control
+     *
+     * @return controlador de panel de control
      */
-    ControladorPanelControl controladorPanelControl;
+    private final ControladorPanelControl controladorPanelControl;
 
     /**
      * Controlador de concesión de préstamos
+     *
+     * @return controlador de concesión de préstamos
      */
-    ControladorConcederPrestamo controladorConcederPrestamo;
+    private final ControladorConcederPrestamo controladorConcederPrestamo;
     /**
      * Controlador de devolución de préstamos
+     *
+     * @return controlador de devolución de préstamos
      */
-    ControladorDevolverPrestamo controladorDevolverPrestamo;
+    private final ControladorDevolverPrestamo controladorDevolverPrestamo;
     /**
      * Controlador de ejemplares
+     *
+     * @return controlador de ejemplares
      */
-    ControladorEjemplares controladorEjemplares;
+    private final ControladorEjemplares controladorEjemplares;
     /**
      * Controlador de nueva publicación (encapsula la lógica de persistencia de
      * publicaciones)
+     *
+     * @return controlador de nueva publicación
      */
-    ControladorNuevaPublicacionDialog controladorNuevaPublicacionDialog;
+    private final ControladorNuevaPublicacionDialog controladorNuevaPublicacionDialog;
     /**
      * Controlador para editar publicaciones (diálogo de edición)
+     *
+     * @return controlador para editar publicaciones
      */
-    ControladorEditarPublicacionDialog controladorEditarPublicacionDialog;
+    private final ControladorEditarPublicacionDialog controladorEditarPublicacionDialog;
     /**
      * Controlador para eliminar publicaciones (diálogo de eliminación)
+     *
+     * @return controlador para eliminar publicaciones
      */
-    ControladorEliminarPublicacion controladorEliminarPublicacion;
+    private final ControladorEliminarPublicacion controladorEliminarPublicacion;
     /**
      * Controlador para el diálogo de nuevo ejemplar
+     *
+     * @return controlador para el diálogo de nuevo ejemplar
      */
-    ControladorNuevoEjemplarDialog controladorNuevoEjemplarDialog;
+    private final ControladorNuevoEjemplarDialog controladorNuevoEjemplarDialog;
     /**
      * Controlador de edición de ejemplares (diálogo)
+     *
+     * @return controlador de edición de ejemplares
      */
-    ControladorEditarEjemplarDialog controladorEditarEjemplarDialog;
+    private final ControladorEditarEjemplarDialog controladorEditarEjemplarDialog;
     /**
      * Controlador para eliminar ejemplares (diálogo)
+     *
+     * @return controlador para eliminar ejemplares
      */
-    ControladorEliminarEjemplarDialog controladorEliminarEjemplarDialog;
+    private final ControladorEliminarEjemplarDialog controladorEliminarEjemplarDialog;
     /**
      * Controlador de gestión de usuarios
+     *
+     * @return controlador de gestión de usuarios
      */
-    ControladorGestionUsuarios controladorGestionUsuarios;
+    private final ControladorGestionUsuarios controladorGestionUsuarios;
     /**
      * Controlador para el diálogo de nuevo usuario
+     *
+     * @return controlador para el diálogo de nuevo usuario
      */
-    ControladorNuevoUsuarioDialog controladorNuevoUsuarioDialog;
+    private final ControladorNuevoUsuarioDialog controladorNuevoUsuarioDialog;
 
     /**
      * Controlador para editar usuarios
+     *
+     * @return controlador para editar usuarios
      */
-    ControladorEditarUsuarioDialog controladorEditarUsuarioDialog;
+    private final ControladorEditarUsuarioDialog controladorEditarUsuarioDialog;
 
     /**
      * Controlador para eliminar (desactivar) usuarios
+     *
+     * @return controlador para eliminar usuarios
      */
-    ControladorEliminarUsuario controladorEliminarUsuario;
+    private final ControladorEliminarUsuario controladorEliminarUsuario;
 
     /**
      * Controlador para sanciones manuales
+     *
+     * @return controlador para sanciones manuales
      */
-    ControladorSancionManual controladorSancionManual;
+    private final ControladorSancionManual controladorSancionManual;
 
     // Getters y Setters
 
@@ -108,82 +148,46 @@ public class Controlador {
 
     /**
      * Obtiene el controlador de navegación
-     * 
-     * @return
+     *
+     * @return controlador de navegación
      */
-    public ControladorNavegacion getControladorNavegacion() {
+    public final ControladorNavegacion getControladorNavegacion() {
         return controladorNavegacion;
     }
 
     /**
-     * Establece el controlador de navegación
-     * 
-     * @param controladorNavegacion
-     */
-    public void setControladorNavegacion(ControladorNavegacion controladorNavegacion) {
-        this.controladorNavegacion = controladorNavegacion;
-    }
-
-    /**
      * Obtiene el controlador de inicio de sesión
-     * 
-     * @return
+     *
+     * @return controlador de inicio de sesión
      */
-    public ControladorInicioSesion getControladorInicioSesion() {
+    public final ControladorInicioSesion getControladorInicioSesion() {
         return controladorInicioSesion;
     }
 
     /**
-     * Establece el controlador de inicio de sesión
-     * 
-     * @param controladorInicioSesion
-     */
-    public void setControladorInicioSesion(ControladorInicioSesion controladorInicioSesion) {
-        this.controladorInicioSesion = controladorInicioSesion;
-    }
-
-    /**
      * Obtiene el controlador de recuperación de cuenta
-     * 
-     * @return
+     *
+     * @return controlador de recuperación de cuenta
      */
-    public ControladorRecuperarCuenta getControladorRecuperarCuenta() {
+    public final ControladorRecuperarCuenta getControladorRecuperarCuenta() {
         return controladorRecuperarCuenta;
     }
 
     /**
-     * Establece el controlador de recuperación de cuenta
-     * 
-     * @param controladorRecuperarCuenta
-     */
-    public void setControladorRecuperarCuenta(ControladorRecuperarCuenta controladorRecuperarCuenta) {
-        this.controladorRecuperarCuenta = controladorRecuperarCuenta;
-    }
-
-    /**
      * Obtiene el controlador de login
-     * 
-     * @return
+     *
+     * @return controlador de login
      */
-    public ControladorLogin getControladorLogin() {
+    public final ControladorLogin getControladorLogin() {
         return controladorLogin;
     }
 
     /**
-     * Establece el controlador de login
-     * 
-     * @param controladorLogin
-     */
-    public void setControladorLogin(ControladorLogin controladorLogin) {
-        this.controladorLogin = controladorLogin;
-    }
-
-    /**
      * Obtiene el controlador de panel de control
-     * 
-     * @return
+     *
+     * @return controlador de panel de control
      */
-    public ControladorPanelControl getControladorPanelControl() {
+    public final ControladorPanelControl getControladorPanelControl() {
         return controladorPanelControl;
     }
 
@@ -192,7 +196,7 @@ public class Controlador {
      *
      * @return controlador de conceder préstamo
      */
-    public ControladorConcederPrestamo getControladorConcederPrestamo() {
+    public final ControladorConcederPrestamo getControladorConcederPrestamo() {
         return controladorConcederPrestamo;
     }
 
@@ -201,53 +205,26 @@ public class Controlador {
      *
      * @return controlador de devolución
      */
-    public ControladorDevolverPrestamo getControladorDevolverPrestamo() {
+    public final ControladorDevolverPrestamo getControladorDevolverPrestamo() {
         return controladorDevolverPrestamo;
     }
 
     /**
-     * Establece el controlador de panel de control
-     * 
-     * @param controladorPanelControl
-     */
-    public void setControladorPanelControl(ControladorPanelControl controladorPanelControl) {
-        this.controladorPanelControl = controladorPanelControl;
-    }
-
-    /**
      * Obtiene el controlador de ejemplares
-     * 
-     * @return
+     *
+     * @return controlador de ejemplares
      */
-    public ControladorEjemplares getControladorEjemplares() {
+    public final ControladorEjemplares getControladorEjemplares() {
         return controladorEjemplares;
     }
 
     /**
-     * Establece el controlador de ejemplares
-     * 
-     * @param controladorEjemplares
-     */
-    public void setControladorEjemplares(ControladorEjemplares controladorEjemplares) {
-        this.controladorEjemplares = controladorEjemplares;
-    }
-
-    /**
      * Obtiene el controlador de gestión de usuarios
-     * 
-     * @return
+     *
+     * @return controlador de gestión de usuarios
      */
-    public ControladorGestionUsuarios getControladorGestionUsuarios() {
+    public final ControladorGestionUsuarios getControladorGestionUsuarios() {
         return controladorGestionUsuarios;
-    }
-
-    /**
-     * Establece el controlador de gestión de usuarios
-     * 
-     * @param controladorGestionUsuarios
-     */
-    public void setControladorGestionUsuarios(ControladorGestionUsuarios controladorGestionUsuarios) {
-        this.controladorGestionUsuarios = controladorGestionUsuarios;
     }
 
     /**
@@ -255,18 +232,8 @@ public class Controlador {
      *
      * @return controlador de nueva publicación
      */
-    public ControladorNuevaPublicacionDialog getControladorNuevaPublicacionDialog() {
+    public final ControladorNuevaPublicacionDialog getControladorNuevaPublicacionDialog() {
         return controladorNuevaPublicacionDialog;
-    }
-
-    /**
-     * Establece el controlador de nueva publicación
-     *
-     * @param controladorNuevaPublicacionDialog
-     */
-    public void setControladorNuevaPublicacionDialog(
-            ControladorNuevaPublicacionDialog controladorNuevaPublicacionDialog) {
-        this.controladorNuevaPublicacionDialog = controladorNuevaPublicacionDialog;
     }
 
     /**
@@ -274,18 +241,8 @@ public class Controlador {
      *
      * @return controlador de edición de publicaciones
      */
-    public ControladorEditarPublicacionDialog getControladorEditarPublicacionDialog() {
+    public final ControladorEditarPublicacionDialog getControladorEditarPublicacionDialog() {
         return controladorEditarPublicacionDialog;
-    }
-
-    /**
-     * Establece el controlador encargado de la edición de publicaciones.
-     *
-     * @param controladorEditarPublicacionDialog controlador de edición
-     */
-    public void setControladorEditarPublicacionDialog(
-            ControladorEditarPublicacionDialog controladorEditarPublicacionDialog) {
-        this.controladorEditarPublicacionDialog = controladorEditarPublicacionDialog;
     }
 
     /**
@@ -293,17 +250,8 @@ public class Controlador {
      *
      * @return controlador de eliminación de publicaciones
      */
-    public ControladorEliminarPublicacion getControladorEliminarPublicacion() {
+    public final ControladorEliminarPublicacion getControladorEliminarPublicacion() {
         return controladorEliminarPublicacion;
-    }
-
-    /**
-     * Establece el controlador encargado de eliminar publicaciones.
-     *
-     * @param controladorEliminarPublicacion controlador de eliminación
-     */
-    public void setControladorEliminarPublicacion(ControladorEliminarPublicacion controladorEliminarPublicacion) {
-        this.controladorEliminarPublicacion = controladorEliminarPublicacion;
     }
 
     /**
@@ -311,7 +259,7 @@ public class Controlador {
      *
      * @return controlador de nuevo ejemplar
      */
-    public ControladorNuevoEjemplarDialog getControladorNuevoEjemplarDialog() {
+    public final ControladorNuevoEjemplarDialog getControladorNuevoEjemplarDialog() {
         return controladorNuevoEjemplarDialog;
     }
 
@@ -320,35 +268,26 @@ public class Controlador {
      *
      * @return controlador de nuevo usuario
      */
-    public ControladorNuevoUsuarioDialog getControladorNuevoUsuarioDialog() {
+    public final ControladorNuevoUsuarioDialog getControladorNuevoUsuarioDialog() {
         return controladorNuevoUsuarioDialog;
     }
 
     /**
      * Obtiene el controlador de edición de usuarios
-     * 
+     *
      * @return controlador de edición de usuarios
      */
-    public ControladorEditarUsuarioDialog getControladorEditarUsuarioDialog() {
+    public final ControladorEditarUsuarioDialog getControladorEditarUsuarioDialog() {
         return controladorEditarUsuarioDialog;
     }
 
     /**
      * Obtiene el controlador de eliminación (desactivar) de usuarios
-     * 
+     *
      * @return controlador de eliminación de usuarios
      */
-    public ControladorEliminarUsuario getControladorEliminarUsuario() {
+    public final ControladorEliminarUsuario getControladorEliminarUsuario() {
         return controladorEliminarUsuario;
-    }
-
-    /**
-     * Establece el controlador encargado de crear nuevos ejemplares.
-     *
-     * @param controladorNuevoEjemplarDialog
-     */
-    public void setControladorNuevoEjemplarDialog(ControladorNuevoEjemplarDialog controladorNuevoEjemplarDialog) {
-        this.controladorNuevoEjemplarDialog = controladorNuevoEjemplarDialog;
     }
 
     /**
@@ -356,65 +295,35 @@ public class Controlador {
      *
      * @return controlador de edición de ejemplares
      */
-    public ControladorEditarEjemplarDialog getControladorEditarEjemplarDialog() {
+    public final ControladorEditarEjemplarDialog getControladorEditarEjemplarDialog() {
         return controladorEditarEjemplarDialog;
-    }
-
-    /**
-     * Establece el controlador encargado de editar ejemplares.
-     *
-     * @param controladorEditarEjemplarDialog
-     */
-    public void setControladorEditarEjemplarDialog(ControladorEditarEjemplarDialog controladorEditarEjemplarDialog) {
-        this.controladorEditarEjemplarDialog = controladorEditarEjemplarDialog;
     }
 
     /**
      * Obtiene el controlador encargado de eliminar ejemplares desde el diálogo.
      *
-     * @return controlador de eliminar ejemplar
+     * @return controlador de eliminar ejemplares
      */
-    public ControladorEliminarEjemplarDialog getControladorEliminarEjemplarDialog() {
+    public final ControladorEliminarEjemplarDialog getControladorEliminarEjemplarDialog() {
         return controladorEliminarEjemplarDialog;
-    }
-
-    /**
-     * Establece el controlador encargado de eliminar ejemplares.
-     *
-     * @param controladorEliminarEjemplarDialog
-     */
-    public void setControladorEliminarEjemplarDialog(
-            ControladorEliminarEjemplarDialog controladorEliminarEjemplarDialog) {
-        this.controladorEliminarEjemplarDialog = controladorEliminarEjemplarDialog;
     }
 
     /**
      * Obtiene el controlador encargado de la gestión de sanciones manuales
      *
-     * @return controlador de sancion manual
+     * @return controlador de gestión de sanciones manuales
      */
-    public ControladorSancionManual getControladorSancionManual() {
+    public final ControladorSancionManual getControladorSancionManual() {
         return controladorSancionManual;
     }
 
-    /**
-     * Establece el controlador encargado de la gestión de sanciones manuales
-     *
-     * @param controladorSancionManual
-     */
-    public void setControladorSancionManual(ControladorSancionManual controladorSancionManual) {
-        this.controladorSancionManual = controladorSancionManual;
-    }
     /**
      * Constructor que acepta una conexión (DBConnection) y la pasa a los
      * controladores que la requieren.
      *
      * @param dbConnection implementación de DBConnection (no puede ser null)
      */
-    public Controlador(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public Controlador(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
         this.controladorInicioSesion = new ControladorInicioSesion(dbConnection);
         this.controladorRecuperarCuenta = new ControladorRecuperarCuenta(dbConnection);
@@ -438,7 +347,6 @@ public class Controlador {
     }
 
     // Metodos del controlador
-
 
     /**
      * Inicia la aplicación

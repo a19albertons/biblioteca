@@ -2,7 +2,10 @@ package com.biblioteca.controlador;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
+
+import javax.annotation.Nonnull;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.AutorDAO;
@@ -10,6 +13,8 @@ import com.biblioteca.dao.CicloDAO;
 import com.biblioteca.dao.ModuloDAO;
 import com.biblioteca.dao.PublicacionDAO;
 import com.biblioteca.dao.TemaDAO;
+import com.biblioteca.utilities.PublicationTransactionHelper;
+import com.biblioteca.utilities.RelacionPublicacionHelperEnum;
 
 /**
  * Controlador responsable de la creación y persistencia de nuevas
@@ -26,16 +31,52 @@ public class ControladorNuevaPublicacionDialog {
     private final DBConnection dbConnection;
 
     /**
+     * Ayudante para transacciones de publicaciones
+     */
+    private final PublicationTransactionHelper transactionHelper;
+
+    /**
+     * Método para procesar autores en la creación de publicaciones.
+     *
+     * @param conexion       conexión a la base de datos
+     * @param publicacionDAO DAO para operaciones de publicación
+     * @param autorDAO       DAO para operaciones de autores
+     * @param autoresCsv     CSV de autores
+     * @param idPub          id de la publicación
+     * @return true si se procesaron correctamente, false si hay error
+     */
+    private boolean procesarAutores(final Connection conexion, final PublicacionDAO publicacionDAO,
+            final AutorDAO autorDAO, final String autoresCsv, final int idPub) {
+        if (autoresCsv == null || autoresCsv.trim().isEmpty()) {
+            return true;
+        }
+
+        String[] autores = autoresCsv.split(",");
+        for (String a : autores) {
+            String nombre = a.trim();
+            if (nombre.isEmpty()) {
+                continue;
+            }
+            int idAutor = autorDAO.obtenerOCrearPorNombre(nombre);
+            if (idAutor == -1) {
+                return false;
+            }
+            if (!publicacionDAO.insertarLibroAutor(idPub, idAutor)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
      * 
-     * @param dbConnection
+     * @param dbConnection DBConnection para conexiones a la base de datos
      */
-    public ControladorNuevaPublicacionDialog(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorNuevaPublicacionDialog(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
+        this.transactionHelper = new PublicationTransactionHelper();
     }
 
     /**
@@ -55,8 +96,10 @@ public class ControladorNuevaPublicacionDialog {
      * @param autoresCsv  lista de autores separados por comas
      * @return true si la creación fue satisfactoria y commit realizado
      */
-    public boolean crearPublicacionLibro(String isbn, String titulo, String idioma, String temasCsv, String modulosCsv,
-            String ciclosCsv, String editorial, int numEdicion, LocalDate fechaPublic, String autoresCsv) {
+    public boolean crearPublicacionLibro(final String isbn, final String titulo, final String idioma,
+            final String temasCsv, final String modulosCsv,
+            final String ciclosCsv, final String editorial, final int numEdicion, final LocalDate fechaPublic,
+            final String autoresCsv) {
 
         // Generar conexión a la base de datos
         try (Connection conexion = this.dbConnection.getConnection();) {
@@ -66,12 +109,14 @@ public class ControladorNuevaPublicacionDialog {
                 return false;
             }
 
+            // CPD-OFF
             // Creación de DAOs para gestionar una transacción completa
             PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
             AutorDAO autorDAO = new AutorDAO(conexion);
             ModuloDAO moduloDAO = new ModuloDAO(conexion);
             TemaDAO temaDAO = new TemaDAO(conexion);
             CicloDAO cicloDAO = new CicloDAO(conexion);
+            // CPD-ON
 
             try {
                 conexion.setAutoCommit(false);
@@ -90,88 +135,29 @@ public class ControladorNuevaPublicacionDialog {
                 }
 
                 // Procesar autores
-                if (autoresCsv != null && !autoresCsv.trim().isEmpty()) {
-                    String[] autores = autoresCsv.split(",");
-                    for (String a : autores) {
-                        String nombre = a.trim();
-                        if (nombre.isEmpty())
-                            continue;
-                        int idAutor = autorDAO.obtenerOCrearPorNombre(nombre);
-                        if (idAutor == -1) {
-                            conexion.rollback();
-                            return false;
-                        }
-                        if (!publicacionDAO.insertarLibroAutor(idPub, idAutor)) {
-                            conexion.rollback();
-                            return false;
-                        }
-                    }
+                if (!procesarAutores(conexion, publicacionDAO, autorDAO, autoresCsv, idPub)) {
+                    return false;
                 }
 
-                // Procesar modulos
-                if (modulosCsv != null && !modulosCsv.trim().isEmpty()) {
-                    String[] modulos = modulosCsv.split(",");
-                    for (String m : modulos) {
-                        String nombre = m.trim();
-                        if (nombre.isEmpty())
-                            continue;
-                        int idModulo = moduloDAO.obtenerOCrear(nombre);
-                        if (idModulo == -1) {
-                            conexion.rollback();
-                            return false;
-                        }
-                        if (!publicacionDAO.insertarPublicacionModulo(idPub, idModulo)) {
-                            conexion.rollback();
-                            return false;
-                        }
-                    }
+                // Procesar modulos, ciclos y temas usando helper
+                if (!transactionHelper.procesarRelaciones(conexion, publicacionDAO, moduloDAO, modulosCsv, idPub, RelacionPublicacionHelperEnum.MODULO)) {
+                    return false;
+                }
+                if (!transactionHelper.procesarRelaciones(conexion, publicacionDAO, cicloDAO, ciclosCsv, idPub, RelacionPublicacionHelperEnum.CICLO)) {
+                    return false;
+                }
+                if (!transactionHelper.procesarRelaciones(conexion, publicacionDAO, temaDAO, temasCsv, idPub, RelacionPublicacionHelperEnum.TEMA)) {
+                    return false;
                 }
 
-                // Procesar ciclos
-                if (ciclosCsv != null && !ciclosCsv.trim().isEmpty()) {
-                    String[] ciclos = ciclosCsv.split(",");
-                    for (String cc : ciclos) {
-                        String nombre = cc.trim();
-                        if (nombre.isEmpty())
-                            continue;
-                        int idCiclo = cicloDAO.obtenerOCrear(nombre);
-                        if (idCiclo == -1) {
-                            conexion.rollback();
-                            return false;
-                        }
-                        if (!publicacionDAO.insertarPublicacionCiclo(idPub, idCiclo)) {
-                            conexion.rollback();
-                            return false;
-                        }
-                    }
-                }
-
-                // Procesar temas
-                if (temasCsv != null && !temasCsv.trim().isEmpty()) {
-                    String[] temas = temasCsv.split(",");
-                    for (String t : temas) {
-                        String nombre = t.trim();
-                        if (nombre.isEmpty())
-                            continue;
-                        int idTema = temaDAO.obtenerOCrear(conexion, nombre);
-                        if (idTema == -1) {
-                            conexion.rollback();
-                            return false;
-                        }
-                        if (!publicacionDAO.insertarPublicacionTema(idPub, idTema)) {
-                            conexion.rollback();
-                            return false;
-                        }
-                    }
-                }
-
+                // CPD-OFF
                 // Si hemos llegado hasta aquí, confirmar
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 try {
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -180,16 +166,15 @@ public class ControladorNuevaPublicacionDialog {
             } finally {
                 try {
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error habilitando el modo autocommit de la base de datos: " + ex.getMessage());
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return false;
         }
-
+        // CPD-ON
     }
 
     /**
@@ -206,8 +191,9 @@ public class ControladorNuevaPublicacionDialog {
      * @param periodicidad texto de periodicidad
      * @return true si la creación fue satisfactoria y commit realizado
      */
-    public boolean crearPublicacionRevista(String isbn, String titulo, String idioma, String temasCsv,
-            String modulosCsv, String ciclosCsv, String editorial, String periodicidad) {
+    public boolean crearPublicacionRevista(final String isbn, final String titulo, final String idioma,
+            final String temasCsv,
+            final String modulosCsv, final String ciclosCsv, final String editorial, final String periodicidad) {
         try (Connection conexion = this.dbConnection.getConnection();) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -235,69 +221,23 @@ public class ControladorNuevaPublicacionDialog {
                     return false;
                 }
 
-                // Procesar modulos
-                if (modulosCsv != null && !modulosCsv.trim().isEmpty()) {
-                    String[] modulos = modulosCsv.split(",");
-                    for (String m : modulos) {
-                        String nombre = m.trim();
-                        if (nombre.isEmpty())
-                            continue;
-                        int idModulo = moduloDAO.obtenerOCrear(nombre);
-                        if (idModulo == -1) {
-                            conexion.rollback();
-                            return false;
-                        }
-                        if (!publicacionDAO.insertarPublicacionModulo(idPub, idModulo)) {
-                            conexion.rollback();
-                            return false;
-                        }
-                    }
+                // Procesar modulos, ciclos y temas usando helper
+                if (!transactionHelper.procesarRelaciones(conexion, publicacionDAO, moduloDAO, modulosCsv, idPub, RelacionPublicacionHelperEnum.MODULO)) {
+                    return false;
                 }
-
-                // Procesar ciclos
-                if (ciclosCsv != null && !ciclosCsv.trim().isEmpty()) {
-                    String[] ciclos = ciclosCsv.split(",");
-                    for (String cc : ciclos) {
-                        String nombre = cc.trim();
-                        if (nombre.isEmpty())
-                            continue;
-                        int idCiclo = cicloDAO.obtenerOCrear(nombre);
-                        if (idCiclo == -1) {
-                            conexion.rollback();
-                            return false;
-                        }
-                        if (!publicacionDAO.insertarPublicacionCiclo(idPub, idCiclo)) {
-                            conexion.rollback();
-                            return false;
-                        }
-                    }
+                if (!transactionHelper.procesarRelaciones(conexion, publicacionDAO, cicloDAO, ciclosCsv, idPub, RelacionPublicacionHelperEnum.CICLO)) {
+                    return false;
                 }
-
-                // Procesar temas
-                if (temasCsv != null && !temasCsv.trim().isEmpty()) {
-                    String[] temas = temasCsv.split(",");
-                    for (String t : temas) {
-                        String nombre = t.trim();
-                        if (nombre.isEmpty())
-                            continue;
-                        int idTema = temaDAO.obtenerOCrear(conexion, nombre);
-                        if (idTema == -1) {
-                            conexion.rollback();
-                            return false;
-                        }
-                        if (!publicacionDAO.insertarPublicacionTema(idPub, idTema)) {
-                            conexion.rollback();
-                            return false;
-                        }
-                    }
+                if (!transactionHelper.procesarRelaciones(conexion, publicacionDAO, temaDAO, temasCsv, idPub, RelacionPublicacionHelperEnum.TEMA)) {
+                    return false;
                 }
-
+                // CPD-OFF
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 try {
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -306,16 +246,15 @@ public class ControladorNuevaPublicacionDialog {
             } finally {
                 try {
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error habilitando el modo autocommit de la base de datos: " + ex.getMessage());
                 }
             }
-        }
-        catch (Exception e1) {
+        } catch (SQLException e1) {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
+        // CPD-ON
     }
 
 }

@@ -1,10 +1,25 @@
 package com.biblioteca.modelo;
 
 public enum TipoUsuario {
+    /**
+     * Tipo de usuario Estudiante
+     */
     E("Estudiante"), // Estudiante
+    /**
+     * Tipo de usuario Profesor
+     */
     P("Profesor"), // Profesor
+    /**
+     * Tipo de usuario Administrativo
+     */
     A("Administrativo"), // Administrativo
+    /**
+     * Tipo de usuario Conserje
+     */
     C("Conserje"), // Conserje
+    /**
+     * Tipo de usuario Limpiador
+     */
     L("Limpiador"); // Limpiador
 
     /**
@@ -15,16 +30,16 @@ public enum TipoUsuario {
     /**
      * Constructor del tipo de usuario
      * 
-     * @param descripcion
+     * @param descripcion descripción del tipo de usuario
      */
-    private TipoUsuario(String descripcion) {
+    TipoUsuario(final String descripcion) {
         this.descripcion = descripcion;
     }
 
     /**
      * Obtiene la descripción del tipo de usuario
      * 
-     * @return
+     * @return la descripción del tipo de usuario
      */
     public String getDescripcion() {
         return descripcion;

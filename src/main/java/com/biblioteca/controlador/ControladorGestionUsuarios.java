@@ -1,6 +1,10 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.annotation.Nonnull;
+import javax.swing.table.DefaultTableModel;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
@@ -18,12 +22,9 @@ public class ControladorGestionUsuarios {
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
      * 
-     * @param dbConnection
+     * @param dbConnection la conexión a la base de datos
      */
-    public ControladorGestionUsuarios(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorGestionUsuarios(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
@@ -40,7 +41,7 @@ public class ControladorGestionUsuarios {
             }
             UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
             return usuarioDAO.listaUsuariosYEstadoSancionActiva();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }
@@ -48,8 +49,45 @@ public class ControladorGestionUsuarios {
     }
 
     /**
+     * Carga los datos de los usuarios en el modelo de tabla
+     * 
+     * @param rawData String[][] con los datos crudos de la base de datos
+     * @param modelo DefaultTableModel donde se cargarán los datos
+     * @return String[][] con los datos procesados para la vista
+     */
+    public String[][] cargarDatosEnTabla(final String[][] rawData, final DefaultTableModel modelo) {
+        if (rawData == null) {
+            return new String[0][0];
+        }
+        
+        // Limpiar modelo
+        for (int i = modelo.getRowCount() - 1; i >= 0; i--) {
+            modelo.removeRow(i);
+        }
+        
+        // Procesar datos
+        String[][] procesados = new String[rawData.length][6];
+        for (int i = 0; i < rawData.length; i++) {
+            String[] r = rawData[i];
+            String id = (r.length > 0 && r[0] != null) ? r[0] : "";
+            String dni = (r.length > 1 && r[1] != null) ? r[1] : "";
+            String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
+            String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
+            String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
+            procesados[i] = new String[] { id, dni, nombre, tipo, sancion, "" };
+        }
+        
+        // Cargar en modelo
+        for (String[] r : procesados) {
+            modelo.addRow(r);
+        }
+        
+        return procesados;
+    }
+
+    /**
      * Obtiene la lista de usuarios sancionables (estudiantes activos)
-     *
+    *
      * @return String[][] con columnas: id, dni, nombre_completo, tipo
      */
     public String[][] obtenerUsuariosSancionables() {
@@ -60,7 +98,7 @@ public class ControladorGestionUsuarios {
             }
             UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
             return usuarioDAO.obtenerUsuariosSancionables();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }

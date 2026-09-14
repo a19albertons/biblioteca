@@ -1,5 +1,10 @@
 package com.biblioteca.controlador;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
 import com.biblioteca.modelo.Usuario;
@@ -16,30 +21,27 @@ public class ControladorRecuperarCuenta {
     /**
      * Constructor con DBConnection (inyección)
      * 
-     * @param dbConnection
+     * @param dbConnection DBConnection para conexiones a la base de datos
      */
-    public ControladorRecuperarCuenta(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorRecuperarCuenta(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
     /**
      * Recupera la cuenta del usuario basado en el identificador proporcionado
      * 
-     * @param trim
-     * @return
+     * @param trim Identificador del usuario
+     * @return Usuario recuperado o null si no se encuentra
      */
-    public Usuario recuperarCuenta(String trim) {
-        try (var conexion = this.dbConnection.getConnection()) {
+    public Usuario recuperarCuenta(final String trim) {
+        try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
                 return null;
             }
             UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
             return usuarioDAO.consultaRecuperarCuenta(trim);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }

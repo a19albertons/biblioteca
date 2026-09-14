@@ -4,12 +4,16 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.dto.ObtenerPublicacionDetallesPorIdDTO;
 import com.biblioteca.modelo.TipoPublicacion;
+import com.biblioteca.utilities.RelacionPublicacionHelperEnum;
 
 /**
  * DAO para Publicacion
@@ -20,16 +24,45 @@ public class PublicacionDAO {
      */
     private final Connection conexion;
 
-    // SQL constants 🔧
+    /**
+     * Constante SQL para listar editoriales de publicaciones
+     */
     private static final String SQL_LISTA_EDITORIALES = "SELECT editorial FROM publicaciones GROUP BY editorial ORDER BY editorial ASC";
+    /**
+     * Constante SQL para insertar una nueva publicación
+     */
     private static final String SQL_INSERT_PUBLICACION = "INSERT INTO publicaciones (titulo, editorial, codigo_isbn, idioma, tipo) VALUES (?, ?, ?, ?, ?)";
+    /**
+     * Constante SQL para insertar un libro
+     */
     private static final String SQL_INSERT_LIBRO = "INSERT INTO libros (id_publicacion, num_edicion, fecha_publicacion) VALUES (?, ?, ?)";
+    /**
+     * Constante SQL para insertar una revista
+     */
     private static final String SQL_INSERT_REVISTA = "INSERT INTO revistas (id_publicacion, periodicidad, num_revista) VALUES (?, ?, ?)";
+    /**
+     * Constante SQL para insertar una relación entre publicación y módulo
+     */
     private static final String SQL_INSERT_PUBLICACION_MODULO = "INSERT INTO publicacion_modulo (id_publicacion, id_modulo) VALUES (?, ?)";
+    /**
+     * Constante SQL para insertar una relación entre publicación y ciclo
+     */
     private static final String SQL_INSERT_PUBLICACION_CICLO = "INSERT INTO publicacion_ciclo (id_publicacion, id_ciclo) VALUES (?, ?)";
+    /**
+     * Constante SQL para insertar una relación entre publicación y tema
+     */
     private static final String SQL_INSERT_PUBLICACION_TEMA = "INSERT INTO publicacion_tema (id_publicacion, id_tema) VALUES (?, ?)";
+    /**
+     * Constante SQL para insertar una relación entre libro y autor
+     */
     private static final String SQL_INSERT_LIBRO_AUTOR = "INSERT INTO libros_autores (id_libro, id_autor) VALUES (?, ?)";
+    /**
+     * Constante SQL para obtener el máximo número de revista
+     */
     private static final String SQL_SELECT_MAX_NUM_REVISTA = "SELECT COALESCE(MAX(num_revista),0) AS m FROM revistas";
+    /**
+     * Constante SQL para obtener un resumen de publicaciones activas
+     */
     private static final String SQL_LISTA_PUBLICACIONES_RESUMEN = "SELECT p.id, p.titulo, p.codigo_isbn, "
             + "COALESCE(GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', '),'') AS autores, "
             + "COALESCE(GROUP_CONCAT(DISTINCT ci.nombre SEPARATOR ', '),'') AS ciclos, "
@@ -43,6 +76,9 @@ public class PublicacionDAO {
             + "WHERE p.estado = TRUE "
             + "GROUP BY p.id "
             + "ORDER BY p.titulo ASC";
+    /**
+     * Constante SQL para obtener un resumen de una publicación por id
+     */
     private static final String SQL_OBTENER_PUBLICACION_RESUMEN_POR_ID = "SELECT p.id, p.titulo, p.codigo_isbn, "
             + "COALESCE(GROUP_CONCAT(DISTINCT a.nombre SEPARATOR ', '),'') AS autores, "
             + "COALESCE(GROUP_CONCAT(DISTINCT ci.nombre SEPARATOR ', '),'') AS ciclos, "
@@ -56,6 +92,9 @@ public class PublicacionDAO {
             + "WHERE p.estado = TRUE AND p.id = ? "
             + "GROUP BY p.id "
             + "ORDER BY p.titulo ASC";
+    /**
+     * Constante SQL para obtener los detalles de una publicación por id
+     */
     private static final String SQL_PUBLICACION_DETALLES_POR_ID = "SELECT p.id, p.titulo, p.codigo_isbn, p.idioma, p.tipo, "
             + "COALESCE(GROUP_CONCAT(DISTINCT t.nombre SEPARATOR ', '),'') AS temas, "
             + "COALESCE(GROUP_CONCAT(DISTINCT m.nombre SEPARATOR ', '),'') AS modulos, "
@@ -77,34 +116,60 @@ public class PublicacionDAO {
             + "LEFT JOIN ciclos c ON pc.id_ciclo = c.id "
             + "WHERE p.id = ? "
             + "GROUP BY p.id";
+    /**
+     * Constante SQL para actualizar publicaciones
+     */
     private static final String SQL_UPDATE_PUBLICACION = "UPDATE publicaciones SET titulo = ?, editorial = ?, codigo_isbn = ?, idioma = ?, tipo = ? WHERE id = ?";
+    /**
+     * Constante SQL para actualizar libros
+     */
     private static final String SQL_UPDATE_LIBROS = "UPDATE libros SET num_edicion = ?, fecha_publicacion = ? WHERE id_publicacion = ?";
+    /**
+     * Constante SQL para actualizar revistas
+     */
     private static final String SQL_UPDATE_REVISTAS = "UPDATE revistas SET periodicidad = ? WHERE id_publicacion = ?";
+    /**
+     * Constante SQL para eliminar relaciones publicación-módulo
+     */
     private static final String SQL_DELETE_PUBLICACION_MODULO = "DELETE FROM publicacion_modulo WHERE id_publicacion = ?";
+    /**
+     * Constante SQL para eliminar relaciones publicación-ciclo
+     */
     private static final String SQL_DELETE_PUBLICACION_CICLO = "DELETE FROM publicacion_ciclo WHERE id_publicacion = ?";
+    /**
+     * Constante SQL para eliminar relaciones publicación-tema
+     */
     private static final String SQL_DELETE_PUBLICACION_TEMA = "DELETE FROM publicacion_tema WHERE id_publicacion = ?";
+    /**
+     * Constante SQL para eliminar relaciones libro-autor
+     */
     private static final String SQL_DELETE_LIBROS_AUTORES = "DELETE FROM libros_autores WHERE id_libro = ?";
+    /**
+     * Constante SQL para comprobar préstamos activos
+     */
     private static final String SQL_TIENEPRESTAMOS_ACTIVOS = "SELECT COUNT(*) AS cnt FROM prestamos p JOIN ejemplares e ON p.id_ejemplar = e.id WHERE e.id_publicacion = ? AND p.estado = TRUE";
+    /**
+     * Constante SQL para marcar ejemplares como inactivos
+     */
     private static final String SQL_BAJA_EJEMPLARES = "UPDATE ejemplares SET estado = FALSE WHERE id_publicacion = ?";
+    /**
+     * Constante SQL para marcar una publicación como inactiva
+     */
     private static final String SQL_BAJA_PUBLICACION = "UPDATE publicaciones SET estado = FALSE WHERE id = ?";
 
     /**
      * Constructor del DAO
      * 
-     * @param conexion
+     * @param conexion connection to the database
      */
-    public PublicacionDAO(Connection conexion) {
-
-        if (conexion == null) {
-            throw new IllegalArgumentException("conexion cannot be null");
-        }
+    public PublicacionDAO(@Nonnull final Connection conexion) {
         this.conexion = conexion;
     }
 
     /**
      * Obtiene las editoriales de las publicaciones
      * 
-     * @return
+     * @return array of editorial names
      */
     public String[] listaEditoriales() {
         // Listado de editoriales
@@ -118,7 +183,7 @@ public class PublicacionDAO {
                     devolver.add(rs.getString("editorial"));
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             devolver = new ArrayList<>();
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -130,14 +195,15 @@ public class PublicacionDAO {
     /**
      * Inserta una nueva publicación y devuelve su id generado.
      *
-     * @param titulo
-     * @param editorial
-     * @param codigoIsbn
-     * @param idioma
-     * @param tipo       'L' o 'R'
+     * @param titulo     título de la publicación
+     * @param editorial  editorial de la publicación
+     * @param codigoIsbn código ISBN de la publicación
+     * @param idioma     idioma de la publicación
+     * @param tipo       tipo de publicación ('L' o 'R')
      * @return id generado o -1 en caso de error
      */
-    public int insertarPublicacion(String titulo, String editorial, String codigoIsbn, String idioma, char tipo) {
+    public int insertarPublicacion(final String titulo, final String editorial, final String codigoIsbn,
+            final String idioma, final char tipo) {
         try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION,
                         Statement.RETURN_GENERATED_KEYS)) {
@@ -155,7 +221,7 @@ public class PublicacionDAO {
                     return rs.getInt(1);
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -166,12 +232,12 @@ public class PublicacionDAO {
     /**
      * Inserta los datos de libros (tabla libros)
      *
-     * @param idPublicacion
-     * @param numEdicion
+     * @param idPublicacion    id de la publicación
+     * @param numEdicion       número de edición
      * @param fechaPublicacion fecha SQL (java.sql.Date)
      * @return true si ok
      */
-    public boolean insertarLibro(int idPublicacion, int numEdicion, Date fechaPublicacion) {
+    public boolean insertarLibro(final int idPublicacion, final int numEdicion, final Date fechaPublicacion) {
         try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_LIBRO)) {
             // establecer parámetros
@@ -181,7 +247,7 @@ public class PublicacionDAO {
             // ejecutar
             ps.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -192,12 +258,12 @@ public class PublicacionDAO {
     /**
      * Inserta los datos de revistas (tabla revistas)
      *
-     * @param idPublicacion
-     * @param periodicidad
-     * @param numRevista
+     * @param idPublicacion id de la publicación
+     * @param periodicidad  periodicidad de la revista
+     * @param numRevista    número de revista
      * @return true si ok
      */
-    public boolean insertarRevista(int idPublicacion, String periodicidad, int numRevista) {
+    public boolean insertarRevista(final int idPublicacion, final String periodicidad, final int numRevista) {
         try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_REVISTA)) {
             // establecer parámetros
@@ -207,7 +273,7 @@ public class PublicacionDAO {
             // ejecutar
             ps.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -217,8 +283,12 @@ public class PublicacionDAO {
 
     /**
      * Inserta relación publicacion <-> modulo
+     *
+     * @param idPublicacion id de la publicación
+     * @param idModulo      id del módulo
+     * @return true si ok
      */
-    public boolean insertarPublicacionModulo(int idPublicacion, int idModulo) {
+    public boolean insertarPublicacionModulo(final int idPublicacion, final int idModulo) {
         try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_MODULO)) {
             // establecer parámetros
@@ -227,7 +297,7 @@ public class PublicacionDAO {
             // ejecutar
             ps.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -237,8 +307,12 @@ public class PublicacionDAO {
 
     /**
      * Inserta relación publicacion <-> ciclo
+     *
+     * @param idPublicacion id de la publicación
+     * @param idCiclo       id del ciclo
+     * @return true si ok
      */
-    public boolean insertarPublicacionCiclo(int idPublicacion, int idCiclo) {
+    public boolean insertarPublicacionCiclo(final int idPublicacion, final int idCiclo) {
         try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_CICLO)) {
             // establecer parámetros
@@ -247,7 +321,7 @@ public class PublicacionDAO {
             // ejecutar
             ps.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -257,8 +331,12 @@ public class PublicacionDAO {
 
     /**
      * Inserta relación publicacion <-> tema
+     *
+     * @param idPublicacion id de la publicación
+     * @param idTema        id del tema
+     * @return true si ok
      */
-    public boolean insertarPublicacionTema(int idPublicacion, int idTema) {
+    public boolean insertarPublicacionTema(final int idPublicacion, final int idTema) {
         try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_PUBLICACION_TEMA)) {
             // establecer parámetros
@@ -267,7 +345,7 @@ public class PublicacionDAO {
             // ejecutar
             ps.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -276,9 +354,36 @@ public class PublicacionDAO {
     }
 
     /**
-     * Inserta relación libro <-> autor
+     * Inserta relación publicacion <-> relación (modulos, ciclos, temas).
+     * Método genérico para evitar duplicación de código.
+     *
+     * @param idPublicacion id de la publicación
+     * @param idRelacion    id de la relación
+     * @param tipoRelacion  tipo de relación: 'M' para modulos, 'C' para ciclos, 'T' para temas
+     * @return true si ok
      */
-    public boolean insertarLibroAutor(int idLibro, int idAutor) {
+    public boolean insertarPublicacionRelacion(final int idPublicacion, final int idRelacion, final RelacionPublicacionHelperEnum tipoRelacion) {
+        switch (tipoRelacion) {
+            case MODULO:
+                return insertarPublicacionModulo(idPublicacion, idRelacion);
+            case CICLO:
+                return insertarPublicacionCiclo(idPublicacion, idRelacion);
+            case TEMA:
+                return insertarPublicacionTema(idPublicacion, idRelacion);
+            default:
+                System.out.println("Tipo de relación no válido: " + tipoRelacion);
+                return false;
+        }
+    }
+
+    /**
+     * Inserta relación libro <-> autor
+     *
+     * @param idLibro id del libro
+     * @param idAutor id del autor
+     * @return true si ok
+     */
+    public boolean insertarLibroAutor(final int idLibro, final int idAutor) {
         try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_LIBRO_AUTOR)) {
             // establecer parámetros
@@ -287,7 +392,7 @@ public class PublicacionDAO {
             // ejecutar
             ps.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -297,7 +402,7 @@ public class PublicacionDAO {
 
     /**
      * Devuelve el siguiente número de revista disponible (max(num_revista)+1)
-     * 
+     *
      * @return siguiente num_revista (>=1) o 1 en caso de error
      */
     public int siguienteNumRevista() {
@@ -309,7 +414,7 @@ public class PublicacionDAO {
                     return rs.getInt("m") + 1;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -321,7 +426,7 @@ public class PublicacionDAO {
      * Devuelve un resumen de las publicaciones activas con los campos solicitados:
      * Título, ISBN, Autor(es), Ciclos, Editorial, Disponibles, id
      *
-     * @return Matriz String[][] con columnas en este orden: titulo, isbn, autores,
+     * @return matriz String[][] con columnas en este orden: titulo, isbn, autores,
      *         ciclos, editorial, disponibles, id
      */
     public String[][] listaPublicacionesResumen() {
@@ -342,12 +447,15 @@ public class PublicacionDAO {
                     String editorial = rs.getString("editorial");
                     String disponibles = String.valueOf(rs.getInt("disponibles"));
 
-                    if (autores == null)
+                    if (autores == null) {
                         autores = "";
-                    if (ciclos == null)
+                    }
+                    if (ciclos == null) {
                         ciclos = "";
-                    if (editorial == null)
+                    }
+                    if (editorial == null) {
                         editorial = "";
+                    }
 
                     String[] fila = new String[7];
                     fila[0] = titulo;
@@ -360,7 +468,7 @@ public class PublicacionDAO {
                     lista.add(fila);
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             lista = new ArrayList<>();
             System.out.println(e.getMessage());
@@ -370,15 +478,14 @@ public class PublicacionDAO {
     }
 
     /**
-     * Obtiene el resumen de una publicacion (mismo formato que
-     * listaPublicacionesResumen)
-     * por su id
+     * Obtiene el resumen de una publicación (mismo formato que
+     * listaPublicacionesResumen) por su id
      *
-     * @param id
+     * @param id id de la publicación
      * @return String[] con columnas:
      *         titulo,isbn,autores,ciclos,editorial,disponibles,id
      */
-    public String[] obtenerResumenPublicacionPorId(int id) {
+    public String[] obtenerResumenPublicacionPorId(final int id) {
         final String sql = SQL_OBTENER_PUBLICACION_RESUMEN_POR_ID;
 
         try (
@@ -396,17 +503,20 @@ public class PublicacionDAO {
                     String editorial = rs.getString("editorial");
                     String disponibles = String.valueOf(rs.getInt("disponibles"));
 
-                    if (autores == null)
+                    if (autores == null) {
                         autores = "";
-                    if (ciclos == null)
+                    }
+                    if (ciclos == null) {
                         ciclos = "";
-                    if (editorial == null)
+                    }
+                    if (editorial == null) {
                         editorial = "";
+                    }
 
                     return new String[] { titulo, isbn, autores, ciclos, editorial, disponibles, String.valueOf(id) };
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -423,7 +533,7 @@ public class PublicacionDAO {
      *         fecha_publicacion (YYYY-MM-DD), autoresCSV, periodicidad, id
      *         (o null si no existe la publicación)
      */
-    public ObtenerPublicacionDetallesPorIdDTO obtenerPublicacionDetallesPorId(int id) {
+    public ObtenerPublicacionDetallesPorIdDTO obtenerPublicacionDetallesPorId(final int id) {
         final String sql = SQL_PUBLICACION_DETALLES_POR_ID;
 
         try (
@@ -451,24 +561,22 @@ public class PublicacionDAO {
                     // devolver arreglo con valores (evitar nulls)
                     return new ObtenerPublicacionDetallesPorIdDTO(
                             TipoPublicacion.valueOf(tipo),
-                            titulo == null ? "" : titulo, 
-                            isbn == null ? "" : isbn, 
+                            titulo == null ? "" : titulo,
+                            isbn == null ? "" : isbn,
                             idioma == null ? "" : idioma,
-                            temas == null ? "" : temas, 
+                            temas == null ? "" : temas,
                             modulos == null ? "" : modulos,
-                            ciclos == null ? "" : ciclos, 
+                            ciclos == null ? "" : ciclos,
                             editorial == null ? "" : editorial,
-                            numEd == null ? "" : numEd, 
+                            numEd == null ? "" : numEd,
                             fechaPub == null ? "" : fechaPub,
-                            autores == null ? "" : autores, 
+                            autores == null ? "" : autores,
                             periodicidad == null ? "" : periodicidad,
                             id,
-                            estado
-
-                    );
+                            estado);
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -488,8 +596,8 @@ public class PublicacionDAO {
      * @return true si la actualización tuvo éxito (o no hubo cambios), false en
      *         caso de error
      */
-    public boolean actualizarPublicacion(int id, String titulo, String editorial,
-            String codigoIsbn, String idioma, char tipo) {
+    public boolean actualizarPublicacion(final int id, final String titulo, final String editorial,
+            final String codigoIsbn, final String idioma, final char tipo) {
         try (PreparedStatement ps = conexion.prepareStatement(SQL_UPDATE_PUBLICACION)) {
             // establecer parámetros
             ps.setString(1, titulo);
@@ -501,7 +609,7 @@ public class PublicacionDAO {
             // ejecutar
             int updated = ps.executeUpdate();
             return updated >= 0;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -518,7 +626,7 @@ public class PublicacionDAO {
      * @return true si la actualización o inserción tuvo éxito, false en caso de
      *         error
      */
-    public boolean actualizarLibro(int idPublicacion, int numEdicion, Date fechaPublicacion) {
+    public boolean actualizarLibro(final int idPublicacion, final int numEdicion, final Date fechaPublicacion) {
         try (PreparedStatement ps = conexion.prepareStatement(SQL_UPDATE_LIBROS)) {
             // establecer parámetros
             ps.setInt(1, numEdicion);
@@ -531,7 +639,7 @@ public class PublicacionDAO {
                 return insertarLibro(idPublicacion, numEdicion, fechaPublicacion);
             }
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
             return false;
@@ -546,7 +654,7 @@ public class PublicacionDAO {
      * @return true si la actualización o inserción tuvo éxito, false en caso de
      *         error
      */
-    public boolean actualizarRevista(int idPublicacion, String periodicidad) {
+    public boolean actualizarRevista(final int idPublicacion, final String periodicidad) {
         try (PreparedStatement ps = conexion.prepareStatement(SQL_UPDATE_REVISTAS)) {
             // establecer parámetros
             ps.setString(1, periodicidad);
@@ -559,7 +667,7 @@ public class PublicacionDAO {
                 return insertarRevista(idPublicacion, periodicidad, numRev);
             }
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -575,7 +683,7 @@ public class PublicacionDAO {
      * @return true si las eliminaciones se realizaron correctamente, false en caso
      *         de error
      */
-    public boolean eliminarRelacionesPublicacion(int idPublicacion) {
+    public boolean eliminarRelacionesPublicacion(final int idPublicacion) {
         try (PreparedStatement ps1 = conexion.prepareStatement(SQL_DELETE_PUBLICACION_MODULO);
                 PreparedStatement ps2 = conexion.prepareStatement(SQL_DELETE_PUBLICACION_CICLO);
                 PreparedStatement ps3 = conexion.prepareStatement(SQL_DELETE_PUBLICACION_TEMA);
@@ -590,7 +698,7 @@ public class PublicacionDAO {
             ps4.setInt(1, idPublicacion);
             ps4.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
             return false;
@@ -602,10 +710,9 @@ public class PublicacionDAO {
      * indicada.
      *
      * @param idPublicacion id de la publicación
-     * @return true si existe al menos un préstamo activo, false en caso
-     *         contrario
+     * @return true si existe al menos un préstamo activo, false en caso contrario
      */
-    public boolean tienePrestamosActivos(int idPublicacion) {
+    public boolean tienePrestamosActivos(final int idPublicacion) {
         final String sql = SQL_TIENEPRESTAMOS_ACTIVOS;
         try (
                 PreparedStatement ps = conexion.prepareStatement(sql)) {
@@ -617,10 +724,11 @@ public class PublicacionDAO {
                     return rs.getInt("cnt") > 0;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
+            return false;
         }
         return false;
     }
@@ -632,7 +740,7 @@ public class PublicacionDAO {
      * @param idPublicacion id publicación
      * @return true si OK
      */
-    public boolean bajaPublicacion(int idPublicacion) {
+    public boolean bajaPublicacion(final int idPublicacion) {
         try (PreparedStatement ps1 = conexion.prepareStatement(SQL_BAJA_EJEMPLARES);
                 PreparedStatement ps2 = conexion.prepareStatement(SQL_BAJA_PUBLICACION)) {
             // establecer parámetros y ejecutar
@@ -641,7 +749,7 @@ public class PublicacionDAO {
             ps2.setInt(1, idPublicacion);
             ps2.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // debug
             System.out.println(e.getMessage());
             System.out.println(e.getCause());

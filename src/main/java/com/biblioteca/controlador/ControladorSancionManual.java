@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
+import javax.annotation.Nonnull;
 import javax.swing.JOptionPane;
 
 import com.biblioteca.conexiones.DBConnection;
@@ -28,16 +30,23 @@ public class ControladorSancionManual {
     /**
      * Constructor con DBConnection (inyección)
      * 
-     * @param dbConnection
+     * @param dbConnection DBConnection para conexiones a la base de datos
      */
-    public ControladorSancionManual(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorSancionManual(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
-    public String aplicarSancionManual(int idUsuario, int idEjemplar, String finSancionString, String descripcion) {
+    /**
+     * Aplica una sanción manual al usuario del ejemplar especificado.
+     * 
+     * @param idUsuario        ID del usuario seleccionado
+     * @param idEjemplar       ID del ejemplar al que se aplica la sanción
+     * @param finSancionString Fecha final de la sanción en formato YYYY-MM-DD
+     * @param descripcion      Descripción de la sanción
+     * @return null en caso de éxito, mensaje de error en caso de fallo
+     */
+    public final String aplicarSancionManual(final int idUsuario, final int idEjemplar, final String finSancionString,
+            final String descripcion) {
         // Validar usuario seleccionado
         if (idUsuario == -1) {
             JOptionPane.showMessageDialog(null, "Seleccione primero un usuario", "Error",
@@ -48,7 +57,7 @@ public class ControladorSancionManual {
         LocalDate finSancion;
         try {
             finSancion = LocalDate.parse(finSancionString);
-        } catch (Exception ex) {
+        } catch (DateTimeParseException ex) {
             return "Error: Fecha fin inválida (formato YYYY-MM-DD)";
         }
         boolean exito = false;
@@ -95,7 +104,6 @@ public class ControladorSancionManual {
                     long diasPendienteOriginal = ChronoUnit.DAYS.between(fechaActual, finSancionActiva);
                     long diasPendienteNuevaSancion = ChronoUnit.DAYS.between(fechaActual, finSancion);
                     nuevoFinSancion = fechaActual.plusDays(diasPendienteOriginal + diasPendienteNuevaSancion);
-                    finSancion = nuevoFinSancion;
                 } else {
                     nuevoFinSancion = finSancion;
                 }
@@ -122,19 +130,17 @@ public class ControladorSancionManual {
 
             } finally {
                 try {
-                    if (!exito) {
-                        conexion.rollback();
+                    if (conexion != null) {
+                        if (!exito) {
+                            conexion.rollback();
+                        }
+                        conexion.setAutoCommit(true);
                     }
-                    conexion.setAutoCommit(true);
                 } catch (SQLException e) {
                     System.out.println("Error al restaurar auto-commit: " + e.getMessage());
                 }
-
-            }
-
-        }
-        // comprobar que el usuario fue el ultimo en tener el ejemplar
-        catch (SQLException e) {
+            } // comprobar que el usuario fue el ultimo en tener el ejemplar
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return "Error: " + e.getMessage();
         }

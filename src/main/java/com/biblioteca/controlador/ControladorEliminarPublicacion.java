@@ -3,6 +3,8 @@ package com.biblioteca.controlador;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.PublicacionDAO;
 
@@ -24,10 +26,7 @@ public class ControladorEliminarPublicacion {
      * 
      * @param dbConnection
      */
-    public ControladorEliminarPublicacion(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorEliminarPublicacion(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
@@ -38,7 +37,7 @@ public class ControladorEliminarPublicacion {
      * @return true si la baja fue satisfactoria, false si hay préstamos activos o
      *         error
      */
-    public boolean eliminarPublicacion(int idPublicacion) {
+    public boolean eliminarPublicacion(final int idPublicacion) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -60,15 +59,15 @@ public class ControladorEliminarPublicacion {
                     conexion.rollback();
                     return false;
                 }
-
+                // CPD-OFF
                 // Commit de la transacción si todo fue bien
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 try {
                     // Si hay error, rollback
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -78,15 +77,14 @@ public class ControladorEliminarPublicacion {
                 try {
                     // Revierte los cambios inicales
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error habilitado el modo autocommit de la base de datos: " + ex.getMessage());
                 }
             }
         } catch (SQLException e1) {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
-
+        // CPD-ON
     }
 }

@@ -30,14 +30,14 @@ public class InicioSesion {
     /**
      * Controlador de la aplicación
      */
-    Controlador controlador;
+    private Controlador controlador;
 
     /**
      * Constructor de la clase InicioSesion
      * 
      * @param controlador
      */
-    public InicioSesion(Controlador controlador) {
+    public InicioSesion(final Controlador controlador) {
         this.controlador = controlador;
     }
 
@@ -47,6 +47,7 @@ public class InicioSesion {
      * @return JPanel con la pantalla de inicio de sesión
      */
     public JPanel pantalla() {
+        // CPD-OFF
         // Crear el panel principal
         JPanel panel = new JPanel();
         panel.setSize(800, 600);
@@ -86,6 +87,8 @@ public class InicioSesion {
         login.setLayout(null);
         tarjeta.add(login);
 
+        // CPD-ON
+
         // Campos de usuario y contraseña
         JLabel usuarioLabel = new JLabel("Usuario");
         usuarioLabel.setBounds(30, 30, 240, 20);
@@ -123,7 +126,7 @@ public class InicioSesion {
         recuperarCuenta.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         recuperarCuenta.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(final MouseEvent e) {
                 controlador.getControladorNavegacion().cambiarPantallaPadre("recuperarCuenta");
             }
         });
@@ -161,8 +164,7 @@ public class InicioSesion {
                 }
                 // Si todo es correcto, navegar a la pantalla principal
                 controlador.getControladorNavegacion().cambiarPantallaPadre("entrarSistema");
-            }
-            else {
+            } else {
                 JOptionPane.showMessageDialog(version, "Por favor, ingrese usuario y contraseña.", "Error de inicio de sesión", JOptionPane.ERROR_MESSAGE);
             }
             

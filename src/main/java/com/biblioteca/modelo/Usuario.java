@@ -2,6 +2,8 @@ package com.biblioteca.modelo;
 
 import java.time.LocalDate;
 
+import javax.annotation.Nonnull;
+
 /**
  * Modelo de datos para la tabla usuarios
  */
@@ -52,7 +54,7 @@ public class Usuario {
     /**
      * Obtiene el id del usuario
      * 
-     * @return
+     * @return el id del usuario
      */
     public int getId() {
         return id;
@@ -61,16 +63,16 @@ public class Usuario {
     /**
      * Permite recuperar el id del usuario de la bd y establecerlo en el objeto
      * 
-     * @return
+     * @param id el id del usuario
      */
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
     /**
      * Obtiene el DNI del usuario
      * 
-     * @return
+     * @return el DNI del usuario
      */
     public String getDni() {
         return dni;
@@ -81,18 +83,14 @@ public class Usuario {
      * 
      * @param dni
      */
-    public void setDni(String dni) {
-        if (dni != null) {
-            this.dni = dni;
-        } else {
-            throw new IllegalArgumentException("El DNI no puede ser nulo");
-        }
+    public void setDni(final String dni) {
+        this.dni = dni;
     }
 
     /**
      * Obtiene el nombre del usuario
      * 
-     * @return
+     * @return el nombre del usuario
      */
     public String getNombre() {
         return nombre;
@@ -103,19 +101,14 @@ public class Usuario {
      * 
      * @param nombre
      */
-    public void setNombre(String nombre) {
-        if (nombre != null) {
-            this.nombre = nombre;
-            setUsuario();
-        } else {
-            throw new IllegalArgumentException("El nombre no puede ser nulo");
-        }
+    public void setNombre(final String nombre) {
+        this.nombre = nombre;
     }
 
     /**
      * Obtiene el primer apellido del usuario
      * 
-     * @return
+     * @return el primer apellido del usuario
      */
     public String getApellido1() {
         return apellido1;
@@ -126,19 +119,14 @@ public class Usuario {
      * 
      * @param apellido1
      */
-    public void setApellido1(String apellido1) {
-        if (apellido1 != null && !apellido1.isEmpty()) {
-            this.apellido1 = apellido1;
-            setUsuario();
-        } else {
-            throw new IllegalArgumentException("El primer apellido no puede ser nulo o vacío");
-        }
+    public void setApellido1(final String apellido1) {
+        this.apellido1 = apellido1;
     }
 
     /**
      * Obtiene el segundo apellido del usuario
      * 
-     * @return
+     * @return el segundo apellido del usuario
      */
     public String getApellido2() {
         return apellido2;
@@ -149,7 +137,7 @@ public class Usuario {
      * 
      * @param apellido2
      */
-    public void setApellido2(String apellido2) {
+    public void setApellido2(final String apellido2) {
         this.apellido2 = apellido2;
         setUsuario();
     }
@@ -157,7 +145,7 @@ public class Usuario {
     /**
      * Genera el nombre de usuario según los calculos de año, nombre y apellidos
      * 
-     * @return
+     * @return el nombre de usuario
      */
     public String getUsuario() {
         return usuario;
@@ -166,7 +154,7 @@ public class Usuario {
     /**
      * Obtiene el email del usuario
      * 
-     * @return
+     * @return el email del usuario
      */
     public String getEmail() {
         return email;
@@ -177,27 +165,34 @@ public class Usuario {
      * 
      * @param email
      */
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
     /**
-     * Calcula el nombre de usuario: 'A' + YY + nombre + inicial apellido1 + inicial apellido2
+     * Calcula el nombre de usuario: 'A' + YY + nombre + inicial apellido1 + inicial
+     * apellido2
      */
     private void setUsuario() {
         String yearSuffix = String.format("%02d", LocalDate.now().getYear() % 100);
         StringBuilder sb = new StringBuilder();
         sb.append('A').append(yearSuffix);
-        if (nombre != null) sb.append(nombre);
-        if (apellido1 != null && !apellido1.isEmpty()) sb.append(apellido1.charAt(0));
-        if (apellido2 != null && !apellido2.isEmpty()) sb.append(apellido2.charAt(0));
+        if (nombre != null) {
+            sb.append(nombre);
+        }
+        if (!apellido1.isEmpty()) {
+            sb.append(apellido1.charAt(0));
+        }
+        if (apellido2 != null && !apellido2.isEmpty()) {
+            sb.append(apellido2.charAt(0));
+        }
         this.usuario = sb.toString();
     }
 
     /**
      * Obtiene la contraseña del usuario
      * 
-     * @return
+     * @return la contraseña del usuario
      */
     public String getContrasena() {
         return contrasena;
@@ -208,18 +203,14 @@ public class Usuario {
      * 
      * @param contrasena
      */
-    public void setContrasena(String contrasena) {
-        if (contrasena != null) {
-            this.contrasena = contrasena;
-        } else {
-            throw new IllegalArgumentException("La contraseña no puede ser nula");
-        }
+    public void setContrasena(final String contrasena) {
+        this.contrasena = contrasena;
     }
 
     /**
      * Obtiene el tipo de usuario
      * 
-     * @return
+     * @return el tipo de usuario
      */
     public TipoUsuario getTipo() {
         return tipo;
@@ -230,14 +221,14 @@ public class Usuario {
      * 
      * @param tipo
      */
-    public void setTipo(TipoUsuario tipo) {
+    public void setTipo(final TipoUsuario tipo) {
         this.tipo = tipo;
     }
 
     /**
      * Obtiene el estado del usuario
      * 
-     * @return
+     * @return el estado del usuario
      */
     public boolean getEstado() {
         return estado;
@@ -248,23 +239,26 @@ public class Usuario {
      * 
      * @param estado
      */
-    public void setEstado(boolean estado) {
+    public void setEstado(final boolean estado) {
         this.estado = estado;
     }
 
     /**
      * Crear nuevo objeto Usuarios
      * 
-     * @param dni
-     * @param nombre
-     * @param apellido1
-     * @param apellido2
-     * @param contrasena
-     * @param tipo
-     * @param estado
+     * @param dni        el DNI del usuario
+     * @param nombre     el nombre del usuario
+     * @param apellido1  el primer apellido del usuario
+     * @param apellido2  el segundo apellido del usuario
+     * @param email      el email del usuario
+     * @param contrasena la contraseña del usuario
+     * @param tipo       el tipo de usuario
+     * @param estado     el estado del usuario
      */
-    public Usuario(String dni, String nombre, String apellido1, String apellido2, String email, String contrasena,
-            TipoUsuario tipo, boolean estado) {
+    public Usuario(@Nonnull final String dni, @Nonnull final String nombre, @Nonnull final String apellido1,
+            final String apellido2,
+            final String email, @Nonnull final String contrasena,
+            final TipoUsuario tipo, final boolean estado) {
         setDni(dni);
         setNombre(nombre);
         setApellido1(apellido1);
@@ -279,18 +273,21 @@ public class Usuario {
     /**
      * Recuperar el usuario de la bd
      * 
-     * @param id
-     * @param dni
-     * @param nombre
-     * @param apellido1
-     * @param apellido2
-     * @param usuario
-     * @param contrasena
-     * @param tipo
-     * @param estado
+     * @param id         el id del usuario
+     * @param dni        el DNI del usuario
+     * @param nombre     el nombre del usuario
+     * @param apellido1  el primer apellido del usuario
+     * @param apellido2  el segundo apellido del usuario
+     * @param usuario    el nombre de usuario
+     * @param email      el email del usuario
+     * @param contrasena la contraseña del usuario
+     * @param tipo       el tipo de usuario
+     * @param estado     el estado del usuario
      */
-    public Usuario(int id, String dni, String nombre, String apellido1, String apellido2, String usuario, String email,
-            String contrasena, TipoUsuario tipo, boolean estado) {
+    public Usuario(final int id, @Nonnull final String dni, @Nonnull final String nombre,
+            @Nonnull final String apellido1, final String apellido2,
+            final String usuario, final String email,
+            @Nonnull final String contrasena, final TipoUsuario tipo, final boolean estado) {
         this.id = id;
         this.dni = dni;
         this.nombre = nombre;

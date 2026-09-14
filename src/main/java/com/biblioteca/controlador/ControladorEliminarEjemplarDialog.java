@@ -3,6 +3,8 @@ package com.biblioteca.controlador;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.EjemplarDAO;
 
@@ -21,23 +23,20 @@ public class ControladorEliminarEjemplarDialog {
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
      * 
-     * @param dbConnection
+     * @param dbConnection conexión a la base de datos
      */
-    public ControladorEliminarEjemplarDialog(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorEliminarEjemplarDialog(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
     /**
      * Elimina (marca como baja) un ejemplar si no tiene préstamos activos.
      *
-     * @param idEjemplar
+     * @param idEjemplar identificador del ejemplar a eliminar
      * @return true si la baja fue satisfactoria, false si hay préstamos activos o
      *         error
      */
-    public boolean eliminarEjemplar(int idEjemplar) {
+    public boolean eliminarEjemplar(final int idEjemplar) {
         // Realizar baja dentro de una transacción
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
@@ -59,13 +58,14 @@ public class ControladorEliminarEjemplarDialog {
                     conexion.rollback();
                     return false;
                 }
+                // CPD-OFF
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 // Si hay error, rollback
                 try {
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -75,15 +75,14 @@ public class ControladorEliminarEjemplarDialog {
                 try {
                     // Restaurar auto-commit y cerrar conexión
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error al restaurar auto-commit: " + ex.getMessage());
                 }
             }
         } catch (SQLException e1) {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
-
+        // CPD-ON
     }
 }

@@ -1,5 +1,7 @@
 package com.biblioteca.modelo;
 
+import javax.annotation.Nonnull;
+
 /**
  * Modelo de datos para la tabla modulo
  */
@@ -18,7 +20,7 @@ public class Modulo {
     /**
      * Obtiene el id del modulo
      * 
-     * @return
+     * @return el id del modulo
      */
     public int getId() {
         return id;
@@ -29,14 +31,14 @@ public class Modulo {
      * 
      * @param id
      */
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
     /**
      * Obtiene el nombre del modulo
      * 
-     * @return
+     * @return el nombre del modulo
      */
     public String getNombre() {
         return nombre;
@@ -47,12 +49,8 @@ public class Modulo {
      * 
      * @param nombre
      */
-    public void setNombre(String nombre) {
-        if (nombre != null) {
-            this.nombre = nombre;
-        } else {
-            throw new IllegalArgumentException("El nombre del módulo no puede ser nulo");
-        }
+    public void setNombre(final String nombre) {
+        this.nombre = nombre;
     }
 
     // Constructores
@@ -61,7 +59,7 @@ public class Modulo {
      * 
      * @param nombre
      */
-    public Modulo(String nombre) {
+    public Modulo(@Nonnull final String nombre) {
         setNombre(nombre);
     }
 
@@ -71,7 +69,7 @@ public class Modulo {
      * @param id
      * @param nombre
      */
-    public Modulo(int id, String nombre) {
+    public Modulo(final int id, @Nonnull final String nombre) {
         this.id = id;
         this.nombre = nombre;
     }

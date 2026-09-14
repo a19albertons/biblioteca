@@ -3,8 +3,11 @@ package com.biblioteca.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+
+import javax.annotation.Nonnull;
 
 /**
  * DAO para Ciclo
@@ -12,43 +15,49 @@ import java.util.ArrayList;
 public class CicloDAO {
     /**
      * Conexión a la base de datos
+     * 
+     * @param conexion la conexión a la base de datos
      */
     private final Connection conexion;
 
-    // SQL constants 🔧
+    /**
+     * SQL para listar todos los ciclos ordenados por nombre
+     */
     private static final String SQL_LISTA_CICLOS = "SELECT nombre FROM ciclos ORDER BY nombre ASC";
+    /**
+     * SQL para obtener el id de un ciclo por nombre
+     */
     private static final String SQL_SELECT_CICLO_ID_POR_NOMBRE = "SELECT id FROM ciclos WHERE nombre = ?";
+    /**
+     * SQL para insertar un nuevo ciclo
+     */
     private static final String SQL_INSERT_CICLO = "INSERT INTO ciclos (nombre) VALUES (?)";
 
     /**
      * Constructor del DAO
      * 
-     * @param conexion conexión a la base de datos (no puede ser null)
+     * @param conexion conexión a la base de datos
      */
-    public CicloDAO(Connection conexion) {
-        if (conexion == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public CicloDAO(@Nonnull final Connection conexion) {
         this.conexion = conexion;
     }
 
     /**
      * Obtiene los nombres de los ciclos
      * 
-     * @return
+     * @return lista de nombres de ciclos
      */
     public String[] listaCiclos() {
         // Listado de ciclos
         ArrayList<String> devolver = new ArrayList<>();
-        try ( // Consulta SQL
-                PreparedStatement ps = conexion.prepareStatement(SQL_LISTA_CICLOS);) {
+        try (PreparedStatement ps = conexion.prepareStatement(SQL_LISTA_CICLOS);) {
             // Ejecutar consulta
             try (ResultSet rs = ps.executeQuery();) {
                 while (rs.next()) {
                     devolver.add(rs.getString("nombre"));
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             devolver = new ArrayList<>();
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
@@ -62,9 +71,9 @@ public class CicloDAO {
      * @param nombre nombre del ciclo
      * @return id del ciclo o -1 en caso de error
      */
-    public int obtenerOCrear(String nombre) {
+    public int obtenerOCrear(final String nombre) {
         try (
-                PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_CICLO_ID_POR_NOMBRE)) {
+                PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_CICLO_ID_POR_NOMBRE);) {
             // establecer parámetro
             ps.setString(1, nombre);
             // ejecutar consulta
@@ -84,7 +93,7 @@ public class CicloDAO {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
         }

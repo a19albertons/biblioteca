@@ -1,6 +1,9 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.annotation.Nonnull;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.CicloDAO;
@@ -20,19 +23,16 @@ public class ControladorPanelControl {
     /**
      * Constructor con DBConnection (inyección)
      * 
-     * @param dbConnection
+     * @param dbConnection DBConnection para conexiones a la base de datos
      */
-    public ControladorPanelControl(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorPanelControl(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
     /**
      * Obtiene el número de préstamos realizados hoy
      * 
-     * @return
+     * @return String con el número de préstamos realizados hoy
      */
     public String obtenerPrestamosHoy() {
         try (Connection conexion = this.dbConnection.getConnection()) {
@@ -42,8 +42,7 @@ public class ControladorPanelControl {
             }
             PrestamoDAO prestamoDAO = new PrestamoDAO(conexion);
             return prestamoDAO.prestamosHoy();
-        } catch (Exception e) {
-            // En caso de error, devolver "error" y loguear el error
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return "error";
         }
@@ -53,7 +52,7 @@ public class ControladorPanelControl {
     /**
      * Obtiene el número de préstamos pendientes
      * 
-     * @return
+     * @return String con el número de préstamos pendientes
      */
     public String obtenerPrestamosPendientes() {
         try (Connection conexion = this.dbConnection.getConnection()) {
@@ -63,8 +62,7 @@ public class ControladorPanelControl {
             }
             PrestamoDAO prestamoDAO = new PrestamoDAO(conexion);
             return prestamoDAO.prestamosPendientes();
-        } catch (Exception e) {
-            // En caso de error, devolver "error" y loguear el error
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return "error";
         }
@@ -73,7 +71,7 @@ public class ControladorPanelControl {
     /**
      * Obtiene el número total de socios activos
      * 
-     * @return
+     * @return String con el número total de socios activos
      */
     public String obtenerTotalSociosActivos() {
         try (Connection conexion = this.dbConnection.getConnection()) {
@@ -83,8 +81,7 @@ public class ControladorPanelControl {
             }
             UsuarioDAO usuarioDAO = new UsuarioDAO(conexion);
             return usuarioDAO.totalSociosActivos();
-        } catch (Exception e) {
-            // En caso de error, devolver "error" y loguear el error
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return "error";
         }
@@ -94,7 +91,7 @@ public class ControladorPanelControl {
     /**
      * Obtiene los últimos movimientos de préstamos
      * 
-     * @return
+     * @return String[][] con los últimos movimientos de préstamos
      */
     public String[][] obtenerUltimosMovimientos() {
         try (Connection conexion = this.dbConnection.getConnection()) {
@@ -104,7 +101,7 @@ public class ControladorPanelControl {
             }
             PrestamoDAO prestamoDAO = new PrestamoDAO(conexion);
             return prestamoDAO.ultimosMovimientos();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return new String[0][0];
         }
@@ -113,15 +110,14 @@ public class ControladorPanelControl {
     /**
      * Obtiene la lista de ciclos
      * 
-     * @return
+     * @return String[] con la lista de ciclos
      */
     public String[] listaCiclos() {
-        String[] listaCiclos = new String[0];
+        String[] listaCiclos;
         try (Connection conexion = this.dbConnection.getConnection()) {
             CicloDAO cicloDAO = new CicloDAO(conexion);
             listaCiclos = cicloDAO.listaCiclos();
-        } catch (Exception e) {
-            // En caso de error, devolver lista vacía y loguear el error
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             listaCiclos = new String[0];
         }
@@ -131,7 +127,7 @@ public class ControladorPanelControl {
     /**
      * Obtiene la lista de editoriales
      * 
-     * @return
+     * @return String[] con la lista de editoriales
      */
     public String[] listaEditoriales() {
         try (Connection conexion = this.dbConnection.getConnection()) {
@@ -142,7 +138,7 @@ public class ControladorPanelControl {
             PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
             String[] listaEditoriales = publicacionDAO.listaEditoriales();
             return listaEditoriales;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return new String[0];
         }
@@ -164,7 +160,7 @@ public class ControladorPanelControl {
             PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
             String[][] resumen = publicacionDAO.listaPublicacionesResumen();
             return resumen;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return new String[0][0];
         }

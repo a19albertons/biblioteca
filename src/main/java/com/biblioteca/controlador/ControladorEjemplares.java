@@ -1,6 +1,9 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.annotation.Nonnull;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.EjemplarDAO;
@@ -18,22 +21,19 @@ public class ControladorEjemplares {
     /**
      * Constructor con DBConnection (inyección)
      * 
-     * @param dbConnection
+     * @param dbConnection DBConnection para conexiones a la base de datos
      */
-    public ControladorEjemplares(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorEjemplares(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
     /**
      * Obtiene los ejemplares de una publicación
      *
-     * @param idPublicacion
+     * @param idPublicacion ID de la publicación
      * @return String[][] con columnas: id, num_ejemplar, fecha, estado
      */
-    public String[][] obtenerEjemplaresPorPublicacion(int idPublicacion) {
+    public String[][] obtenerEjemplaresPorPublicacion(final int idPublicacion) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -41,7 +41,7 @@ public class ControladorEjemplares {
             }
             EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
             return ejemplarDAO.listaEjemplaresPorPublicacion(idPublicacion);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }
@@ -50,11 +50,11 @@ public class ControladorEjemplares {
     /**
      * Obtiene los detalles de un ejemplar por id (para vistas/diálogos).
      *
-     * @param idEjemplar
+     * @param idEjemplar ID del ejemplar
      * @return arreglo con {id, id_publicacion, num_ejemplar, fecha_adquisicion,
      *         estado} o null
      */
-    public EstadoEjemplarDTO obtenerDetallesEjemplar(int idEjemplar) {
+    public EstadoEjemplarDTO obtenerDetallesEjemplar(final int idEjemplar) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -62,7 +62,7 @@ public class ControladorEjemplares {
             }
             EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
             return ejemplarDAO.obtenerEjemplarPorId(idEjemplar);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }

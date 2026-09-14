@@ -5,6 +5,8 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.EjemplarDAO;
 
@@ -20,14 +22,12 @@ public class ControladorNuevoEjemplarDialog {
     private final DBConnection dbConnection;
 
     /**
-     * 
      * Constructor que permite inyectar una `DBConnection` (recomendado para tests
      * y para la nueva arquitectura).
+     *
+     * @param dbConnection la conexión a la base de datos
      */
-    public ControladorNuevoEjemplarDialog(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorNuevoEjemplarDialog(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
@@ -37,11 +37,11 @@ public class ControladorNuevoEjemplarDialog {
      * Esta operación es transaccional y calcula el siguiente número de ejemplar
      * para la publicación.
      *
-     * @param idPublicacion
+     * @param idPublicacion    ID de la publicación
      * @param fechaAdquisicion fecha de adquisición (java.time.LocalDate)
      * @return true si la inserción fue satisfactoria
      */
-    public boolean crearEjemplar(int idPublicacion, LocalDate fechaAdquisicion) {
+    public boolean crearEjemplar(final int idPublicacion, final LocalDate fechaAdquisicion) {
 
         // Obtener conexión a la base de datos
         try (Connection conexion = this.dbConnection.getConnection()) {
@@ -76,15 +76,15 @@ public class ControladorNuevoEjemplarDialog {
                     conexion.rollback();
                     return false;
                 }
-
+                // CPD-OFF
                 // Commit de la transacción si todo fue correcto
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 // En caso de excepción, intentar rollback y reportar el error
                 try {
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -94,14 +94,14 @@ public class ControladorNuevoEjemplarDialog {
                 // Restaurar auto-commit y cerrar conexión
                 try {
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error habilitando el modo autocommit de la base de datos: " + ex.getMessage());
                 }
             }
         } catch (SQLException e1) {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
+        // CPD-ON
     }
 }

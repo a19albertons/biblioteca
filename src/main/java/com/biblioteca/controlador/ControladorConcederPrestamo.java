@@ -2,7 +2,10 @@ package com.biblioteca.controlador;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
+
+import javax.annotation.Nonnull;
 
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.EjemplarDAO;
@@ -26,19 +29,21 @@ public class ControladorConcederPrestamo {
 
     /**
      * Constructor con DBConnection (inyección)
+     *
+     * @param dbConnection la conexión a la base de datos
      */
-    public ControladorConcederPrestamo(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorConcederPrestamo(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
     /**
      * Busca el usuario por DNI o ID y devuelve arreglo: id, dni, nombre_completo,
      * sancion_activa (SANCIONADO/ACTIVO/BAJA), tipo_desc
+     *
+     * @param dniOrId el DNI o ID del usuario a buscar
+     * @return el usuario encontrado con su estado o null si no existe o hay error
      */
-    public UsuarioEstadoPorDNIOID buscarUsuarioPorDniOId(String dniOrId) {
+    public UsuarioEstadoPorDNIOID buscarUsuarioPorDniOId(final String dniOrId) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -46,7 +51,7 @@ public class ControladorConcederPrestamo {
             }
             UsuarioDAO dao = new UsuarioDAO(conexion);
             return dao.obtenerUsuarioYEstadoPorDniOId(dniOrId == null ? "" : dniOrId.trim());
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }
@@ -56,8 +61,12 @@ public class ControladorConcederPrestamo {
      * Detecta un ejemplar por su id y devuelve arreglo con info o null
      * Retorna: idEjemplar, idPublicacion, numEjemplar, estadoEjemplar, titulo,
      * numEdicion, tipoPublicacion
+     *
+     * @param idEjemplar el ID del ejemplar a buscar
+     * @return el ejemplar encontrado con su información o null si no existe o hay
+     *         error
      */
-    public EjemplarConTituloDTO detectarEjemplar(int idEjemplar) {
+    public EjemplarConTituloDTO detectarEjemplar(final int idEjemplar) {
         EjemplarConTituloDTO resultado = null;
         try (Connection conexion = this.dbConnection.getConnection()) {
             EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
@@ -83,7 +92,7 @@ public class ControladorConcederPrestamo {
             int numEdicion;
             try {
                 numEdicion = Integer.parseInt(detallesPub.getNumEdicion());
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 numEdicion = 0; // si no hay numEdicion, poner 0
             }
             resultado = new EjemplarConTituloDTO(
@@ -94,7 +103,7 @@ public class ControladorConcederPrestamo {
                     titulo,
                     numEdicion,
                     TipoPublicacion.valueOf(tipo));
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return null;
         }
@@ -104,8 +113,13 @@ public class ControladorConcederPrestamo {
     /**
      * Registra un préstamo con la lógica de negocio solicitada.
      * Devuelve null en caso de éxito, o mensaje de error en caso de fallo.
+     *
+     * @param idUsuario  el ID del usuario que realiza el préstamo
+     * @param idEjemplar el ID del ejemplar a prestar
+     * @return null si el préstamo se registró con éxito, o mensaje de error en caso
+     *         de fallo
      */
-    public String registrarPrestamo(int idUsuario, int idEjemplar) {
+    public String registrarPrestamo(final int idUsuario, final int idEjemplar) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             boolean exito = false; // bandera para controlar commit/rollback
             try {
@@ -161,7 +175,7 @@ public class ControladorConcederPrestamo {
                 }
 
                 // 7. comprobar usuario activo (no sancionado ni baja)
-                String sancion = usuario.getSancionActiva();
+                String sancion = usuario.getSancionactiva();
                 // comprobar sanciones o baja
                 if ("SANCIONADO".equalsIgnoreCase(sancion) || "BAJA".equalsIgnoreCase(sancion)) {
                     return "El usuario tiene sanciones o está dado de baja";
@@ -213,11 +227,11 @@ public class ControladorConcederPrestamo {
                 return null; // null indica éxito
             } finally {
                 // Restaurar auto-commit
-                if (!exito) {
+                if (!exito && conexion != null) {
                     try {
                         conexion.rollback();
                         conexion.setAutoCommit(true);
-                    } catch (Exception ex) {
+                    } catch (SQLException ex) {
                         System.out
                                 .println("Error al hacer rollback o al restablecer el auto-commit: " + ex.getMessage());
                     }
@@ -225,7 +239,7 @@ public class ControladorConcederPrestamo {
 
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             return "Error al obtener conexión a BD: " + e.getMessage();
         }
 

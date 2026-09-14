@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
 import com.biblioteca.security.HashearContrasena;
@@ -26,10 +28,7 @@ public class ControladorNuevoUsuarioDialog {
      * 
      * @param dbConnection
      */
-    public ControladorNuevoUsuarioDialog(DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorNuevoUsuarioDialog(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
@@ -44,7 +43,8 @@ public class ControladorNuevoUsuarioDialog {
      * @param tipoCode  código de tipo de usuario (E,P,A,C,L)
      * @return true si la creación y commit fue satisfactoria
      */
-    public boolean crearUsuario(String dni, String nombre, String apellidos, String email, String tipoCode) {
+    public boolean crearUsuario(final String dni, final String nombre, final String apellidos, final String email,
+            final String tipoCode) {
         try (Connection conexion = this.dbConnection.getConnection()) {
             // Comprobar conexión
             if (conexion == null) {
@@ -61,7 +61,9 @@ public class ControladorNuevoUsuarioDialog {
             }
             // Preparar datos
             String apellido1 = (apellidos != null) ? apellidos.trim() : "";
-            String apellido2 = ""; // dejamos el campo apellido2 vacío por simplicidad
+            String apellido2 = apellidos != null && apellidos.trim().replaceAll("\\s+", " ").contains(" ")
+                    ? apellidos.trim().replaceAll("\\s+", " ").split(" ")[1]
+                    : ""; // dejamos el campo apellido2 vacío por simplicidad
             String contrasena = dni.trim(); // la contraseña inicial es el DNI
 
             // Crear string de usuario (login) a partir del nombre y apellido1
@@ -69,15 +71,16 @@ public class ControladorNuevoUsuarioDialog {
             String fecha2digitos = fechaActual.format(DateTimeFormatter.ofPattern("yy"));
             String apellido1Formateado = apellido1.isEmpty() ? "" : apellido1.substring(0, 1).toUpperCase();
             String apellido2Formateado = apellido2.isEmpty() ? "" : apellido2.substring(0, 1).toUpperCase();
-            String usuarioConsultar = "A"+fecha2digitos+nombre.trim().toUpperCase().charAt(0)+nombre.trim().substring(1)+apellido1Formateado+apellido2Formateado;
-
+            String usuarioConsultar = "A" + fecha2digitos + nombre.trim().toUpperCase().charAt(0)
+                    + nombre.trim().substring(1) + apellido1Formateado + apellido2Formateado;
 
             try {
                 // Iniciar transacción
                 conexion.setAutoCommit(false);
                 int numeroUsuariosMismoPatron = usuarioDAO.consultaNumeroUsuariosPorUsuario(usuarioConsultar);
 
-                // Genera el nombre de usuario final basado en el patrón y el número de usuarios existentes
+                // Genera el nombre de usuario final basado en el patrón y el número de usuarios
+                // existentes
                 String usuarioFinal;
                 if (numeroUsuariosMismoPatron == -1) {
                     return false;
@@ -98,14 +101,15 @@ public class ControladorNuevoUsuarioDialog {
                     conexion.rollback();
                     return false;
                 }
+                // CPD-OFF
                 // Confirmar transacción
                 conexion.commit();
                 return true;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 try {
                     // Hacer rollback en caso de error
                     conexion.rollback();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     System.out.println("Error al hacer rollback: " + ex.getMessage());
                 }
                 System.out.println(e.getMessage());
@@ -115,15 +119,14 @@ public class ControladorNuevoUsuarioDialog {
                 try {
                     // Restaurar auto-commit y cerrar conexión
                     conexion.setAutoCommit(true);
-                    conexion.close();
-                } catch (Exception ex) {
-                    System.out.println("Error cerrando conexión: " + ex.getMessage());
+                } catch (SQLException ex) {
+                    System.out.println("Error al restaurar auto-commit: " + ex.getMessage());
                 }
             }
         } catch (SQLException e1) {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
-
+        // CPD-ON
     }
 }

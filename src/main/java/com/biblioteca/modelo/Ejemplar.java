@@ -2,6 +2,8 @@ package com.biblioteca.modelo;
 
 import java.time.LocalDate;
 
+import javax.annotation.Nonnull;
+
 /**
  * Modelo de datos para la tabla ejemplares
  */
@@ -32,7 +34,7 @@ public class Ejemplar {
     /**
      * Obtiene el id del ejemplar
      * 
-     * @return
+     * @return el id del ejemplar
      */
     public int getId() {
         return id;
@@ -43,14 +45,14 @@ public class Ejemplar {
      * 
      * @param id
      */
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
     /**
      * Obtiene la publicacion del ejemplar
      * 
-     * @return
+     * @return la publicacion del ejemplar
      */
     public Publicacion getPublicacion() {
         return publicacion;
@@ -59,21 +61,18 @@ public class Ejemplar {
     /**
      * Establece la publicacion del ejemplar
      * 
-     * @param publicacion
+     * @param publicacion la publicacion del ejemplar
      */
-    public void setPublicacion(Publicacion publicacion) {
-        if (publicacion != null) {
-            this.publicacion = publicacion;
-        } else {
-            throw new IllegalArgumentException("La publicación no puede ser nula");
-        }
+    public void setPublicacion(final Publicacion publicacion) {
+        this.publicacion = publicacion;
+    
 
     }
 
     /**
      * Obtiene el número de ejemplar
      * 
-     * @return
+     * @return el número de ejemplar
      */
     public int getNumEjemplar() {
         return numEjemplar;
@@ -82,16 +81,16 @@ public class Ejemplar {
     /**
      * Establece el número de ejemplar
      * 
-     * @param numEjemplar
+     * @param numEjemplar el número de ejemplar
      */
-    public void setNumEjemplar(int numEjemplar) {
+    public void setNumEjemplar(final int numEjemplar) {
         this.numEjemplar = numEjemplar;
     }
 
     /**
      * Obtiene la fecha de adquisición del ejemplar
      * 
-     * @return
+     * @return la fecha de adquisición del ejemplar
      */
     public LocalDate getFechaAdquisicion() {
         return fechaAdquisicion;
@@ -100,20 +99,16 @@ public class Ejemplar {
     /**
      * Establece la fecha de adquisición del ejemplar
      * 
-     * @param fechaAdquisicion
+     * @param fechaAdquisicion la fecha de adquisición del ejemplar
      */
-    public void setFechaAdquisicion(LocalDate fechaAdquisicion) {
-        if (fechaAdquisicion != null) {
-            this.fechaAdquisicion = fechaAdquisicion;
-        } else {
-            throw new IllegalArgumentException("La fecha de adquisición no puede ser nula");
-        }
+    public void setFechaAdquisicion(final LocalDate fechaAdquisicion) {
+        this.fechaAdquisicion = fechaAdquisicion;
     }
 
     /**
      * Obtiene el estado del ejemplar
      * 
-     * @return
+     * @return el estado del ejemplar
      */
     public boolean isEstado() {
         return estado;
@@ -122,9 +117,9 @@ public class Ejemplar {
     /**
      * Establece el estado del ejemplar
      * 
-     * @param estado
+     * @param estado el estado del ejemplar
      */
-    public void setEstado(boolean estado) {
+    public void setEstado(final boolean estado) {
         this.estado = estado;
     }
 
@@ -132,12 +127,12 @@ public class Ejemplar {
     /**
      * Crear nuevo ejemplar
      * 
-     * @param publicacion
-     * @param numEjemplar
-     * @param fechaAdquisicion
-     * @param estado
+     * @param publicacion la publicacion
+     * @param numEjemplar el número de ejemplar
+     * @param fechaAdquisicion la fecha de adquisición
+     * @param estado el estado
      */
-    public Ejemplar(Publicacion publicacion, int numEjemplar, LocalDate fechaAdquisicion, boolean estado) {
+    public Ejemplar(@Nonnull final Publicacion publicacion, final int numEjemplar, @Nonnull final LocalDate fechaAdquisicion, final boolean estado) {
         setPublicacion(publicacion);
         setNumEjemplar(numEjemplar);
         setFechaAdquisicion(fechaAdquisicion);
@@ -153,7 +148,7 @@ public class Ejemplar {
      * @param fechaAdquisicion
      * @param estado
      */
-    public Ejemplar(int id, Publicacion publicacion, int numEjemplar, LocalDate fechaAdquisicion, boolean estado) {
+    public Ejemplar(final int id, @Nonnull final Publicacion publicacion, final int numEjemplar, @Nonnull final LocalDate fechaAdquisicion, final boolean estado) {
         this.id = id;
         this.publicacion = publicacion;
         this.numEjemplar = numEjemplar;

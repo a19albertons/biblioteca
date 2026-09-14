@@ -2,10 +2,12 @@ package com.biblioteca.modelo;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 /**
  * Modelo de datos para la tabla publicaciones
  */
-public abstract class Publicacion {
+public class Publicacion {
     // atributos comunes de las publicaciones
 
     /**
@@ -53,9 +55,9 @@ public abstract class Publicacion {
     /**
      * Obtiene el id de la publicacion
      * 
-     * @return
+     * @return el id de la publicacion
      */
-    public int getId() {
+    public final int getId() {
         return id;
     }
 
@@ -65,16 +67,16 @@ public abstract class Publicacion {
      * 
      * @param id
      */
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
     /**
      * Obtiene el titulo de la publicacion
      * 
-     * @return
+     * @return el titulo de la publicacion
      */
-    public String getTitulo() {
+    public final String getTitulo() {
         return titulo;
     }
 
@@ -84,20 +86,16 @@ public abstract class Publicacion {
      * 
      * @param titulo
      */
-    public void setTitulo(String titulo) {
-        if (titulo != null) {
-            this.titulo = titulo;
-        } else {
-            throw new IllegalArgumentException("El título no puede ser nulo");
-        }
+    public void setTitulo(final String titulo) {
+        this.titulo = titulo;
     }
 
     /**
      * Obtiene la editorial de la publicacion
      * 
-     * @return
+     * @return la editorial de la publicacion
      */
-    public String getEditorial() {
+    public final String getEditorial() {
         return editorial;
     }
 
@@ -107,20 +105,16 @@ public abstract class Publicacion {
      * 
      * @param editorial
      */
-    public void setEditorial(String editorial) {
-        if (editorial != null) {
-            this.editorial = editorial;
-        } else {
-            throw new IllegalArgumentException("La editorial no puede ser nula");
-        }
+    public void setEditorial(final String editorial) {
+        this.editorial = editorial;
     }
 
     /**
      * Obtiene el codigo ISBN de la publicacion
      * 
-     * @return
+     * @return el codigo ISBN de la publicacion
      */
-    public String getCodigoISBN() {
+    public final String getCodigoISBN() {
         return codigoISBN;
     }
 
@@ -130,20 +124,16 @@ public abstract class Publicacion {
      * 
      * @param codigoISBN
      */
-    public void setCodigoISBN(String codigoISBN) {
-        if (codigoISBN != null) {
-            this.codigoISBN = codigoISBN;
-        } else {
-            throw new IllegalArgumentException("El código ISBN no puede ser nulo");
-        }
+    public void setCodigoISBN(final String codigoISBN) {
+        this.codigoISBN = codigoISBN;
     }
 
     /**
      * Obtiene el idioma de la publicacion
      * 
-     * @return
+     * @return el idioma de la publicacion
      */
-    public String getIdioma() {
+    public final String getIdioma() {
         return idioma;
     }
 
@@ -153,20 +143,16 @@ public abstract class Publicacion {
      * 
      * @param idioma
      */
-    public void setIdioma(String idioma) {
-        if (idioma != null) {
-            this.idioma = idioma;
-        } else {
-            throw new IllegalArgumentException("El idioma no puede ser nulo");
-        }
+    public void setIdioma(final String idioma) {
+        this.idioma = idioma;
     }
 
     /**
      * Obtiene el tipo de la publicacion
      * 
-     * @return
+     * @return el tipo de la publicacion
      */
-    public TipoPublicacion getTipo() {
+    public final TipoPublicacion getTipo() {
         return tipo;
     }
 
@@ -176,16 +162,16 @@ public abstract class Publicacion {
      * 
      * @param tipo
      */
-    public void setTipo(TipoPublicacion tipo) {
+    public void setTipo(final TipoPublicacion tipo) {
         this.tipo = tipo;
     }
 
     /**
      * Obtiene el estado de la publicacion
      * 
-     * @return
+     * @return el estado de la publicacion
      */
-    public boolean isEstado() {
+    public final boolean isEstado() {
         return estado;
     }
 
@@ -195,14 +181,16 @@ public abstract class Publicacion {
      * 
      * @param estado
      */
-    public void setEstado(boolean estado) {
+    public void setEstado(final boolean estado) {
         this.estado = estado;
     }
 
     /**
      * Obtiene los modulos asociados a la publicacion
+     * 
+     * @return los modulos asociados a la publicacion
      */
-    public java.util.List<Modulo> getModulos() {
+    public final java.util.List<Modulo> getModulos() {
         return modulos;
     }
 
@@ -211,16 +199,16 @@ public abstract class Publicacion {
      * 
      * @param modulos
      */
-    public void setModulos(java.util.List<Modulo> modulos) {
+    public void setModulos(final java.util.List<Modulo> modulos) {
         this.modulos = modulos;
     }
 
     /**
      * Obtiene los ciclos asociados a la publicacion
      * 
-     * @return
+     * @return los ciclos asociados a la publicacion
      */
-    public List<Ciclo> getCiclos() {
+    public final List<Ciclo> getCiclos() {
         return ciclos;
     }
 
@@ -229,16 +217,16 @@ public abstract class Publicacion {
      * 
      * @param ciclos
      */
-    public void setCiclos(List<Ciclo> ciclos) {
+    public void setCiclos(final List<Ciclo> ciclos) {
         this.ciclos = ciclos;
     }
 
     /**
      * Obtiene los temas asociados a la publicacion
      * 
-     * @return
+     * @return los temas asociados a la publicacion
      */
-    public List<Tema> getTemas() {
+    public final List<Tema> getTemas() {
         return temas;
     }
 
@@ -247,7 +235,7 @@ public abstract class Publicacion {
      * 
      * @param temas
      */
-    public void setTemas(List<Tema> temas) {
+    public void setTemas(final List<Tema> temas) {
         this.temas = temas;
     }
 
@@ -265,8 +253,10 @@ public abstract class Publicacion {
      * @param ciclos
      * @param temas
      */
-    public Publicacion(String titulo, String editorial, String codigoISBN, String idioma, TipoPublicacion tipo,
-            boolean estado, List<Modulo> modulos, List<Ciclo> ciclos, List<Tema> temas) {
+    public Publicacion(@Nonnull final String titulo, @Nonnull final String editorial, @Nonnull final String codigoISBN,
+            @Nonnull final String idioma,
+            final TipoPublicacion tipo,
+            final boolean estado, final List<Modulo> modulos, final List<Ciclo> ciclos, final List<Tema> temas) {
         setTitulo(titulo);
         setEditorial(editorial);
         setCodigoISBN(codigoISBN);
@@ -292,8 +282,10 @@ public abstract class Publicacion {
      * @param ciclos
      * @param temas
      */
-    public Publicacion(int id, String titulo, String editorial, String codigoISBN, String idioma, TipoPublicacion tipo,
-            boolean estado, List<Modulo> modulos, List<Ciclo> ciclos, List<Tema> temas) {
+    public Publicacion(@Nonnull final int id, @Nonnull final String titulo, @Nonnull final String editorial,
+            @Nonnull final String codigoISBN,
+            @Nonnull final String idioma, final TipoPublicacion tipo,
+            final boolean estado, final List<Modulo> modulos, final List<Ciclo> ciclos, final List<Tema> temas) {
         this.id = id;
         this.titulo = titulo;
         this.editorial = editorial;

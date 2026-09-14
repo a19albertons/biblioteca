@@ -3,7 +3,10 @@ package com.biblioteca.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+
+import javax.annotation.Nonnull;
 
 /**
  * DAO para la tabla `autores`.
@@ -16,18 +19,21 @@ public class AutorDAO {
     private final Connection conexion;
 
     // SQL constants 🔧
+    /**
+     * SQL query para obtener el ID de un autor por nombre.
+     */
     private static final String SQL_SELECT_AUTOR_ID_POR_NOMBRE = "SELECT id FROM autores WHERE nombre = ?";
+    /**
+     * SQL query para insertar un nuevo autor.
+     */
     private static final String SQL_INSERT_AUTOR = "INSERT INTO autores (nombre, nacionalidad) VALUES (?, ?)";
 
     /**
      * Constructor del DAO
      * 
-     * @param conexion conexión a la base de datos (no puede ser null)
+     * @param conexion conexión a la base de datos
      */
-    public AutorDAO(Connection conexion) {
-        if (conexion == null) {
-            throw new IllegalArgumentException("Connection cannot be null");
-        }
+    public AutorDAO(@Nonnull final Connection conexion) {
         this.conexion = conexion;
     }
 
@@ -37,7 +43,7 @@ public class AutorDAO {
      * @param nombre nombre completo del autor
      * @return id si existe, -1 si no
      */
-    public int obtenerIdPorNombre(String nombre) {
+    public final int obtenerIdPorNombre(final String nombre) {
         try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_SELECT_AUTOR_ID_POR_NOMBRE)) {
             // establecer parámetro
@@ -47,7 +53,7 @@ public class AutorDAO {
                     return rs.getInt("id");
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
         }
@@ -62,7 +68,7 @@ public class AutorDAO {
      * @param nacionalidad código de nacionalidad (ej: ES)
      * @return id generado o -1 en caso de error
      */
-    public int crearAutor(String nombre, String nacionalidad) {
+    public final int crearAutor(final String nombre, final String nacionalidad) {
         try (
                 // preparar sentencia
                 PreparedStatement ps = conexion.prepareStatement(
@@ -77,7 +83,7 @@ public class AutorDAO {
                     return rs.getInt(1);
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.out.println(e.getCause());
         }
@@ -90,10 +96,11 @@ public class AutorDAO {
      * @param nombre nombre del autor
      * @return id del autor o -1 en caso de error
      */
-    public int obtenerOCrearPorNombre(String nombre) {
+    public final int obtenerOCrearPorNombre(final String nombre) {
         int id = obtenerIdPorNombre(nombre);
-        if (id != -1)
+        if (id != -1) {
             return id;
+        }
         return crearAutor(nombre, "ES");
     }
 }
