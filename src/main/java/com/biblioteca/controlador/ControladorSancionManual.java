@@ -104,7 +104,6 @@ public class ControladorSancionManual {
                     long diasPendienteOriginal = ChronoUnit.DAYS.between(fechaActual, finSancionActiva);
                     long diasPendienteNuevaSancion = ChronoUnit.DAYS.between(fechaActual, finSancion);
                     nuevoFinSancion = fechaActual.plusDays(diasPendienteOriginal + diasPendienteNuevaSancion);
-                    finSancion = nuevoFinSancion;
                 } else {
                     nuevoFinSancion = finSancion;
                 }
@@ -131,10 +130,12 @@ public class ControladorSancionManual {
 
             } finally {
                 try {
-                    if (!exito) {
-                        conexion.rollback();
+                    if (conexion != null) {
+                        if (!exito) {
+                            conexion.rollback();
+                        }
+                        conexion.setAutoCommit(true);
                     }
-                    conexion.setAutoCommit(true);
                 } catch (SQLException e) {
                     System.out.println("Error al restaurar auto-commit: " + e.getMessage());
                 }
