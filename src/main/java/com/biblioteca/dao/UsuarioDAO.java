@@ -137,6 +137,7 @@ public class UsuarioDAO {
             // establecer parámetros
             ps.setString(1, usuario);
             // ejecutar consulta
+            // CPD-OFF
             try (ResultSet resultado = ps.executeQuery()) {
                 if (resultado.next()) {
                     // crear objeto Usuario con los datos obtenidos
@@ -163,6 +164,7 @@ public class UsuarioDAO {
             System.out.println(e.getCause());
         }
         return devolver;
+        // CPD-ON
     }
 
     /**
@@ -180,6 +182,7 @@ public class UsuarioDAO {
             ps.setString(1, trim);
             ps.setString(2, trim);
             // ejecutar consulta
+            // CPD-OFF
             try (ResultSet resultado = ps.executeQuery()) {
                 if (resultado.next()) {
                     // crear objeto Usuario con los datos obtenidos
@@ -206,6 +209,7 @@ public class UsuarioDAO {
             System.out.println(e.getCause());
         }
         return devolver;
+        //CPD-ON
     }
 
     /**

@@ -1,21 +1,14 @@
 package com.biblioteca.vista.pantalla;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,11 +20,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import com.biblioteca.controlador.Controlador;
-import com.biblioteca.utilities.AppResources;
 import com.biblioteca.utilities.BackgroundWorker;
 import com.biblioteca.vista.dialogo.EditarUsuarioDialog;
 import com.biblioteca.vista.dialogo.EliminarUsuarioDialog;
 import com.biblioteca.vista.dialogo.NuevoUsuarioDialog;
+import com.biblioteca.vista.jswing.JButtonBorrar;
+import com.biblioteca.vista.jswing.JButtonEditar;
 
 /**
  * Clase para la vista Gestión de usuarios
@@ -92,53 +86,9 @@ public class GestionUsuarios {
             panelCell.setOpaque(false);
             panelCell.setLayout(new FlowLayout(FlowLayout.RIGHT, 6, 6));
 
-            URL editarIconUrl = AppResources.editarPath();
-            final JButton editBtn = new JButton() {
-                @Override
-                protected void paintComponent(final Graphics g) {
-                    final Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setComposite(AlphaComposite.SrcOver);
-                    g2.setColor(new Color(70, 141, 174, 102));
-                    g2.fillRect(0, 0, getWidth(), getHeight());
-                    g2.dispose();
-                    super.paintComponent(g);
-                }
-            };
-            if (editarIconUrl != null) {
-                Image img = new ImageIcon(editarIconUrl).getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
-                editBtn.setIcon(new ImageIcon(img));
-            }
-            editBtn.setPreferredSize(new Dimension(24, 24));
-            editBtn.setToolTipText("Editar");
-            editBtn.setBorder(null);
-            editBtn.setFocusPainted(false);
-            editBtn.setContentAreaFilled(false);
-            editBtn.setOpaque(false);
-            editBtn.setMargin(new Insets(0, 0, 0, 0));
+            final JButtonEditar editBtn = new JButtonEditar();
 
-            URL borrarIconUrl = AppResources.eliminarPath();
-            final JButton delBtn = new JButton() {
-                @Override
-                protected void paintComponent(final Graphics g) {
-                    final Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setComposite(AlphaComposite.SrcOver);
-                    g2.setColor(new Color(192, 57, 43, 102));
-                    g2.fillRect(0, 0, getWidth(), getHeight());
-                    g2.dispose();
-                    super.paintComponent(g);
-                }
-            };
-            if (borrarIconUrl != null) {
-                final Image img = new ImageIcon(borrarIconUrl).getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
-                delBtn.setIcon(new ImageIcon(img));
-            }
-            delBtn.setPreferredSize(new Dimension(24, 24));
-            delBtn.setToolTipText("Eliminar");
-            delBtn.setBorder(null);
-            delBtn.setFocusPainted(false);
-            delBtn.setContentAreaFilled(false);
-            delBtn.setOpaque(false);
-            delBtn.setMargin(new Insets(0, 0, 0, 0));
+            final JButton delBtn = new JButtonBorrar();
 
             panelCell.add(editBtn);
             panelCell.add(delBtn);
@@ -357,19 +307,9 @@ public class GestionUsuarios {
                     JOptionPane.INFORMATION_MESSAGE);
         }
 
-        // Limpiar modelo y rellenar
-        for (int i = usuariosModel.getRowCount() - 1; i >= 0; i--) {
-            usuariosModel.removeRow(i);
-        }
-        // Rellenar con datos nuevos
-        for (String[] r : rawData) {
-            String dni = (r.length > 1 && r[1] != null) ? r[1] : "";
-            String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
-            String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
-            String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
-            usuariosModel
-                    .addRow(new Object[] { (r.length > 0 ? r[0] : ""), dni, nombre, tipo, sancion, "" });
-        }
+        // Usar método del controlador
+        controlador.getControladorGestionUsuarios().cargarDatosEnTabla(rawData, usuariosModel);
+        
         // Asegurarse de refrescar la tabla si está disponible
         if (this.usuariosTable != null) {
             this.usuariosTable.revalidate();
@@ -402,19 +342,9 @@ public class GestionUsuarios {
                         rawData = new String[0][0];
                     }
 
-                    // Limpiar modelo
-                    for (int i = usuariosModel.getRowCount() - 1; i >= 0; i--) {
-                        usuariosModel.removeRow(i);
-                    }
-                    // Rellenar con datos nuevos
-                    for (String[] r : rawData) {
-                        String dni = (r.length > 1 && r[1] != null) ? r[1] : "";
-                        String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
-                        String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
-                        String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
-                        usuariosModel
-                                .addRow(new Object[] { (r.length > 0 ? r[0] : ""), dni, nombre, tipo, sancion, "" });
-                    }
+                    // Usar método del controlador
+                    controlador.getControladorGestionUsuarios().cargarDatosEnTabla(rawData, usuariosModel);
+                    
                     // Asegurarse de refrescar la tabla si está disponible
                     if (this.usuariosTable != null) {
                         this.usuariosTable.revalidate();

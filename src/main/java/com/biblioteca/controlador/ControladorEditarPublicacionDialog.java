@@ -13,6 +13,8 @@ import com.biblioteca.dao.ModuloDAO;
 import com.biblioteca.dao.PublicacionDAO;
 import com.biblioteca.dao.TemaDAO;
 import com.biblioteca.dto.ObtenerPublicacionDetallesPorIdDTO;
+import com.biblioteca.utilities.PublicationTransactionHelper;
+import com.biblioteca.utilities.RelacionPublicacionHelperEnum;
 
 /**
  * Controlador responsable de la edición de publicaciones.
@@ -27,6 +29,10 @@ public class ControladorEditarPublicacionDialog {
      * DBConnection para conexiones a la base de datos
      */
     private final DBConnection dbConnection;
+    /**
+     * Ayudante para transacciones de publicaciones
+     */
+    private final PublicationTransactionHelper transactionHelper;
 
     /**
      * Método para procesar autores en la edición de libros.
@@ -73,25 +79,13 @@ public class ControladorEditarPublicacionDialog {
      */
     private boolean procesarModulos(final Connection conexion, final PublicacionDAO publicacionDAO,
             final ModuloDAO moduloDAO, final String modulosCsv, final int idPublicacion) {
-        if (modulosCsv == null || modulosCsv.trim().isEmpty()) {
-            return true;
+        try {
+            return transactionHelper.procesarRelaciones(conexion, publicacionDAO, moduloDAO, modulosCsv,
+                    idPublicacion, RelacionPublicacionHelperEnum.MODULO);
+        } catch (SQLException e) {
+            System.out.println("Error al procesar modulos: " + e.getMessage());
+            return false;
         }
-
-        String[] modulos = modulosCsv.split(",");
-        for (String m : modulos) {
-            String nombre = m.trim();
-            if (nombre.isEmpty()) {
-                continue;
-            }
-            int idModulo = moduloDAO.obtenerOCrear(nombre);
-            if (idModulo == -1) {
-                return false;
-            }
-            if (!publicacionDAO.insertarPublicacionModulo(idPublicacion, idModulo)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -106,25 +100,13 @@ public class ControladorEditarPublicacionDialog {
      */
     private boolean procesarCiclos(final Connection conexion, final PublicacionDAO publicacionDAO,
             final CicloDAO cicloDAO, final String ciclosCsv, final int idPublicacion) {
-        if (ciclosCsv == null || ciclosCsv.trim().isEmpty()) {
-            return true;
+        try {
+            return transactionHelper.procesarRelaciones(conexion, publicacionDAO, cicloDAO, ciclosCsv,
+                    idPublicacion, RelacionPublicacionHelperEnum.CICLO);
+        } catch (SQLException e) {
+            System.out.println("Error al procesar ciclos: " + e.getMessage());
+            return false;
         }
-
-        String[] ciclos = ciclosCsv.split(",");
-        for (String cc : ciclos) {
-            String nombre = cc.trim();
-            if (nombre.isEmpty()) {
-                continue;
-            }
-            int idCiclo = cicloDAO.obtenerOCrear(nombre);
-            if (idCiclo == -1) {
-                return false;
-            }
-            if (!publicacionDAO.insertarPublicacionCiclo(idPublicacion, idCiclo)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -139,25 +121,13 @@ public class ControladorEditarPublicacionDialog {
      */
     private boolean procesarTemas(final Connection conexion, final PublicacionDAO publicacionDAO,
             final TemaDAO temaDAO, final String temasCsv, final int idPublicacion) {
-        if (temasCsv == null || temasCsv.trim().isEmpty()) {
-            return true;
+        try {
+            return transactionHelper.procesarRelaciones(conexion, publicacionDAO, temaDAO, temasCsv,
+                    idPublicacion, RelacionPublicacionHelperEnum.TEMA);
+        } catch (SQLException e) {
+            System.out.println("Error al procesar temas: " + e.getMessage());
+            return false;
         }
-
-        String[] temas = temasCsv.split(",");
-        for (String t : temas) {
-            String nombre = t.trim();
-            if (nombre.isEmpty()) {
-                continue;
-            }
-            int idTema = temaDAO.obtenerOCrear(conexion, nombre);
-            if (idTema == -1) {
-                return false;
-            }
-            if (!publicacionDAO.insertarPublicacionTema(idPublicacion, idTema)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -171,6 +141,7 @@ public class ControladorEditarPublicacionDialog {
             throw new IllegalArgumentException("DBConnection cannot be null");
         }
         this.dbConnection = dbConnection;
+        this.transactionHelper = new PublicationTransactionHelper();
     }
 
     /**
@@ -261,7 +232,7 @@ public class ControladorEditarPublicacionDialog {
                 if (!procesarTemas(conexion, publicacionDAO, temaDAO, temasCsv, idPublicacion)) {
                     return false;
                 }
-
+                // CPD-OFF
                 conexion.commit();
                 return true;
             } catch (SQLException e) {
@@ -284,6 +255,7 @@ public class ControladorEditarPublicacionDialog {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
+        // CPD-ON
     }
 
     /**
@@ -310,11 +282,13 @@ public class ControladorEditarPublicacionDialog {
                 return false;
             }
 
+            // CPD-OFF
             // Creación de DAOs para gestionar una transacción completa
             PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
             ModuloDAO moduloDAO = new ModuloDAO(conexion);
             TemaDAO temaDAO = new TemaDAO(conexion);
             CicloDAO cicloDAO = new CicloDAO(conexion);
+            // CPD-ON
 
             try {
                 // Begin transaction
@@ -407,7 +381,7 @@ public class ControladorEditarPublicacionDialog {
                         }
                     }
                 }
-
+                // CPD-OFF
                 conexion.commit();
                 return true;
             } catch (SQLException e) {
@@ -432,6 +406,6 @@ public class ControladorEditarPublicacionDialog {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
-
+        // CPD-ON
     }
 }

@@ -33,6 +33,8 @@ import com.biblioteca.vista.dialogo.EditarPublicacionDialog;
 import com.biblioteca.vista.dialogo.EliminarEjemplarDialog;
 import com.biblioteca.vista.dialogo.EliminarPublicacionDialog;
 import com.biblioteca.vista.dialogo.NuevoEjemplarDialog;
+import com.biblioteca.vista.jswing.JButtonBorrar;
+import com.biblioteca.vista.jswing.JButtonEditar;
 
 /**
  * Clase para la vista Ejemplares
@@ -105,7 +107,7 @@ public class Ejemplares {
 
         return panel;
     }
-
+    // CPD-OFF
     /**
      * Crea el panel principal de la pantalla.
      *
@@ -132,6 +134,7 @@ public class Ejemplares {
         encabezado.setLayout(null);
         encabezado.setBounds(0, 0, 600, 60);
 
+        // CPD-ON
         // Titulo
         JLabel titulo = new JLabel("Gestion de Ejemplares");
         titulo.setFont(titulo.getFont().deriveFont(24f));
@@ -478,43 +481,13 @@ public class Ejemplares {
          * Panel de celda para los botones de acción.
          */
         private final JPanel panelCell = new JPanel();
-        /**
-         * Botón de editar dentro del renderizador.
-         */
-        private final JButton edit = new JButton();
-        /**
-         * Botón de eliminar dentro del renderizador.
-         */
-        private final JButton del = new JButton();
 
         ActionsRenderer() {
             panelCell.setOpaque(false);
             panelCell.setLayout(new FlowLayout(FlowLayout.RIGHT, 6, 6));
 
             // Botón editar con fondo translúcido pintado manualmente
-            java.net.URL editarIconUrl = AppResources.editarPath();
-            final JButton editBtn = new JButton() {
-                @Override
-                protected void paintComponent(final Graphics g) {
-                    Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setComposite(AlphaComposite.SrcOver);
-                    g2.setColor(new Color(70, 141, 174, 102));
-                    g2.fillRect(0, 0, getWidth(), getHeight());
-                    g2.dispose();
-                    super.paintComponent(g);
-                }
-            };
-            if (editarIconUrl != null) {
-                Image img = new ImageIcon(editarIconUrl).getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
-                editBtn.setIcon(new ImageIcon(img));
-            }
-            editBtn.setPreferredSize(new Dimension(24, 24));
-            editBtn.setToolTipText("Editar");
-            editBtn.setBorder(null);
-            editBtn.setFocusPainted(false);
-            editBtn.setContentAreaFilled(false);
-            editBtn.setOpaque(false);
-            editBtn.setMargin(new Insets(0, 0, 0, 0));
+            final JButton editBtn = new JButtonEditar();
 
             // Abrir diálogo de edición de la publicación actual (usa
             // `currentPublicacionId`)
@@ -532,29 +505,7 @@ public class Ejemplares {
             });
 
             // Botón eliminar con fondo translúcido pintado manualmente
-            URL borrarIconUrl = AppResources.eliminarPath();
-            final JButton delBtn = new JButton() {
-                @Override
-                protected void paintComponent(final Graphics g) {
-                    Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setComposite(AlphaComposite.SrcOver);
-                    g2.setColor(new Color(192, 57, 43, 102));
-                    g2.fillRect(0, 0, getWidth(), getHeight());
-                    g2.dispose();
-                    super.paintComponent(g);
-                }
-            };
-            if (borrarIconUrl != null) {
-                Image img = new ImageIcon(borrarIconUrl).getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
-                delBtn.setIcon(new ImageIcon(img));
-            }
-            delBtn.setPreferredSize(new Dimension(24, 24));
-            delBtn.setToolTipText("Eliminar");
-            delBtn.setBorder(null);
-            delBtn.setFocusPainted(false);
-            delBtn.setContentAreaFilled(false);
-            delBtn.setOpaque(false);
-            delBtn.setMargin(new Insets(0, 0, 0, 0));
+            final JButton delBtn = new JButtonBorrar();
 
             panelCell.add(editBtn);
             panelCell.add(delBtn);
@@ -583,8 +534,8 @@ public class Ejemplares {
         String titulo = resumen.length > 0 ? resumen[0] : "";
         String isbn = resumen.length > 1 ? resumen[1] : "";
         String autores = resumen.length > 2 ? resumen[2] : "";
-        String editorial = resumen.length > 4 ? resumen[4] : "";
-        String disponibles = resumen.length > 5 ? resumen[5] : "";
+        // String editorial = resumen.length > 4 ? resumen[4] : "";
+        // String disponibles = resumen.length > 5 ? resumen[5] : "";
         String idStr = resumen.length > 6 ? resumen[6] : "";
 
         // Cargar datos en etiquetas

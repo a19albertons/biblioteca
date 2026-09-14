@@ -2,24 +2,18 @@ package com.biblioteca.vista.dialogo;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.MouseAdapter;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.RootPaneContainer;
 
 import com.biblioteca.controlador.Controlador;
 
@@ -29,23 +23,15 @@ import javax.swing.JOptionPane;
  * Diálogo para crear un nuevo ejemplar asociado a una publicación.
  * Muestra un campo de fecha de adquisición (YYYY-MM-DD) y un botón Añadir.
  */
-public class NuevoEjemplarDialog extends JDialog {
+public class NuevoEjemplarDialog extends OverlayDialog {
     /**
      * Controlador de la aplicación
      */
     private final Controlador controlador;
     /**
-     * Frame padre (para overlay)
-     */
-    private final JFrame parentFrame;
-    /**
      * ID de la publicación a la que se añade el ejemplar
      */
     private final int idPublicacion;
-    /**
-     * Componente previo del glass pane (para restaurar al cerrar el diálogo)
-     */
-    private java.awt.Component previousGlassPane;
 
     /**
      * Constructor del diálogo
@@ -55,26 +41,12 @@ public class NuevoEjemplarDialog extends JDialog {
      * @param idPublicacion
      */
     public NuevoEjemplarDialog(final JFrame parent, final Controlador controlador, final int idPublicacion) {
-        super(parent, "Nuevo Ejemplar", true);
+        super(parent, "Nuevo Ejemplar");
         this.controlador = controlador;
-        this.parentFrame = parent;
         this.idPublicacion = idPublicacion;
         initUI();
         setSize(new Dimension(420, 160));
         setLocationRelativeTo(parent);
-
-        // Cierra el overlay al cerrar el diálogo
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(final WindowEvent e) {
-                removeOverlay();
-            }
-
-            @Override
-            public void windowClosing(final WindowEvent e) {
-                removeOverlay();
-            }
-        });
     }
 
     /**
@@ -153,63 +125,5 @@ public class NuevoEjemplarDialog extends JDialog {
 
         getContentPane().add(content, BorderLayout.CENTER);
         getContentPane().add(footer, BorderLayout.SOUTH);
-    }
-
-    /**
-     * Controla la visibilidad del diálogo y el overlay
-     */
-    @Override
-    public final void setVisible(final boolean b) {
-        if (b) {
-            installOverlay();
-        }
-        super.setVisible(b);
-        if (!b) {
-            removeOverlay();
-        }
-    }
-
-    /**
-     * Instala un overlay semitransparente en el frame padre
-     */
-    private void installOverlay() {
-        // Controla si el frame padre es nulo
-        if (parentFrame == null) {
-            return;
-        }
-        // Guardar el componente previo del glass pane para restaurarlo después
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        Component current = rpc.getRootPane().getGlassPane();
-        previousGlassPane = current;
-
-        // Crear panel semitransparente
-        JPanel overlay = new JPanel();
-        overlay.setOpaque(true);
-        overlay.setBackground(new Color(217, 217, 217, 153));
-        overlay.addMouseListener(new MouseAdapter() {
-        });
-
-        // Asignar overlay como glass pane
-        rpc.getRootPane().setGlassPane(overlay);
-        overlay.setVisible(true);
-    }
-
-    /**
-     * Quita el overlay del frame padre
-     */
-    private void removeOverlay() {
-        // Controla si el frame padre es nulo
-        if (parentFrame == null) {
-            return;
-        }
-        // Restaurar el componente previo del glass pane
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        if (previousGlassPane != null) {
-            rpc.getRootPane().setGlassPane(previousGlassPane);
-            previousGlassPane.setVisible(false);
-            previousGlassPane = null;
-        } else {
-            rpc.getRootPane().getGlassPane().setVisible(false);
-        }
     }
 }

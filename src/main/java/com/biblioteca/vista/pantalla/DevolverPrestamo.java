@@ -1,27 +1,24 @@
 package com.biblioteca.vista.pantalla;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.biblioteca.controlador.Controlador;
 import com.biblioteca.dto.EjemplarConTituloDTO;
-import com.biblioteca.dto.UsuarioEstadoPorDNIOID;
-
-import javax.swing.event.DocumentEvent;
-import javax.swing.BorderFactory;
 
 /**
  * Clase para la vista Devolver préstamo
  */
-public class DevolverPrestamo {
+public class DevolverPrestamo extends PantallaPrestamoBase {
 
     /**
      * Controlador de la aplicación
@@ -34,7 +31,9 @@ public class DevolverPrestamo {
      * @param controlador controlador principal
      */
     public DevolverPrestamo(final Controlador controlador) {
+        super(controlador, "Devolución Préstamo", "Formulario registrar prestamo");
         this.controlador = controlador;
+        super.pantalla();
     }
 
     /**
@@ -47,155 +46,13 @@ public class DevolverPrestamo {
     }
 
     /**
-     * Muestra la pantalla para gestionar devoluciones de préstamo
-     *
-     * @return JPanel con la vista de devolución de préstamos
-     */
-    public JPanel pantalla() {
-        JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(600, 600));
-        panel.setBackground(Color.decode("#EDF3F6"));
-        panel.setLayout(null);
-
-        JPanel encabezado = crearEncabezado();
-        JPanel contenido = crearContenido();
-
-        panel.add(encabezado);
-        panel.add(contenido);
-        return panel;
-    }
-
-    /**
-     * Crea el panel de encabezado
-     *
-     * @return el panel de encabezado
-     */
-    private JPanel crearEncabezado() {
-        JPanel encabezado = new JPanel();
-        encabezado.setSize(new Dimension(600, 60));
-        encabezado.setBackground(Color.white);
-        encabezado.setLayout(null);
-        encabezado.setBounds(0, 0, 600, 60);
-
-        JLabel titulo = new JLabel("Devolución Préstamo");
-        titulo.setFont(titulo.getFont().deriveFont(24f));
-        titulo.setBounds(30, 10, 300, 40);
-        encabezado.add(titulo);
-
-        JButton btnFormularioRegistrar = new JButton("Formulario registrar prestamo");
-        btnFormularioRegistrar.setBounds(360, 15, 220, 30);
-        btnFormularioRegistrar.setBackground(Color.white);
-        btnFormularioRegistrar.setForeground(Color.decode("#468DAE"));
-        btnFormularioRegistrar.setFocusPainted(false);
-        btnFormularioRegistrar.setBorder(null);
-        encabezado.add(btnFormularioRegistrar);
-
-        // Eventos botones
-        btnFormularioRegistrar.addActionListener(e -> {
-            controlador.getControladorNavegacion().cambiarPantallaHijo("concederPrestamo");
-        });
-
-        return encabezado;
-    }
-
-    /**
-     * Crea el panel de contenido
-     *
-     * @return el panel de contenido
-     */
-    private JPanel crearContenido() {
-        JPanel contenido = new JPanel();
-        contenido.setSize(540, 480);
-        contenido.setLayout(null);
-        contenido.setBackground(Color.white);
-        contenido.setBounds(30, 80, 540, 480);
-
-        JTextField txtIdEjemplar = new JTextField();
-        txtIdEjemplar.setBounds(20, 280, 200, 35);
-        contenido.add(txtIdEjemplar);
-
-        configurarPasoSocio(contenido);
-        configurarPasoEjemplar(contenido, txtIdEjemplar);
-        configurarBotonesAccion(contenido, txtIdEjemplar);
-
-        return contenido;
-    }
-
-    /**
-     * Configura el paso 1: Identificar socio
-     *
-     * @param contenido el panel de contenido
-     */
-    private void configurarPasoSocio(final JPanel contenido) {
-        JLabel paso1 = new JLabel("1. Identificar Socio (Usuario)");
-        paso1.setBounds(20, 20, 350, 30);
-        paso1.setForeground(Color.decode("#468DAE"));
-        paso1.setFont(paso1.getFont().deriveFont(16f));
-        contenido.add(paso1);
-
-        JLabel dniID = new JLabel("DNI / ID:");
-        dniID.setBounds(20, 70, 100, 25);
-        contenido.add(dniID);
-
-        JTextField txtDniID = new JTextField();
-        txtDniID.setBounds(20, 100, 300, 35);
-        contenido.add(txtDniID);
-
-        JButton btnBuscarSocio = new JButton("Buscar");
-        btnBuscarSocio.setBounds(330, 100, 90, 35);
-        btnBuscarSocio.setBackground(Color.decode("#468DAE"));
-        btnBuscarSocio.setForeground(Color.WHITE);
-        btnBuscarSocio.setFocusPainted(false);
-        btnBuscarSocio.setBorder(null);
-        contenido.add(btnBuscarSocio);
-
-        JLabel resultadoSocio = new JLabel("");
-        resultadoSocio.setBounds(20, 150, 480, 40);
-        resultadoSocio.setText(
-                "<html>Usuario: (Estudiante) - <span style='color:#2BC187; font-weight:bold'>Sin Sanciones</span></html>");
-        resultadoSocio.setBackground(Color.decode("#EDF3F6"));
-        resultadoSocio.setOpaque(true);
-        resultadoSocio.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
-        contenido.add(resultadoSocio);
-
-        final int[] usuarioSeleccionado = new int[] { -1 };
-        btnBuscarSocio.addActionListener(e -> {
-            String input = txtDniID.getText().trim();
-            if (input.isEmpty()) {
-                resultadoSocio.setText("<html><span style='color:#F4791B'>Ingrese DNI o ID</span></html>");
-                usuarioSeleccionado[0] = -1;
-                return;
-            }
-            UsuarioEstadoPorDNIOID usuario = getControlador().getControladorDevolverPrestamo()
-                    .buscarUsuarioPorDniOId(input);
-            if (usuario == null) {
-                resultadoSocio.setText("<html><span style='color:#F4791B'>Usuario no encontrado</span></html>");
-                usuarioSeleccionado[0] = -1;
-                return;
-            }
-            usuarioSeleccionado[0] = usuario.getId();
-            String estado = usuario.getSancionactiva();
-            String tipoDesc = usuario.getTipoUsuario().getDescripcion();
-            if ("SANCIONADO".equalsIgnoreCase(estado)) {
-                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto() + " (" + tipoDesc
-                        + ") - <span style='color:#F4791B; font-weight:bold'>Tiene sanciones</span></html>");
-            } else if ("BAJA".equalsIgnoreCase(estado)) {
-                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto()
-                        + " - <span style='color:#F4791B; font-weight:bold'>Dado de baja</span></html>");
-            } else {
-                resultadoSocio.setText("<html>Usuario: " + usuario.getNombreCompleto() + " (" + tipoDesc
-                        + ") - <span style='color:#2BC187; font-weight:bold'>Sin sanciones</span></html>");
-            }
-        });
-    }
-
-    /**
      * Configura el paso 2: Identificar ejemplar
      *
      * @param contenido     el panel de contenido
      * @param txtIdEjemplar campo de texto para el ID del ejemplar
      */
-    private void configurarPasoEjemplar(final JPanel contenido, final JTextField txtIdEjemplar) {
+    @Override 
+    protected void configurarPasoEjemplar(final JPanel contenido, final JTextField txtIdEjemplar) {
         JLabel paso2 = new JLabel("2. Identificar Ejemplar");
         paso2.setBounds(20, 200, 300, 30);
         paso2.setForeground(Color.decode("#468DAE"));
@@ -245,6 +102,7 @@ public class DevolverPrestamo {
                     txtPublicacion.setText("");
                     return;
                 }
+                // CPD-OFF
                 String pubTitulo = detectado.getTitulo();
                 String numEd = String.valueOf(detectado.getNumEdicion());
                 String tipoPub = detectado.getTipoPublicacion().toString();
@@ -258,6 +116,7 @@ public class DevolverPrestamo {
                 } else {
                     txtPublicacion.setText("Detectado: " + pubTitulo);
                 }
+                // CPD-ON
             }
 
             @Override
@@ -283,7 +142,8 @@ public class DevolverPrestamo {
      * @param contenido     el panel de contenido
      * @param txtIdEjemplar campo de texto para el ID del ejemplar
      */
-    private void configurarBotonesAccion(final JPanel contenido, final JTextField txtIdEjemplar) {
+    @Override 
+    protected void configurarBotonesAccion(final JPanel contenido, final JTextField txtIdEjemplar) {
         JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setBounds(250, 420, 100, 35);
         btnCancelar.setBackground(Color.white);
@@ -306,29 +166,11 @@ public class DevolverPrestamo {
         });
 
         btnDevolverPrestamo.addActionListener(e -> {
-            final int[] usuarioSeleccionado = new int[] { -1 };
-            if (usuarioSeleccionado[0] == -1) {
-                JOptionPane.showMessageDialog(null, "Seleccione primero un usuario válido", "Error",
-                        JOptionPane.ERROR_MESSAGE);
+            if (!super.validarUsuarioYEjemplar(getUsuarioSeleccionado(), txtIdEjemplar)) {
                 return;
             }
-            String idEjStr = txtIdEjemplar.getText().trim();
-            if (idEjStr.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Introduzca el ID del ejemplar", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            int idEj;
-            try {
-                idEj = Integer.parseInt(idEjStr);
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "ID de ejemplar inválido", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            String err = getControlador().getControladorDevolverPrestamo().devolverPrestamo(usuarioSeleccionado[0],
-                    idEj);
+            String err = getControlador().getControladorDevolverPrestamo()
+                    .devolverPrestamo(getUsuarioSeleccionado()[0], Integer.parseInt(txtIdEjemplar.getText()));
             if (err == null) {
                 JOptionPane.showMessageDialog(null, "Devolución registrada correctamente", "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
@@ -344,6 +186,11 @@ public class DevolverPrestamo {
             } else {
                 JOptionPane.showMessageDialog(null, err, "Error", JOptionPane.ERROR_MESSAGE);
             }
+        });
+
+        // Eventos botones
+        getBtnCambiarFormulario().addActionListener(e -> {
+            controlador.getControladorNavegacion().cambiarPantallaHijo("concederPrestamo");
         });
     }
 

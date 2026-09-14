@@ -1,21 +1,9 @@
 package com.biblioteca.vista.dialogo;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.event.MouseAdapter;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.RootPaneContainer;
 
 import com.biblioteca.controlador.Controlador;
 import com.biblioteca.dto.EstadoEjemplarDTO;
@@ -24,23 +12,11 @@ import com.biblioteca.dto.EstadoEjemplarDTO;
  * Diálogo de confirmación para eliminar (marcar como baja) un ejemplar.
  * Comprueba que no haya préstamos activos antes de marcar la baja.
  */
-public class EliminarEjemplarDialog extends JDialog {
-    /**
-     * Controlador de la aplicación
-     */
-    private Controlador controlador;
-    /**
-     * Frame padre (para overlay)
-     */
-    private JFrame parentFrame;
+public class EliminarEjemplarDialog extends BaseEliminarDialog {
     /**
      * ID del ejemplar a eliminar
      */
-    private int idEjemplar;
-    /**
-     * Componente previo del glass pane (para restaurar al cerrar el diálogo)
-     */
-    private Component previousGlassPane;
+    private final int idEjemplar;
 
     /**
      * Constructor del diálogo
@@ -50,156 +26,56 @@ public class EliminarEjemplarDialog extends JDialog {
      * @param idEjemplar
      */
     public EliminarEjemplarDialog(final JFrame parent, final Controlador controlador, final int idEjemplar) {
-        super(parent, "Eliminar Ejemplar", true);
-        this.controlador = controlador;
-        this.parentFrame = parent;
+        super(parent, controlador, idEjemplar, "Eliminar Ejemplar", "Seguro que quieres eliminar el ejemplar?",
+                "EJEMPLAR");
         this.idEjemplar = idEjemplar;
-        initUI();
+        super.initUI();
         setSize(new Dimension(420, 160));
         setLocationRelativeTo(parent);
-
-        // Cierra el overlay al cerrar el diálogo
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosed(final java.awt.event.WindowEvent e) {
-                removeOverlay();
-            }
-
-            @Override
-            public void windowClosing(final java.awt.event.WindowEvent e) {
-                removeOverlay();
-            }
-        });
     }
 
     /**
-     * Inicializa la interfaz del diálogo
-     */
-    private void initUI() {
-        // Layout y contenido
-        getContentPane().setLayout(new BorderLayout());
-        JPanel content = new JPanel(new BorderLayout());
-        content.setBackground(Color.white);
-        content.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-
-        // Título y mensaje
-        JLabel title = new JLabel("Eliminar Ejemplar");
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
-        content.add(title, BorderLayout.NORTH);
-
-        // Mensaje de confirmación
-        JLabel texto = new JLabel("Seguro que quieres eliminar el ejemplar?");
-        texto.setBorder(BorderFactory.createEmptyBorder(12, 6, 12, 6));
-        content.add(texto, BorderLayout.CENTER);
-
-        // Botones
-        JPanel botones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        botones.setBackground(Color.white);
-
-        // Botones Cancelar y Eliminar
-        JButton cancelar = new JButton("Cancelar");
-        cancelar.setBackground(Color.white);
-        cancelar.setForeground(Color.decode("#000000"));
-        cancelar.setBorder(null);
-        cancelar.addActionListener(e -> dispose());
-
-        JButton eliminar = new JButton("Eliminar");
-        eliminar.setBackground(Color.decode("#E53935"));
-        eliminar.setForeground(Color.white);
-        eliminar.setBorder(null);
-        eliminar.addActionListener(e -> {
-            // Antes de eliminar, obtener id_publicacion para refrescar la vista tras la
-            // operación
-            EstadoEjemplarDTO detalles = controlador.getControladorEjemplares().obtenerDetallesEjemplar(idEjemplar);
-            int idPublicacion = -1;
-            // extraer id_publicacion de los detalles obtenidos
-            if (detalles != null) {
-                idPublicacion = detalles.getIdPublicacion();
-            }
-
-            // Intentar eliminar el ejemplar
-            boolean ok = controlador.getControladorEliminarEjemplarDialog().eliminarEjemplar(idEjemplar);
-            if (ok) {
-                JOptionPane.showMessageDialog(this, "Ejemplar marcado como baja", "Éxito",
-                        JOptionPane.INFORMATION_MESSAGE);
-                // refrescar lista de ejemplares para la publicación asociada (si se pudo
-                // obtener)
-                if (idPublicacion > 0) {
-                    controlador.getControladorNavegacion().mostrarEjemplaresParaPublicacion(idPublicacion);
-                } else {
-                    controlador.getControladorNavegacion().refrescarPanelControl();
-                }
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(this,
-                        "No es posible eliminar el ejemplar: existen préstamos activos o error",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        botones.add(cancelar);
-        botones.add(eliminar);
-
-        getContentPane().add(content, BorderLayout.CENTER);
-        getContentPane().add(botones, BorderLayout.SOUTH);
-    }
-
-    /**
-     * Muestra u oculta el diálogo, instalando o quitando el overlay en el frame
-     * padre.
+     * Lógica de eliminación específica para ejemplar
+     * 
+     * @return true si la eliminación fue exitosa
      */
     @Override
-    public void setVisible(final boolean b) {
-        if (b) {
-            installOverlay();
+    protected boolean onEliminar() {
+        // Antes de eliminar, obtener id_publicacion para refrescar la vista tras la
+        // operación
+        EstadoEjemplarDTO detalles = getControlador().getControladorEjemplares().obtenerDetallesEjemplar(idEjemplar);
+        // extraer id_publicacion de los detalles obtenidos
+        if (detalles != null) {
+            setIdPublicacion(detalles.getIdPublicacion());
         }
-        super.setVisible(b);
-        if (!b) {
-            removeOverlay();
-        }
+
+        // Intentar eliminar el ejemplar
+        boolean ok = getControlador().getControladorEliminarEjemplarDialog().eliminarEjemplar(idEjemplar);
+        return ok;
     }
 
     /**
-     * Instala un overlay semitransparente en el frame padre
+     * Manejo de salida (refrescos) específico para ejemplar
+     * 
+     * @param exito true si la eliminación fue exitosa
      */
-    private void installOverlay() {
-        // Controla si el frame padre es nulo
-        if (parentFrame == null) {
-            return;
-        }
-        // Guardar el componente previo del glass pane para restaurarlo después
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        Component current = rpc.getRootPane().getGlassPane();
-        previousGlassPane = current;
-
-        // Crear un panel semitransparente para el overlay
-        JPanel overlay = new JPanel();
-        overlay.setOpaque(true);
-        overlay.setBackground(new Color(217, 217, 217, 153));
-        overlay.addMouseListener(new MouseAdapter() {
-        });
-
-        // Asignar el overlay como glass pane
-        rpc.getRootPane().setGlassPane(overlay);
-        overlay.setVisible(true);
-    }
-
-    /**
-     * Quita el overlay del frame padre
-     */
-    private void removeOverlay() {
-        // Controla si el frame padre es nulo
-        if (parentFrame == null) {
-            return;
-        }
-        // Restaurar el componente previo del glass pane
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
-        if (previousGlassPane != null) {
-            rpc.getRootPane().setGlassPane(previousGlassPane);
-            previousGlassPane.setVisible(false);
-            previousGlassPane = null;
+    @Override
+    protected void onExit(final boolean exito) {
+        if (exito) {
+            JOptionPane.showMessageDialog(this, "Ejemplar marcado como baja", "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE);
+            // refrescar lista de ejemplares para la publicación asociada (si se pudo
+            // obtener)
+            if (getIdPublicacion() > 0) {
+                getControlador().getControladorNavegacion().mostrarEjemplaresParaPublicacion(getIdPublicacion());
+            } else {
+                getControlador().getControladorNavegacion().refrescarPanelControl();
+            }
+            dispose();
         } else {
-            rpc.getRootPane().getGlassPane().setVisible(false);
+            JOptionPane.showMessageDialog(this,
+                    "No es posible eliminar el ejemplar: existen préstamos activos o error",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

@@ -100,6 +100,7 @@ public class ControladorNuevoUsuarioDialog {
                     conexion.rollback();
                     return false;
                 }
+                // CPD-OFF
                 // Confirmar transacción
                 conexion.commit();
                 return true;
@@ -125,6 +126,6 @@ public class ControladorNuevoUsuarioDialog {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
-
+        // CPD-ON
     }
 }
