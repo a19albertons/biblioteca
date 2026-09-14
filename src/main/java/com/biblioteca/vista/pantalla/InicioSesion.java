@@ -47,6 +47,7 @@ public class InicioSesion {
      * @return JPanel con la pantalla de inicio de sesión
      */
     public JPanel pantalla() {
+        // CPD-OFF
         // Crear el panel principal
         JPanel panel = new JPanel();
         panel.setSize(800, 600);
@@ -85,6 +86,8 @@ public class InicioSesion {
         login.setBackground(Color.white);
         login.setLayout(null);
         tarjeta.add(login);
+
+        // CPD-ON
 
         // Campos de usuario y contraseña
         JLabel usuarioLabel = new JLabel("Usuario");

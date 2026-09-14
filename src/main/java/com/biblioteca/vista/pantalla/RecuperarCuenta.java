@@ -57,6 +57,7 @@ public class RecuperarCuenta {
      * @return JPanel con el formulario de recuperación
      */
     public JPanel pantalla() {
+        // CPD-OFF
         // Panel principal
         JPanel panel = new JPanel();
         panel.setSize(800, 600);
@@ -94,6 +95,8 @@ public class RecuperarCuenta {
         login.setBackground(Color.white);
         login.setLayout(null);
         tarjeta.add(login);
+
+        // CPD-ON
 
         // Etiqueta
         JLabel etiqueta = new JLabel("Correo Electrónico o Usuario");
