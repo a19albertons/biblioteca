@@ -246,7 +246,7 @@ public class UsuarioDAO {
      */
     public String[][] listaUsuariosYEstadoSancionActiva() {
         // Listado de usuarios
-        String[][] devolver = new String[0][0];
+        String[][] devolver;
         try (
                 // Consulta SQL
                 PreparedStatement ps = conexion.prepareStatement(SQL_LISTA_USUARIOS_ESTADO);) { // Ejecutar consulta
