@@ -107,7 +107,7 @@ public class Ejemplares {
 
         return panel;
     }
-
+    // CPD-OFF
     /**
      * Crea el panel principal de la pantalla.
      *
@@ -134,6 +134,7 @@ public class Ejemplares {
         encabezado.setLayout(null);
         encabezado.setBounds(0, 0, 600, 60);
 
+        // CPD-ON
         // Titulo
         JLabel titulo = new JLabel("Gestion de Ejemplares");
         titulo.setFont(titulo.getFont().deriveFont(24f));

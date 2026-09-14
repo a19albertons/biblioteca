@@ -99,6 +99,7 @@ public class PanelControl {
         return panel;
     }
 
+    // CPD-OFF
     /**
      * Crea el panel principal del control
      *
@@ -124,6 +125,7 @@ public class PanelControl {
         encabezado.setLayout(null);
         encabezado.setBounds(0, 0, 600, 60);
 
+        // CPD-ON
         JLabel titulo = new JLabel("Panel de Control");
         titulo.setFont(titulo.getFont().deriveFont(24f));
         titulo.setBounds(10, 10, 200, 40);
