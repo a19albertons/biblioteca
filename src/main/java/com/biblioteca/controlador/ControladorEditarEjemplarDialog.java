@@ -27,9 +27,6 @@ public class ControladorEditarEjemplarDialog {
      * @param dbConnection la conexión a la base de datos
      */
     public ControladorEditarEjemplarDialog(@Nonnull final DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
         this.dbConnection = dbConnection;
     }
 
