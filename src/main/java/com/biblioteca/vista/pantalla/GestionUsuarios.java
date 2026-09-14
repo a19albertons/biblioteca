@@ -1,21 +1,14 @@
 package com.biblioteca.vista.pantalla;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,8 +20,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import com.biblioteca.controlador.Controlador;
-import com.biblioteca.utilities.AppResources;
 import com.biblioteca.utilities.BackgroundWorker;
+import com.biblioteca.vista.JSwing.JButtonBorrar;
+import com.biblioteca.vista.JSwing.JButtonEditar;
 import com.biblioteca.vista.dialogo.EditarUsuarioDialog;
 import com.biblioteca.vista.dialogo.EliminarUsuarioDialog;
 import com.biblioteca.vista.dialogo.NuevoUsuarioDialog;
@@ -92,53 +86,9 @@ public class GestionUsuarios {
             panelCell.setOpaque(false);
             panelCell.setLayout(new FlowLayout(FlowLayout.RIGHT, 6, 6));
 
-            URL editarIconUrl = AppResources.editarPath();
-            final JButton editBtn = new JButton() {
-                @Override
-                protected void paintComponent(final Graphics g) {
-                    final Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setComposite(AlphaComposite.SrcOver);
-                    g2.setColor(new Color(70, 141, 174, 102));
-                    g2.fillRect(0, 0, getWidth(), getHeight());
-                    g2.dispose();
-                    super.paintComponent(g);
-                }
-            };
-            if (editarIconUrl != null) {
-                Image img = new ImageIcon(editarIconUrl).getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
-                editBtn.setIcon(new ImageIcon(img));
-            }
-            editBtn.setPreferredSize(new Dimension(24, 24));
-            editBtn.setToolTipText("Editar");
-            editBtn.setBorder(null);
-            editBtn.setFocusPainted(false);
-            editBtn.setContentAreaFilled(false);
-            editBtn.setOpaque(false);
-            editBtn.setMargin(new Insets(0, 0, 0, 0));
+            final JButtonEditar editBtn = new JButtonEditar();
 
-            URL borrarIconUrl = AppResources.eliminarPath();
-            final JButton delBtn = new JButton() {
-                @Override
-                protected void paintComponent(final Graphics g) {
-                    final Graphics2D g2 = (Graphics2D) g.create();
-                    g2.setComposite(AlphaComposite.SrcOver);
-                    g2.setColor(new Color(192, 57, 43, 102));
-                    g2.fillRect(0, 0, getWidth(), getHeight());
-                    g2.dispose();
-                    super.paintComponent(g);
-                }
-            };
-            if (borrarIconUrl != null) {
-                final Image img = new ImageIcon(borrarIconUrl).getImage().getScaledInstance(12, 12, Image.SCALE_SMOOTH);
-                delBtn.setIcon(new ImageIcon(img));
-            }
-            delBtn.setPreferredSize(new Dimension(24, 24));
-            delBtn.setToolTipText("Eliminar");
-            delBtn.setBorder(null);
-            delBtn.setFocusPainted(false);
-            delBtn.setContentAreaFilled(false);
-            delBtn.setOpaque(false);
-            delBtn.setMargin(new Insets(0, 0, 0, 0));
+            final JButton delBtn = new JButtonBorrar();
 
             panelCell.add(editBtn);
             panelCell.add(delBtn);
