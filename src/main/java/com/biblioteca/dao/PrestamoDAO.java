@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.dto.ObtenerUltimoPrestamoPorEjemplarDTO;
 import com.biblioteca.dto.RegistroDevolucionDTO;
 
@@ -69,10 +71,7 @@ public class PrestamoDAO {
      * 
      * @param conexion
      */
-    public PrestamoDAO(final Connection conexion) {
-        if (conexion == null) {
-            throw new IllegalArgumentException("Connection cannot be null");
-        }
+    public PrestamoDAO(@Nonnull final Connection conexion) {
         this.conexion = conexion;
     }
 

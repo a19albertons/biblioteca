@@ -2,6 +2,8 @@ package com.biblioteca.modelo;
 
 import java.time.LocalDate;
 
+import javax.annotation.Nonnull;
+
 /**
  * Modelo de datos para la tabla prestamos
  */
@@ -66,9 +68,6 @@ public class Prestamo {
      * @param usuario
      */
     public void setUsuario(final Usuario usuario) {
-        if (usuario == null) {
-            throw new IllegalArgumentException("El usuario no puede ser nulo");
-        }
         this.usuario = usuario;
     }
 
@@ -87,9 +86,6 @@ public class Prestamo {
      * @param ejemplar
      */
     public void setEjemplar(final Ejemplar ejemplar) {
-        if (ejemplar == null) {
-            throw new IllegalArgumentException("El ejemplar no puede ser nulo");
-        }
         this.ejemplar = ejemplar;
     }
 
@@ -108,9 +104,6 @@ public class Prestamo {
      * @param fechaInicio
      */
     public void setFechaInicio(final LocalDate fechaInicio) {
-        if (fechaInicio == null) {
-            throw new IllegalArgumentException("La fecha de inicio no puede ser nula");
-        }
         this.fechaInicio = fechaInicio;
     }
 
@@ -129,13 +122,12 @@ public class Prestamo {
      * @param fechaFin
      */
     public void setFechaFin(final LocalDate fechaFin) {
-        if (fechaFin == null) {
-            throw new IllegalArgumentException("La fecha de fin no puede ser nula");
+        if (fechaFin.isBefore(this.fechaInicio)) {
+            this.fechaFin = this.fechaInicio;
+            this.fechaInicio = fechaFin;
+        } else {
+            this.fechaFin = fechaFin;
         }
-        if (this.fechaInicio != null && fechaFin.isBefore(this.fechaInicio)) {
-            throw new IllegalArgumentException("La fecha de fin no puede ser anterior a la fecha de inicio");
-        }
-        this.fechaFin = fechaFin;
     }
 
     /**
@@ -166,8 +158,8 @@ public class Prestamo {
      * @param fechaFin    la fecha de fin
      * @param estado      el estado
      */
-    public Prestamo(final Usuario usuario, final Ejemplar ejemplar, final LocalDate fechaInicio,
-            final LocalDate fechaFin, final boolean estado) {
+    public Prestamo(@Nonnull final Usuario usuario, @Nonnull final Ejemplar ejemplar, @Nonnull final LocalDate fechaInicio,
+            @Nonnull final LocalDate fechaFin, final boolean estado) {
         setUsuario(usuario);
         setEjemplar(ejemplar);
         setFechaInicio(fechaInicio);
@@ -185,8 +177,9 @@ public class Prestamo {
      * @param fechaFin    la fecha de fin
      * @param estado      el estado
      */
-    public Prestamo(final int id, final Usuario usuario, final Ejemplar ejemplar, final LocalDate fechaInicio,
-            final LocalDate fechaFin,
+    public Prestamo(final int id, @Nonnull final Usuario usuario, @Nonnull final Ejemplar ejemplar,
+            @Nonnull final LocalDate fechaInicio,
+            @Nonnull final LocalDate fechaFin,
             final boolean estado) {
         this.id = id;
         this.usuario = usuario;

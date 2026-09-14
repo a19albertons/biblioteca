@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.EjemplarDAO;
 import com.biblioteca.dao.PrestamoDAO;
@@ -44,10 +46,7 @@ public class ControladorDevolverPrestamo {
      * 
      * @param dbConnection
      */
-    public ControladorDevolverPrestamo(final DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorDevolverPrestamo(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 

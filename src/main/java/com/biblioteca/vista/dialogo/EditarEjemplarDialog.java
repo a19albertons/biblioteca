@@ -23,7 +23,7 @@ import com.biblioteca.dto.EstadoEjemplarDTO;
  * Diálogo para editar un ejemplar existente.
  * Muestra número de ejemplar (readonly) y fecha de adquisición.
  */
-public class EditarEjemplarDialog extends OverlayDialog {
+public final class EditarEjemplarDialog extends OverlayDialog {
     /**
      * Controlador de la aplicación
      */

@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.UsuarioDAO;
 import com.biblioteca.security.HashearContrasena;
@@ -26,10 +28,7 @@ public class ControladorNuevoUsuarioDialog {
      * 
      * @param dbConnection
      */
-    public ControladorNuevoUsuarioDialog(final DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorNuevoUsuarioDialog(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
@@ -62,7 +61,9 @@ public class ControladorNuevoUsuarioDialog {
             }
             // Preparar datos
             String apellido1 = (apellidos != null) ? apellidos.trim() : "";
-            String apellido2 = ""; // dejamos el campo apellido2 vacío por simplicidad
+            String apellido2 = apellidos != null && apellidos.trim().replaceAll("\\s+", " ").contains(" ")
+                    ? apellidos.trim().replaceAll("\\s+", " ").split(" ")[1]
+                    : ""; // dejamos el campo apellido2 vacío por simplicidad
             String contrasena = dni.trim(); // la contraseña inicial es el DNI
 
             // Crear string de usuario (login) a partir del nombre y apellido1

@@ -1,5 +1,7 @@
 package com.biblioteca.modelo;
 
+import javax.annotation.Nonnull;
+
 /**
  * Modelo de datos para la tabla modulo
  */
@@ -48,11 +50,7 @@ public class Modulo {
      * @param nombre
      */
     public void setNombre(final String nombre) {
-        if (nombre != null) {
-            this.nombre = nombre;
-        } else {
-            throw new IllegalArgumentException("El nombre del módulo no puede ser nulo");
-        }
+        this.nombre = nombre;
     }
 
     // Constructores
@@ -61,7 +59,7 @@ public class Modulo {
      * 
      * @param nombre
      */
-    public Modulo(final String nombre) {
+    public Modulo(@Nonnull final String nombre) {
         setNombre(nombre);
     }
 
@@ -71,7 +69,7 @@ public class Modulo {
      * @param id
      * @param nombre
      */
-    public Modulo(final int id, final String nombre) {
+    public Modulo(final int id, @Nonnull final String nombre) {
         this.id = id;
         this.nombre = nombre;
     }

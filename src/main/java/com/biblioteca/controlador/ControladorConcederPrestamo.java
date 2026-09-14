@@ -5,6 +5,8 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.EjemplarDAO;
 import com.biblioteca.dao.PrestamoDAO;
@@ -30,10 +32,7 @@ public class ControladorConcederPrestamo {
      *
      * @param dbConnection la conexión a la base de datos
      */
-    public ControladorConcederPrestamo(final DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorConcederPrestamo(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 
@@ -228,7 +227,7 @@ public class ControladorConcederPrestamo {
                 return null; // null indica éxito
             } finally {
                 // Restaurar auto-commit
-                if (!exito) {
+                if (!exito && conexion != null) {
                     try {
                         conexion.rollback();
                         conexion.setAutoCommit(true);

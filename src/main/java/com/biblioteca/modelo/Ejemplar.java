@@ -2,6 +2,8 @@ package com.biblioteca.modelo;
 
 import java.time.LocalDate;
 
+import javax.annotation.Nonnull;
+
 /**
  * Modelo de datos para la tabla ejemplares
  */
@@ -62,11 +64,8 @@ public class Ejemplar {
      * @param publicacion la publicacion del ejemplar
      */
     public void setPublicacion(final Publicacion publicacion) {
-        if (publicacion != null) {
-            this.publicacion = publicacion;
-        } else {
-            throw new IllegalArgumentException("La publicación no puede ser nula");
-        }
+        this.publicacion = publicacion;
+    
 
     }
 
@@ -103,11 +102,7 @@ public class Ejemplar {
      * @param fechaAdquisicion la fecha de adquisición del ejemplar
      */
     public void setFechaAdquisicion(final LocalDate fechaAdquisicion) {
-        if (fechaAdquisicion != null) {
-            this.fechaAdquisicion = fechaAdquisicion;
-        } else {
-            throw new IllegalArgumentException("La fecha de adquisición no puede ser nula");
-        }
+        this.fechaAdquisicion = fechaAdquisicion;
     }
 
     /**
@@ -137,7 +132,7 @@ public class Ejemplar {
      * @param fechaAdquisicion la fecha de adquisición
      * @param estado el estado
      */
-    public Ejemplar(final Publicacion publicacion, final int numEjemplar, final LocalDate fechaAdquisicion, final boolean estado) {
+    public Ejemplar(@Nonnull final Publicacion publicacion, final int numEjemplar, @Nonnull final LocalDate fechaAdquisicion, final boolean estado) {
         setPublicacion(publicacion);
         setNumEjemplar(numEjemplar);
         setFechaAdquisicion(fechaAdquisicion);
@@ -153,7 +148,7 @@ public class Ejemplar {
      * @param fechaAdquisicion
      * @param estado
      */
-    public Ejemplar(final int id, final Publicacion publicacion, final int numEjemplar, final LocalDate fechaAdquisicion, final boolean estado) {
+    public Ejemplar(final int id, @Nonnull final Publicacion publicacion, final int numEjemplar, @Nonnull final LocalDate fechaAdquisicion, final boolean estado) {
         this.id = id;
         this.publicacion = publicacion;
         this.numEjemplar = numEjemplar;

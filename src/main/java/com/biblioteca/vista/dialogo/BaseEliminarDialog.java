@@ -126,13 +126,12 @@ public abstract class BaseEliminarDialog extends OverlayDialog {
         this.titulo = titulo;
         this.mensajeConfirmacion = mensajeConfirmacion;
         this.idPublicacion = 0;
-        initUI();
     }
 
     /**
      * Inicializa la interfaz del diálogo
      */
-    protected void initUI() {
+    protected final void initUI() {
         // Layout y contenido
         getContentPane().setLayout(new BorderLayout());
         JPanel contenido = new JPanel(new BorderLayout());

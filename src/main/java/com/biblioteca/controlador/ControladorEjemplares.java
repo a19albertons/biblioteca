@@ -3,6 +3,8 @@ package com.biblioteca.controlador;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.dao.EjemplarDAO;
 import com.biblioteca.dto.EstadoEjemplarDTO;
@@ -21,10 +23,7 @@ public class ControladorEjemplares {
      * 
      * @param dbConnection DBConnection para conexiones a la base de datos
      */
-    public ControladorEjemplares(final DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public ControladorEjemplares(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
     }
 

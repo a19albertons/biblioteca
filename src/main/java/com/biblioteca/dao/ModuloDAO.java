@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.annotation.Nonnull;
+
 /**
  * DAO para la tabla `modulo` (módulos).
  */
@@ -30,10 +32,7 @@ public class ModuloDAO {
      * 
      * @param conexion conexión a la base de datos
      */
-    public ModuloDAO(final Connection conexion) {
-        if (conexion == null) {
-            throw new IllegalArgumentException("conexion cannot be null");
-        }
+    public ModuloDAO(@Nonnull final Connection conexion) {
         this.conexion = conexion;
     }
 

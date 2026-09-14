@@ -5,6 +5,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.dto.UsuarioFinSancionDTO;
 
 /**
@@ -36,10 +38,7 @@ public class SancionDAO {
      * 
      * @param conexion
      */
-    public SancionDAO(final Connection conexion) {
-        if (conexion == null) {
-            throw new IllegalArgumentException("Connection cannot be null");
-        }
+    public SancionDAO(@Nonnull final Connection conexion) {
         this.conexion = conexion;
     }
 

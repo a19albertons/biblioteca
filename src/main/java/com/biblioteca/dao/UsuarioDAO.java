@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.dto.UsuarioEstadoPorDNIOID;
 import com.biblioteca.dto.UsuarioTipoDTO;
 import com.biblioteca.modelo.TipoUsuario;
@@ -113,10 +115,7 @@ public class UsuarioDAO {
      * 
      * @param conexion conexión a la base de datos (no puede ser null)
      */
-    public UsuarioDAO(final Connection conexion) {
-        if (conexion == null) {
-            throw new IllegalArgumentException("Connection cannot be null");
-        }
+    public UsuarioDAO(@Nonnull final Connection conexion) {
         this.conexion = conexion;
     }
 
@@ -247,7 +246,7 @@ public class UsuarioDAO {
      */
     public String[][] listaUsuariosYEstadoSancionActiva() {
         // Listado de usuarios
-        String[][] devolver = new String[0][0];
+        String[][] devolver;
         try (
                 // Consulta SQL
                 PreparedStatement ps = conexion.prepareStatement(SQL_LISTA_USUARIOS_ESTADO);) { // Ejecutar consulta

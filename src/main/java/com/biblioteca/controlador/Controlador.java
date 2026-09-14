@@ -1,5 +1,7 @@
 package com.biblioteca.controlador;
 
+import javax.annotation.Nonnull;
+
 import com.biblioteca.conexiones.DBConnection;
 import com.biblioteca.vista.navegacion.ControladorNavegacion;
 
@@ -321,10 +323,7 @@ public class Controlador {
      *
      * @param dbConnection implementación de DBConnection (no puede ser null)
      */
-    public Controlador(final DBConnection dbConnection) {
-        if (dbConnection == null) {
-            throw new IllegalArgumentException("DBConnection cannot be null");
-        }
+    public Controlador(@Nonnull final DBConnection dbConnection) {
         this.dbConnection = dbConnection;
         this.controladorInicioSesion = new ControladorInicioSesion(dbConnection);
         this.controladorRecuperarCuenta = new ControladorRecuperarCuenta(dbConnection);
