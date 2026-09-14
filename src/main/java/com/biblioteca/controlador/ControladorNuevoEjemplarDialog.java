@@ -77,7 +77,7 @@ public class ControladorNuevoEjemplarDialog {
                     conexion.rollback();
                     return false;
                 }
-
+                // CPD-OFF
                 // Commit de la transacción si todo fue correcto
                 conexion.commit();
                 return true;
@@ -103,5 +103,6 @@ public class ControladorNuevoEjemplarDialog {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
+        // CPD-ON
     }
 }

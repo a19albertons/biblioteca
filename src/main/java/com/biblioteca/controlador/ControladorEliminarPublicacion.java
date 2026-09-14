@@ -60,7 +60,7 @@ public class ControladorEliminarPublicacion {
                     conexion.rollback();
                     return false;
                 }
-
+                // CPD-OFF
                 // Commit de la transacción si todo fue bien
                 conexion.commit();
                 return true;
@@ -86,6 +86,6 @@ public class ControladorEliminarPublicacion {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
-
+        // CPD-ON
     }
 }

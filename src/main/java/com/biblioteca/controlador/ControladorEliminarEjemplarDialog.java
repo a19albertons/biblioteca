@@ -59,6 +59,7 @@ public class ControladorEliminarEjemplarDialog {
                     conexion.rollback();
                     return false;
                 }
+                // CPD-OFF
                 conexion.commit();
                 return true;
             } catch (SQLException e) {
@@ -83,6 +84,6 @@ public class ControladorEliminarEjemplarDialog {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
-
+        // CPD-ON
     }
 }

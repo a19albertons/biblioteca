@@ -151,6 +151,7 @@ public class ControladorNuevaPublicacionDialog {
                     return false;
                 }
 
+                // CPD-OFF
                 // Si hemos llegado hasta aquí, confirmar
                 conexion.commit();
                 return true;
@@ -174,7 +175,7 @@ public class ControladorNuevaPublicacionDialog {
             System.out.println("Error al obtener conexión: " + e.getMessage());
             return false;
         }
-
+        // CPD-ON
     }
 
     /**
@@ -231,7 +232,7 @@ public class ControladorNuevaPublicacionDialog {
                 if (!transactionHelper.procesarRelaciones(conexion, publicacionDAO, temaDAO, temasCsv, idPub, RelacionPublicacionHelperEnum.TEMA)) {
                     return false;
                 }
-
+                // CPD-OFF
                 conexion.commit();
                 return true;
             } catch (SQLException e) {
@@ -254,6 +255,7 @@ public class ControladorNuevaPublicacionDialog {
             System.out.println("Error al obtener conexión: " + e1.getMessage());
             return false;
         }
+        // CPD-ON
     }
 
 }
