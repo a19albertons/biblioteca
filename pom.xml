@@ -155,6 +155,7 @@
           <failOnError>true</failOnError>
           <xmlOutput>true</xmlOutput>
           <htmlOutput>true</htmlOutput>
+          <excludeFilterFile>${project.basedir}/config/spotbugs-exclude.xml</excludeFilterFile>
         </configuration>
 
         <executions>
