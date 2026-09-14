@@ -11,12 +11,10 @@ import java.awt.Insets;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import com.biblioteca.controlador.Controlador;
 import com.biblioteca.modelo.TipoUsuario;
@@ -25,11 +23,12 @@ import com.biblioteca.modelo.TipoUsuario;
  * Diálogo para crear un nuevo usuario/socio.
  * La contraseña inicial se fijará al valor del DNI suministrado.
  */
-public class NuevoUsuarioDialog extends OverlayDialog {
+public class NuevoUsuarioDialog extends BaseUsuarioDialog {
     /**
      * Controlador principal de la aplicación
      */
     private Controlador controlador;
+
 
     /**
      * Constructor
@@ -78,8 +77,7 @@ public class NuevoUsuarioDialog extends OverlayDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        JTextField dniField = new JTextField(20);
-        center.add(dniField, gbc);
+        center.add(getDniField(), gbc);
 
         // Nombre
         gbc.gridy++;
@@ -90,8 +88,7 @@ public class NuevoUsuarioDialog extends OverlayDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        JTextField nombreField = new JTextField(20);
-        center.add(nombreField, gbc);
+        center.add(getNombreField(), gbc);
 
         // Apellidos
         gbc.gridy++;
@@ -102,8 +99,7 @@ public class NuevoUsuarioDialog extends OverlayDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        JTextField apellidosField = new JTextField(20);
-        center.add(apellidosField, gbc);
+        center.add(getApellidosField(), gbc);
 
         // Email
         gbc.gridy++;
@@ -114,8 +110,7 @@ public class NuevoUsuarioDialog extends OverlayDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        JTextField emailField = new JTextField(20);
-        center.add(emailField, gbc);
+        center.add(getEmailField(), gbc);
 
         // Tipo
         gbc.gridy++;
@@ -127,12 +122,10 @@ public class NuevoUsuarioDialog extends OverlayDialog {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         // Rellenar JComboBox con descripciones de TipoUsuario
-        String[] tiposDesc = new String[TipoUsuario.values().length];
         for (int i = 0; i < TipoUsuario.values().length; i++) {
-            tiposDesc[i] = TipoUsuario.values()[i].getDescripcion();
+            getTipoBox().addItem(TipoUsuario.values()[i].getDescripcion());
         }
-        JComboBox<String> tipoBox = new JComboBox<>(tiposDesc);
-        center.add(tipoBox, gbc);
+        center.add(getTipoBox(), gbc);
 
         content.add(center, BorderLayout.CENTER);
 
@@ -147,24 +140,18 @@ public class NuevoUsuarioDialog extends OverlayDialog {
         add.setBorder(null);
         add.setFocusPainted(false);
         add.addActionListener(e -> {
-            // Obtener datos del formulario
-            String dni = dniField.getText();
-            String nombre = nombreField.getText();
-            String apellidos = apellidosField.getText();
-            String email = emailField.getText();
-            int tipoIdx = tipoBox.getSelectedIndex();
-            String tipoCode = TipoUsuario.values()[tipoIdx].name();
+
 
             // Validaciones básicas
-            if (dni == null || dni.trim().isEmpty() || nombre == null || nombre.trim().isEmpty()) {
+            if (getDni() == null || getDni().isEmpty() || getNombre() == null || getNombre().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "DNI y Nombre son obligatorios", "Error",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // Intentar crear usuario
-            boolean ok = controlador.getControladorNuevoUsuarioDialog().crearUsuario(dni.trim(), nombre.trim(),
-                    apellidos.trim(), email.trim(), tipoCode);
+            boolean ok = controlador.getControladorNuevoUsuarioDialog().crearUsuario(getDni().trim(), getNombre(),
+                    getApellidos(), getEmail(), getCode());
             if (ok) {
                 JOptionPane.showMessageDialog(this, "Usuario creado y contraseña inicial igual al DNI", "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
