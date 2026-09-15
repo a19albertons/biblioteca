@@ -42,8 +42,7 @@ public class EliminarPublicacionDialog extends BaseEliminarDialog {
     @Override
     protected boolean onEliminar() {
         // Pedir al controlador que elimine la publicación
-        boolean ok = getControlador().getControladorEliminarPublicacion().eliminarPublicacion(idPublicacion);
-        return ok;
+        return getControlador().getControladorEliminarPublicacion().eliminarPublicacion(idPublicacion);
     }
 
     /**

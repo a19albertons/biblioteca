@@ -219,8 +219,8 @@ public class GestionUsuarios {
         // Cargar usuarios en background
         BackgroundWorker.run(
                 () -> controlador.getControladorGestionUsuarios().obtenerUsuariosYEstadoSancionActiva(),
-                rawData -> cargarUsuariosEnTabla(rawData),
-                ex -> mostrarErrorCargaUsuarios(ex));
+                this::cargarUsuariosEnTabla,
+                this::mostrarErrorCargaUsuarios);
 
         table.setRowHeight(48);
         table.setShowGrid(false);

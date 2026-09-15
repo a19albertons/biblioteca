@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class EjemplarDAO {
                     // obtener datos
                     String id = String.valueOf(rs.getInt("id"));
                     String num = String.valueOf(rs.getInt("num_ejemplar"));
-                    Date fecha = rs.getDate("fecha_adquisicion");
+                    LocalDate fecha = rs.getDate("fecha_adquisicion").toLocalDate();
                     String fechaStr = (fecha != null) ? fecha.toString() : "";
                     boolean enServicio = rs.getBoolean("en_servicio");
                     int prestamosActivos = rs.getInt("prestamos_activos");
@@ -132,14 +133,14 @@ public class EjemplarDAO {
      * @param fechaAdquisicion la fecha de adquisición
      * @return true si la inserción fue exitosa
      */
-    public boolean insertarEjemplar(final int idPublicacion, final int numEjemplar, final Date fechaAdquisicion) {
+    public boolean insertarEjemplar(final int idPublicacion, final int numEjemplar, final LocalDate fechaAdquisicion) {
         // Consulta SQL
         final String sql = SQL_INSERT_EJEMPLAR;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
             ps.setInt(1, idPublicacion);
             ps.setInt(2, numEjemplar);
-            ps.setDate(3, fechaAdquisicion);
+            ps.setDate(3, Date.valueOf(fechaAdquisicion));
             // Ejecutar inserción
             int rows = ps.executeUpdate();
             return rows == 1;
@@ -170,7 +171,7 @@ public class EjemplarDAO {
                     String id = String.valueOf(rs.getInt("id"));
                     String idPub = String.valueOf(rs.getInt("id_publicacion"));
                     String num = String.valueOf(rs.getInt("num_ejemplar"));
-                    Date fecha = rs.getDate("fecha_adquisicion");
+                    LocalDate fecha = rs.getDate("fecha_adquisicion").toLocalDate();
                     String fechaStr = (fecha != null) ? fecha.toString() : "";
                     boolean enServicio = rs.getBoolean("estado");
                     String estadoStr = enServicio ? "DISPONIBLE" : "BAJA";
@@ -199,12 +200,12 @@ public class EjemplarDAO {
      *                         false = baja)
      * @return true si la actualización afectó exactamente una fila
      */
-    public boolean actualizarEjemplar(final int idEjemplar, final Date fechaAdquisicion, final boolean estado) {
+    public boolean actualizarEjemplar(final int idEjemplar, final LocalDate fechaAdquisicion, final boolean estado) {
         // Consulta SQL
         final String sql = SQL_UPDATE_EJEMPLAR;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             // Asignar parámetros
-            ps.setDate(1, fechaAdquisicion);
+            ps.setDate(1, Date.valueOf(fechaAdquisicion));
             ps.setBoolean(2, estado);
             ps.setInt(3, idEjemplar);
             // Ejecutar actualización

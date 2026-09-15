@@ -1,7 +1,6 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
@@ -82,8 +81,8 @@ public class ControladorEditarEjemplarDialog {
                 boolean estadoActual = true; // Por defecto activo
                 estadoActual = "DISPONIBLE".equals(detalles.getEstado());
 
-                Date fechaSql = (fechaAdquisicion != null) ? Date.valueOf(fechaAdquisicion)
-                        : new Date(System.currentTimeMillis());
+                LocalDate fechaSql = fechaAdquisicion != null ? fechaAdquisicion
+                        : LocalDate.now();
                 // Actualiza el ejemplar preservando el estado
                 if (!dao.actualizarEjemplar(idEjemplar, fechaSql, estadoActual)) {
                     conexion.rollback();

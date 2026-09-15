@@ -170,8 +170,8 @@ public class PrestamoDAO {
      * @param fechaFin    fecha en la que termina el préstamo
      * @return true si se insertó correctamente
      */
-    public boolean insertarPrestamo(final int idUsuario, final int idEjemplar, final Date fechaInicio,
-            final Date fechaFin) {
+    public boolean insertarPrestamo(final int idUsuario, final int idEjemplar, final LocalDate fechaInicio,
+            final LocalDate fechaFin) {
         // Consulta SQL para insertar el préstamo
         final String sql = SQL_INSERT_PRESTAMO;
         try (
@@ -179,8 +179,8 @@ public class PrestamoDAO {
             // Asignar parámetros
             ps.setInt(1, idUsuario);
             ps.setInt(2, idEjemplar);
-            ps.setDate(3, fechaInicio);
-            ps.setDate(4, fechaFin);
+            ps.setDate(3, Date.valueOf(fechaInicio));
+            ps.setDate(4, Date.valueOf(fechaFin));
 
             // Ejecutar inserción
             int rows = ps.executeUpdate();
@@ -334,8 +334,8 @@ public class PrestamoDAO {
                 if (rs.next()) {
                     int id = rs.getInt("id");
                     int idUsuario = rs.getInt("id_usuario");
-                    Date fechaInicio = rs.getDate("fecha_inicio");
-                    Date fechaFin = rs.getDate("fecha_fin");
+                    LocalDate fechaInicio = rs.getDate("fecha_inicio").toLocalDate();
+                    LocalDate fechaFin = rs.getDate("fecha_fin").toLocalDate();
                     boolean estado = rs.getBoolean("estado");
                     return new ObtenerUltimoPrestamoPorEjemplarDTO(id, idUsuario, fechaInicio, fechaFin, estado);
                 }
