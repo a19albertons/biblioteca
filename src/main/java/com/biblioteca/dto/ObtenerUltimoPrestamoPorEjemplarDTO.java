@@ -1,6 +1,6 @@
 package com.biblioteca.dto;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class ObtenerUltimoPrestamoPorEjemplarDTO {
     /**
@@ -14,11 +14,11 @@ public class ObtenerUltimoPrestamoPorEjemplarDTO {
     /**
      * Fecha de inicio del préstamo.
      */
-    private final Date fechaInicio;
+    private final LocalDate fechaInicio;
     /**
      * Fecha de fin del préstamo.
      */
-    private final Date fechaFin;
+    private final LocalDate fechaFin;
     /**
      * Estado del préstamo (activo o finalizado).
      */
@@ -33,8 +33,8 @@ public class ObtenerUltimoPrestamoPorEjemplarDTO {
      * @param fechaFin    fecha de fin del préstamo
      * @param estado      estado del préstamo (activo o finalizado)
      */
-    public ObtenerUltimoPrestamoPorEjemplarDTO(final int id, final int idUsuario, final Date fechaInicio,
-            final Date fechaFin, final boolean estado) {
+    public ObtenerUltimoPrestamoPorEjemplarDTO(final int id, final int idUsuario, final LocalDate fechaInicio,
+            final LocalDate fechaFin, final boolean estado) {
         this.id = id;
         this.idUsuario = idUsuario;
         this.fechaInicio = fechaInicio;
@@ -65,7 +65,7 @@ public class ObtenerUltimoPrestamoPorEjemplarDTO {
      * 
      * @return La fecha de inicio del préstamo.
      */
-    public Date getFechaInicio() {
+    public LocalDate getFechaInicio() {
         return fechaInicio;
     }
 
@@ -74,7 +74,7 @@ public class ObtenerUltimoPrestamoPorEjemplarDTO {
      * 
      * @return La fecha de fin del préstamo.
      */
-    public Date getFechaFin() {
+    public LocalDate getFechaFin() {
         return fechaFin;
     }
 

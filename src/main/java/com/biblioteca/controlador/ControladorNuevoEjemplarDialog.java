@@ -1,7 +1,6 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
@@ -54,8 +53,8 @@ public class ControladorNuevoEjemplarDialog {
             EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
             // Convertir la fecha proporcionada (LocalDate) a java.sql.Date
             // Si no se proporciona fecha, usar la fecha actual
-            Date fechaSql = (fechaAdquisicion != null) ? Date.valueOf(fechaAdquisicion)
-                    : new Date(System.currentTimeMillis());
+            LocalDate fechaSql = fechaAdquisicion != null ? fechaAdquisicion
+                    : LocalDate.now();
 
             try {
                 // Iniciar transacción (desactivar auto-commit)

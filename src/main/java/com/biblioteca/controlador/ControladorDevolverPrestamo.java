@@ -1,7 +1,6 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -226,8 +225,8 @@ public class ControladorDevolverPrestamo {
                 Boolean crearSancon = sancionDAO.insertarSancion(
                         idUsuario,
                         idPrestamo,
-                        Date.valueOf(hoy),
-                        Date.valueOf(finSancion),
+                        hoy,
+                        finSancion,
                         descripcion);
 
                 if (!crearSancon) {

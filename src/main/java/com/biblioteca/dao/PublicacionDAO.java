@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -237,13 +238,13 @@ public class PublicacionDAO {
      * @param fechaPublicacion fecha SQL (java.sql.Date)
      * @return true si ok
      */
-    public boolean insertarLibro(final int idPublicacion, final int numEdicion, final Date fechaPublicacion) {
+    public boolean insertarLibro(final int idPublicacion, final int numEdicion, final LocalDate fechaPublicacion) {
         try (
                 PreparedStatement ps = conexion.prepareStatement(SQL_INSERT_LIBRO)) {
             // establecer parámetros
             ps.setInt(1, idPublicacion);
             ps.setInt(2, numEdicion);
-            ps.setDate(3, fechaPublicacion);
+            ps.setDate(3, Date.valueOf(fechaPublicacion));
             // ejecutar
             ps.executeUpdate();
             return true;
@@ -359,10 +360,12 @@ public class PublicacionDAO {
      *
      * @param idPublicacion id de la publicación
      * @param idRelacion    id de la relación
-     * @param tipoRelacion  tipo de relación: 'M' para modulos, 'C' para ciclos, 'T' para temas
+     * @param tipoRelacion  tipo de relación: 'M' para modulos, 'C' para ciclos, 'T'
+     *                      para temas
      * @return true si ok
      */
-    public boolean insertarPublicacionRelacion(final int idPublicacion, final int idRelacion, final RelacionPublicacionHelperEnum tipoRelacion) {
+    public boolean insertarPublicacionRelacion(final int idPublicacion, final int idRelacion,
+            final RelacionPublicacionHelperEnum tipoRelacion) {
         switch (tipoRelacion) {
             case MODULO:
                 return insertarPublicacionModulo(idPublicacion, idRelacion);
@@ -626,11 +629,11 @@ public class PublicacionDAO {
      * @return true si la actualización o inserción tuvo éxito, false en caso de
      *         error
      */
-    public boolean actualizarLibro(final int idPublicacion, final int numEdicion, final Date fechaPublicacion) {
+    public boolean actualizarLibro(final int idPublicacion, final int numEdicion, final LocalDate fechaPublicacion) {
         try (PreparedStatement ps = conexion.prepareStatement(SQL_UPDATE_LIBROS)) {
             // establecer parámetros
             ps.setInt(1, numEdicion);
-            ps.setDate(2, fechaPublicacion);
+            ps.setDate(2, Date.valueOf(fechaPublicacion));
             ps.setInt(3, idPublicacion);
             // ejecutar
             int updated = ps.executeUpdate();

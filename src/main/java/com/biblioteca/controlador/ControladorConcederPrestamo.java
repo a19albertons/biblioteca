@@ -1,7 +1,6 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
@@ -217,8 +216,8 @@ public class ControladorConcederPrestamo {
                 }
 
                 // registrar préstamo
-                boolean inserted = prestamoDAO.insertarPrestamo(idUsuario, idEjemplar, Date.valueOf(hoy),
-                        Date.valueOf(fin));
+                boolean inserted = prestamoDAO.insertarPrestamo(idUsuario, idEjemplar, hoy,
+                        fin);
                 if (!inserted) {
                     return "Error registrando el préstamo en la base de datos";
                 }

@@ -39,8 +39,7 @@ public class EliminarUsuarioDialog extends BaseEliminarDialog {
     @Override
     protected boolean onEliminar() {
         // Intentar eliminar usuario
-        boolean ok = getControlador().getControladorEliminarUsuario().eliminarUsuario(idUsuario);
-        return ok;
+        return getControlador().getControladorEliminarUsuario().eliminarUsuario(idUsuario);
     }
 
     /**

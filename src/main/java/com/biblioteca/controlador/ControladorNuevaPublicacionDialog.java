@@ -1,7 +1,6 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
@@ -128,7 +127,7 @@ public class ControladorNuevaPublicacionDialog {
                 }
 
                 // Insertar libro
-                boolean okLib = publicacionDAO.insertarLibro(idPub, numEdicion, Date.valueOf(fechaPublic));
+                boolean okLib = publicacionDAO.insertarLibro(idPub, numEdicion, fechaPublic);
                 if (!okLib) {
                     conexion.rollback();
                     return false;

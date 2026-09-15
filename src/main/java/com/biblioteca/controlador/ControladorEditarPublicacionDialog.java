@@ -1,7 +1,6 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -202,7 +201,7 @@ public class ControladorEditarPublicacionDialog {
                 if (!publicacionDAO.actualizarPublicacion(idPublicacion, titulo, editorial, isbn, idioma, 'L')) {
                     return false;
                 }
-                if (!publicacionDAO.actualizarLibro(idPublicacion, numEdicion, Date.valueOf(fechaPublic))) {
+                if (!publicacionDAO.actualizarLibro(idPublicacion, numEdicion, fechaPublic)) {
                     return false;
                 }
 

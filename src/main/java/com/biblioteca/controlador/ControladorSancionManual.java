@@ -1,7 +1,6 @@
 package com.biblioteca.controlador;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -117,8 +116,8 @@ public class ControladorSancionManual {
                 }
 
                 // Insertar nueva sanción
-                boolean insertado = sancionDAO.insertarSancion(idUsuario, idPrestamo, Date.valueOf(fechaActual),
-                        Date.valueOf(nuevoFinSancion), descripcion);
+                boolean insertado = sancionDAO.insertarSancion(idUsuario, idPrestamo, fechaActual,
+                        nuevoFinSancion, descripcion);
                 if (!insertado) {
                     return "Error: No se pudo insertar la nueva sanción";
                 }
