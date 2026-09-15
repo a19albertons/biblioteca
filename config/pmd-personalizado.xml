@@ -16,6 +16,7 @@
         <exclude name="UnusedLocalVariable"/>
         <exclude name="LooseCoupling"/>
         <exclude name="PreserveStackTrace"/>
+        <exclude name="ExhaustiveSwitchHasDefault"/>
 
     </rule>
 
