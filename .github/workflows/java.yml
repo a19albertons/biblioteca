@@ -1,100 +1,122 @@
 name: Java CI
 
 on:
-    push:
-        branches: [main, desarrollo]
+  push:
+    branches: [main]
 
-    pull_request:
-        branches: [desarrollo]
-        paths-ignore: ["**.md"]
+  pull_request:
+    paths-ignore: ["**.md"]
 
 # Variables de entorno
 env:
-    JAVA_VERSION: 21
+  JAVA_VERSION: 21
 
 # Jobs
 jobs:
-    analisisEstatico:
-        name: Análisis estático del código
-        runs-on: ubuntu-24.04
-        strategy:
-            # Política ante fallos
-            fail-fast: false
-            # Matriz de acciones de análisis estático
-            matrix:
-                include:
-                    - action: checkstyle:check
-                      fichero: target/checkstyle-result.xml
-                    - action: pmd:check
-                      fichero: target/pmd.xml
-                    - action: pmd:cpd-check
-                      fichero: target/cpd.xml
-                    - action: spotbugs:check
-                      fichero: target/spotbugs.html
-        steps:
-            # Descarga el repositorio
-            - name: Checkout del repositorio
-              uses: actions/checkout@v4
+  analisisEstatico:
+    name: Análisis estático del código
+    runs-on: ubuntu-24.04
+    strategy:
+      # Política ante fallos
+      fail-fast: false
+      # Matriz de acciones de análisis estático
+      matrix:
+        include:
+          - action: checkstyle:check
+            fichero: target/checkstyle-result.xml
+          - action: pmd:check
+            fichero: target/pmd.xml
+          - action: pmd:cpd-check
+            fichero: target/cpd.xml
+          - action: spotbugs:check
+            fichero: target/spotbugs.html
+    steps:
+      # Descarga el repositorio
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
 
-            #   Configura Java
-            - name: Configurar Java ${{ env.JAVA_VERSION }}
-              uses: actions/setup-java@v4
-              with:
-                  distribution: temurin
-                  java-version: ${{ env.JAVA_VERSION}}
+      #   Configura Java
+      - name: Configurar Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION}}
 
-                  # Ejecuta Maven para la acción de análisis estático correspondiente
-            - name: Ejecutar Maven
-              working-directory: ${{ github.workspace}}
-              run: ./mvnw ${{ matrix.action }}
+          # Ejecuta Maven para la acción de análisis estático correspondiente
+      - name: Ejecutar Maven
+        working-directory: ${{ github.workspace}}
+        run: ./mvnw ${{ matrix.action }}
 
-            #   Sube el temporal de resultados del análisis estático
-            - name: Subir resultados del análisis estático
-              uses: actions/upload-artifact@v4
-              if: always()
-              with:
-                  name: ${{ matrix.action }}
-                  path: ${{ github.workspace}}/target/${{ matrix.fichero }}
+      #   Sube el temporal de resultados del análisis estático
+      - name: Subir resultados del análisis estático
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ matrix.action }}
+          path: ${{ github.workspace}}/target/${{ matrix.fichero }}
 
-    # Prueba la compilación del proyecto Java. No funcionara el jar porque el fichero properties no lo tiene.
-    compilacion:
-        name: Compilación del proyecto
-        runs-on: ubuntu-24.04
-        needs: analisisEstatico
-        steps:
-            # Descarga el repositorio
-            - name: Checkout del repositorio
-              uses: actions/checkout@v4
+  # Prueba la compilación del proyecto Java. No funcionara el jar porque el fichero properties no lo tiene.
+  compilacion:
+    name: Compilación del proyecto
+    runs-on: ubuntu-24.04
+    needs: analisisEstatico
+    steps:
+      # Descarga el repositorio
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
 
-            # Configura Java
-            - name: Configurar Java ${{ env.JAVA_VERSION }}
-              uses: actions/setup-java@v4
-              with:
-                  distribution: temurin
-                  java-version: ${{ env.JAVA_VERSION}}
+      # Configura Java
+      - name: Configurar Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION}}
 
-            # Ejecuta Maven para compilar el proyecto
-            - name: Ejecutar Maven para compilar el proyecto
-              working-directory: ${{ github.workspace}}
-              run: ./mvnw clean install -DskipTests
+      # Ejecuta Maven para compilar el proyecto
+      - name: Ejecutar Maven para compilar el proyecto
+        working-directory: ${{ github.workspace}}
+        run: ./mvnw clean install -DskipTests
 
-    tests:
-        name: Ejecutar pruebas unitarias
-        runs-on: ubuntu-24.04
-        needs: compilacion
-        steps:
-            # Descarga el repositorio
-            - name: Checkout del repositorio
-              uses: actions/checkout@v4
+  tests:
+    name: Ejecutar pruebas unitarias
+    runs-on: ubuntu-24.04
+    needs: compilacion
+    steps:
+      # Descarga el repositorio
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
 
-            # Configura Java
-            - name: Configurar Java ${{ env.JAVA_VERSION }}
-              uses: actions/setup-java@v4
-              with:
-                  distribution: temurin
-                  java-version: ${{ env.JAVA_VERSION}}
+      # Configura Java
+      - name: Configurar Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION}}
 
-            # Ejecuta Maven para ejecutar las pruebas unitarias
-            - name: Ejecutar Maven para ejecutar las pruebas unitarias
-              working-directory: ${{ github.workspace}}
-              run: ./mvnw test
+      # Ejecuta Maven para ejecutar las pruebas unitarias
+      - name: Ejecutar Maven para ejecutar las pruebas unitarias
+        working-directory: ${{ github.workspace}}
+        run: ./mvnw test
+
+  release:
+    name: Crear release
+    runs-on: ubuntu-24.04
+    needs: [tests]
+    if: startsWith(github.ref, 'refs/tags/') && startsWith(github.ref_name, 'Biblioteca-v')
+    permissions:
+      contents: write
+    steps:
+      # Configura checkout
+      - uses: actions/checkout@v4
+
+      # Hace el release a partir del tag
+      - name: Generar el release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name}}
+          name: ${{ github.ref_name}}
+          body_path: cambios.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

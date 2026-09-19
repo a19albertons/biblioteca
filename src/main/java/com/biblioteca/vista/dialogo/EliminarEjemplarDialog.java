@@ -50,8 +50,7 @@ public class EliminarEjemplarDialog extends BaseEliminarDialog {
         }
 
         // Intentar eliminar el ejemplar
-        boolean ok = getControlador().getControladorEliminarEjemplarDialog().eliminarEjemplar(idEjemplar);
-        return ok;
+        return getControlador().getControladorEliminarEjemplarDialog().eliminarEjemplar(idEjemplar);
     }
 
     /**

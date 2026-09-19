@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 import javax.annotation.Nonnull;
 
@@ -52,7 +53,7 @@ public class SancionDAO {
      * @param descripcion
      * @return true si se insertó correctamente
      */
-    public boolean insertarSancion(final int idUsuario, final int idPrestamo, final Date inicio, final Date fin,
+    public boolean insertarSancion(final int idUsuario, final int idPrestamo, final LocalDate inicio, final LocalDate fin,
             final String descripcion) {
         // insertar sanción
         final String sql = SQL_INSERT_SANCION;
@@ -61,8 +62,8 @@ public class SancionDAO {
             // establecer parámetros
             ps.setInt(1, idUsuario);
             ps.setInt(2, idPrestamo);
-            ps.setDate(3, inicio);
-            ps.setDate(4, fin);
+            ps.setDate(3, Date.valueOf(inicio));
+            ps.setDate(4, Date.valueOf(fin));
             ps.setString(5, descripcion);
             // ejecutar
             int rows = ps.executeUpdate();
