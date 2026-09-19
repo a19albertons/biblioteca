@@ -34,7 +34,7 @@ jobs:
     steps:
       # Descarga el repositorio
       - name: Checkout del repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       #   Configura Java
       - name: Configurar Java ${{ env.JAVA_VERSION }}
@@ -65,7 +65,7 @@ jobs:
     steps:
       # Descarga el repositorio
       - name: Checkout del repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Configura Java
       - name: Configurar Java ${{ env.JAVA_VERSION }}
@@ -87,7 +87,7 @@ jobs:
     steps:
       # Descarga el repositorio
       - name: Checkout del repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Configura Java
       - name: Configurar Java ${{ env.JAVA_VERSION }}
@@ -111,7 +111,7 @@ jobs:
       contents: write
     steps:
       # Configura checkout
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Hace el release a partir del tag
       - name: Generar el release
