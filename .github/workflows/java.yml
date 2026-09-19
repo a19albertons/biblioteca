@@ -51,7 +51,7 @@ jobs:
 
       #   Sube el temporal de resultados del análisis estático
       - name: Subir resultados del análisis estático
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: ${{ matrix.action }}
