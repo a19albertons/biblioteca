@@ -2,10 +2,9 @@ name: Java CI
 
 on:
   push:
-    branches: [main, desarrollo]
+    branches: [main]
 
   pull_request:
-    branches: [desarrollo]
     paths-ignore: ["**.md"]
 
 # Variables de entorno
