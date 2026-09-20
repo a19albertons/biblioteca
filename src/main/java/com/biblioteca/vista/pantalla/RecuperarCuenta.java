@@ -148,7 +148,7 @@ public class RecuperarCuenta {
         login.add(volver);
 
         // Versión (bajada un poco para evitar solapamiento)
-        version = new JLabel("Sistema de Gestión Académica v1.0");
+        version = new JLabel("Sistema de Gestión Académica v1.0.1");
         version.setBounds(40, 195, 240, 20);
         version.setFont(version.getFont().deriveFont(Font.PLAIN));
         login.add(version);

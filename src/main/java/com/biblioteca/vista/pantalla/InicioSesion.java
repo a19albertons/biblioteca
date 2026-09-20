@@ -132,7 +132,7 @@ public class InicioSesion {
         });
         login.add(recuperarCuenta);
 
-        JLabel version = new JLabel("Sistema de Gestion Academica v1.0");
+        JLabel version = new JLabel("Sistema de Gestion Academica v1.0.1");
         version.setBounds(40, 260, 240, 20);
         version.setFont(version.getFont().deriveFont(Font.PLAIN));
         login.add(version);
