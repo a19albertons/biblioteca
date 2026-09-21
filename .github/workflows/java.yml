@@ -3,6 +3,7 @@ name: Java CI
 on:
   push:
     branches: [main]
+    tags: ["Biblioteca-v*"]
 
   pull_request:
     branches: [main]
