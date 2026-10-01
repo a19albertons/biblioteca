@@ -190,7 +190,7 @@ public class Publicacion {
      * 
      * @return los modulos asociados a la publicacion
      */
-    public final java.util.List<Modulo> getModulos() {
+    public final List<Modulo> getModulos() {
         return modulos;
     }
 
@@ -199,7 +199,7 @@ public class Publicacion {
      * 
      * @param modulos
      */
-    public void setModulos(final java.util.List<Modulo> modulos) {
+    public void setModulos(final List<Modulo> modulos) {
         this.modulos = modulos;
     }
 

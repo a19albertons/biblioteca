@@ -11,7 +11,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -312,7 +311,7 @@ public class PanelControl {
         table.setRowHeight(28);
         table.setShowGrid(false);
         table.setFillsViewportHeight(true);
-        table.setIntercellSpacing(new java.awt.Dimension(0, 0));
+        table.setIntercellSpacing(new Dimension(0, 0));
         table.setBackground(Color.white);
         table.setForeground(Color.decode("#666666"));
         table.setFont(Fonts.openSans(12f));
@@ -337,7 +336,7 @@ public class PanelControl {
                     final boolean hasFocus, final int row, final int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 String s = (value != null) ? value.toString().toUpperCase() : "";
-                setHorizontalAlignment(SwingConstants.CENTER);
+                setHorizontalAlignment(CENTER);
                 setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
                 if ("DEVUELTO".equals(s)) {
                     setBackground(Color.decode("#E6FFF0"));
@@ -451,7 +450,7 @@ public class PanelControl {
                 });
 
         valor3.setText("...");
-        com.biblioteca.utilities.BackgroundWorker.run(
+        BackgroundWorker.run(
                 () -> controlador.getControladorPanelControl().obtenerTotalSociosActivos(),
                 // Actualizar UI con resultados
                 result -> {
