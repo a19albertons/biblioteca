@@ -89,7 +89,7 @@ public class EjemplarDAO {
                         estado = "DISPONIBLE"; // disponible y en servicio
                     }
 
-                    lista.add(new String[] { id, num, fechaStr, estado });
+                    lista.add(new String[]{id, num, fechaStr, estado });
                 }
             }
         } catch (SQLException e) {

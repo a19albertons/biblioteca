@@ -74,7 +74,7 @@ public class ControladorGestionUsuarios {
             String nombre = (r.length > 2 && r[2] != null) ? r[2] : "";
             String tipo = (r.length > 4 && r[4] != null) ? r[4] : "";
             String sancion = (r.length > 3 && r[3] != null) ? r[3] : "";
-            procesados[i] = new String[] { id, dni, nombre, tipo, sancion, "" };
+            procesados[i] = new String[]{id, dni, nombre, tipo, sancion, "" };
         }
         
         // Cargar en modelo

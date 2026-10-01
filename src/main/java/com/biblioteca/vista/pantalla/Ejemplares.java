@@ -330,7 +330,7 @@ public class Ejemplares {
 
         // Tabla de ejemplares (modelo dinámico, se actualizará cuando se cargue una
         // publicación)
-        String[] cols = new String[] { "ID", "num_ejemplar", "FECHA", "ESTADO", "ACCIONES" };
+        String[] cols = new String[]{"ID", "num_ejemplar", "FECHA", "ESTADO", "ACCIONES" };
 
         ejemplaresModel = new DefaultTableModel(new Object[0][0], cols) {
             @Override
@@ -578,7 +578,7 @@ public class Ejemplares {
             } else {
                 for (String[] row : ejemplaresData) {
                     // row: id, num_ejemplar, fecha, estado
-                    Object[] fila = new Object[] { "#" + row[0], row[1], row[2], row[3], null };
+                    Object[] fila = new Object[]{"#" + row[0], row[1], row[2], row[3], null };
                     ejemplaresModel.addRow(fila);
                 }
             }

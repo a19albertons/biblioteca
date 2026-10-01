@@ -72,7 +72,7 @@ public class PanelControl {
     /**
      * Nombres de las columnas de la tabla
      */
-    private String[] columnNames = { "ID EJEMPLAR", "LIBRO", "ESTADO" };
+    private String[] columnNames = {"ID EJEMPLAR", "LIBRO", "ESTADO"};
 
     /**
      * Renderer para la columna estado

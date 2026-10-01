@@ -516,7 +516,7 @@ public class PublicacionDAO {
                         editorial = "";
                     }
 
-                    return new String[] { titulo, isbn, autores, ciclos, editorial, disponibles, String.valueOf(id) };
+                    return new String[]{titulo, isbn, autores, ciclos, editorial, disponibles, String.valueOf(id) };
                 }
             }
         } catch (SQLException e) {

@@ -201,7 +201,7 @@ public class GestionUsuarios {
         listaUsuarios.setBounds(20, 80, 540, 480);
 
         // Tabla con columnas y datos (cargados en background)
-        String[] cols = new String[] { "ID", "DNI", "NOMBRE Y APELLIDO", "TIPO", "ESTADO", "ACCIONES" };
+        String[] cols = new String[] {"ID", "DNI", "NOMBRE Y APELLIDO", "TIPO", "ESTADO", "ACCIONES"};
         String[][] initialData = new String[0][0];
 
         // Guardar modelo y tabla como campos para permitir refrescar desde fuera
