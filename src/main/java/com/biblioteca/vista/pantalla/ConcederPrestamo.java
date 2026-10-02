@@ -163,7 +163,7 @@ public class ConcederPrestamo extends PantallaPrestamoBase {
      * @param usuarioSeleccionado array holder con el ID de usuario seleccionado
      */
     private void detectarCampos(final JTextField txtIdEjemplar, final JLabel txtPublicacion,
-            final JLabel txtFechaInicio, final JLabel txtFechaFin, final int[] usuarioSeleccionado) {
+            final JLabel txtFechaInicio, final JLabel txtFechaFin, final int... usuarioSeleccionado) {
         // si está vacío, limpiar campos
         String idEjStr = txtIdEjemplar.getText().trim();
         if (idEjStr.isEmpty()) {

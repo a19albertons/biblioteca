@@ -62,7 +62,7 @@ public abstract class PantallaPrestamoBase {
      * 
      * @param usuarioSeleccionado establece el usuario seleccionado
      */
-    public void setUsuarioSeleccionado(final int[] usuarioSeleccionado) {
+    public void setUsuarioSeleccionado(final int... usuarioSeleccionado) {
         this.usuarioSeleccionado[0] = usuarioSeleccionado[0];
     }
 

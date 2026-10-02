@@ -293,7 +293,7 @@ public class GestionUsuarios {
         }
     }
 
-    private void cargarUsuariosEnTabla(final String[][] rawData) {
+    private void cargarUsuariosEnTabla(final String[]... rawData) {
         // Manejo de errores y mensajes
         if (rawData == null) {
             JOptionPane.showMessageDialog(null,

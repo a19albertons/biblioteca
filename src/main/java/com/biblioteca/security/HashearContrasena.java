@@ -23,7 +23,7 @@ public final class HashearContrasena {
      * @param password la contraseña como un char array
      * @return el hash de la contraseña
      */
-    public static String hash(final char[] password) {
+    public static String hash(final char... password) {
         return BCrypt.withDefaults().hashToString(COST, password);
     }
 
