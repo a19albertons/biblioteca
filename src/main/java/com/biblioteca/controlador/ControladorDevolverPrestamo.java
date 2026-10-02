@@ -86,7 +86,7 @@ public class ControladorDevolverPrestamo {
      * @return EjemplarConTituloDTO o null si no se encuentra
      */
     public EjemplarConTituloDTO detectarEjemplar(final int idEjemplar) {
-        EjemplarConTituloDTO resultado = null;
+        EjemplarConTituloDTO resultado;
         try (Connection conexion = this.dbConnection.getConnection()) {
             if (conexion == null) {
                 System.out.println("No se puede obtener conexión a BD");
@@ -187,7 +187,7 @@ public class ControladorDevolverPrestamo {
                 LocalDate finSancion;
                 String descripcionBase = "Retraso en devolución " + diasRetraso + " días";
                 String descripcion = descripcionBase;
-                boolean previaDesactivada = false;
+                boolean previaDesactivada;
                 // Si ya hay sanción activa, acumular días y desactivar la previa
 
                 if (sancionActiva != null && sancionActiva.getFinSancion() != null
@@ -233,6 +233,7 @@ public class ControladorDevolverPrestamo {
                     return "Error al insertar la sanción automática en la base de datos.";
                 }
 
+                String notificacion;
                 try {
                     // Mira si hay sanción previa
                     if (sancionActiva != null && sancionActiva.getFinSancion() != null
@@ -241,20 +242,21 @@ public class ControladorDevolverPrestamo {
                         LocalDate finAct = LocalDate.parse(finOriginal);
                         LocalDate finNuevo = finSancion;
                         if (finNuevo.isAfter(finAct)) {
-                            ultimaNotificacionSancion = "La nueva fecha de sanción ha sido actualizada a "
+                            notificacion = "La nueva fecha de sanción ha sido actualizada a "
                                     + finNuevo;
                         } else {
-                            ultimaNotificacionSancion = "La sanción permanece sin cambios a " + finAct;
+                            notificacion = "La sanción permanece sin cambios a " + finAct;
                         }
                     } else {
-                        ultimaNotificacionSancion = "Se ha aplicado una nueva sanción hasta " + finSancion;
+                        notificacion = "Se ha aplicado una nueva sanción hasta " + finSancion;
                     }
                 } catch (DateTimeParseException e) {
                     System.out
                             .println("Error preparando notificación de sanción automática: " + e.getMessage());
                     e.printStackTrace();
-                    ultimaNotificacionSancion = "Se ha aplicado una sanción automática.";
+                    notificacion = "Se ha aplicado una sanción automática.";
                 }
+                ultimaNotificacionSancion = notificacion;
             }
         }
         return null; // éxito

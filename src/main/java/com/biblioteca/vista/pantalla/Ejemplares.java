@@ -550,7 +550,7 @@ public class Ejemplares {
         }
 
         // Cargar ejemplares reales para la publicación
-        int id = -1;
+        int id;
         try {
             id = Integer.parseInt(idStr);
         } catch (NumberFormatException e) {

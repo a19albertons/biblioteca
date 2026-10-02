@@ -66,7 +66,7 @@ public class ControladorConcederPrestamo {
      *         error
      */
     public EjemplarConTituloDTO detectarEjemplar(final int idEjemplar) {
-        EjemplarConTituloDTO resultado = null;
+        EjemplarConTituloDTO resultado;
         try (Connection conexion = this.dbConnection.getConnection()) {
             EjemplarDAO ejemplarDAO = new EjemplarDAO(conexion);
             PublicacionDAO publicacionDAO = new PublicacionDAO(conexion);
