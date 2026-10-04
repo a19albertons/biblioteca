@@ -9,7 +9,6 @@
         <exclude name="SystemPrintln" />
         <exclude name="AvoidPrintStackTrace" />
         <exclude name="UnusedFormalParameter" />
-        <exclude name="UseVarargs" />
         <exclude name="LiteralsFirstInComparisons"/>
         <exclude name="UnusedPrivateField"/>
         <exclude name="UnusedLocalVariable"/>

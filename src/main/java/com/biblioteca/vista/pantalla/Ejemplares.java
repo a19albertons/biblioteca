@@ -524,7 +524,7 @@ public class Ejemplares {
      *
      * @param resumen arreglo: titulo,isbn,autores,ciclos,editorial,disponibles,id
      */
-    public void cargarPublicacionResumen(final String[] resumen) {
+    public void cargarPublicacionResumen(final String... resumen) {
         // Comprobación básica
         if (resumen == null) {
             return;
