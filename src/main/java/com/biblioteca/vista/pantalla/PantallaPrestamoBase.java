@@ -28,7 +28,7 @@ public abstract class PantallaPrestamoBase {
     private final JButton btnCambiarFormulario = new JButton();
 
     /** identificador del usuario seleccionado */
-    private int[] usuarioSeleccionado = new int[] { -1 };
+    private int[] usuarioSeleccionado = new int[]{-1};
 
     /**
      * Controlador de la aplicación
@@ -54,7 +54,7 @@ public abstract class PantallaPrestamoBase {
      * @return array con el ID del usuario seleccionado
      */
     public int[] getUsuarioSeleccionado() {
-        return new int[] { usuarioSeleccionado[0] };
+        return new int[] {usuarioSeleccionado[0]};
     }
 
     /**

@@ -54,7 +54,7 @@ public final class Fonts {
         } catch (IOException | FontFormatException e) {
             if (LOGGER.isLoggable(Level.WARNING)) {
                 LOGGER.log(Level.WARNING, "No se pudo cargar la fuente {0}: {1}",
-                        new Object[] { resourceName, e.getMessage() });
+                        new Object[]{resourceName, e.getMessage()});
             }
             return null;
         }

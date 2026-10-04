@@ -168,7 +168,7 @@ public class SancionManual {
      * @param formularioSancion el panel de formulario padre
      */
     private void createUserSelectionButton(final JPanel formularioSancion) {
-        usuarioSeleccionado = new int[] { -1 };
+        usuarioSeleccionado = new int[]{-1};
 
         JButton btnCambiarUsuario = new JButton("Cambiar");
         btnCambiarUsuario.setBounds(390, 55, 100, 30);
