@@ -34,7 +34,6 @@
         <exclude name="CallSuperInConstructor"/>
         <exclude name="CommentDefaultAccessModifier"/>
         <exclude name="ShortClassName"/>
-        <exclude name="UnnecessaryCast"/>
         <exclude name="PrematureDeclaration"/>
         <exclude name="UnnecessaryLocalBeforeReturn"/>
     </rule>

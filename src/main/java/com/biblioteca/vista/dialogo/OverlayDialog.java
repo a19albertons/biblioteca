@@ -53,7 +53,7 @@ public abstract class OverlayDialog extends JDialog {
             return;
         }
         // Recordar el glass pane previo
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+        RootPaneContainer rpc = parentFrame;
         Component current = rpc.getRootPane().getGlassPane();
         previousGlassPane = current;
         JPanel overlay = new JPanel();
@@ -73,7 +73,7 @@ public abstract class OverlayDialog extends JDialog {
             return;
         }
         // Restaurar el glass pane previo (si lo teníamos)
-        RootPaneContainer rpc = (RootPaneContainer) parentFrame;
+        RootPaneContainer rpc = parentFrame;
         if (previousGlassPane != null) {
             rpc.getRootPane().setGlassPane(previousGlassPane);
             previousGlassPane.setVisible(false);
