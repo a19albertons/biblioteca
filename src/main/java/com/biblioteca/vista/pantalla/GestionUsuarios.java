@@ -15,7 +15,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
@@ -43,7 +42,7 @@ public class GestionUsuarios {
     private static class StatusRenderer extends JLabel implements TableCellRenderer {
         StatusRenderer() {
             setOpaque(true);
-            setHorizontalAlignment(SwingConstants.CENTER);
+            setHorizontalAlignment(CENTER);
         }
 
         @Override

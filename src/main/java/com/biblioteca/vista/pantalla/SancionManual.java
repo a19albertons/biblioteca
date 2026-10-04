@@ -198,7 +198,7 @@ public class SancionManual {
             JList<String> jlist = new JList<>(listModel);
             jlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             JScrollPane scroll = new JScrollPane(jlist);
-            scroll.setPreferredSize(new java.awt.Dimension(400, 200));
+            scroll.setPreferredSize(new Dimension(400, 200));
             int option = JOptionPane.showConfirmDialog(null, scroll, "Seleccione usuario",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 

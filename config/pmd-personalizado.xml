@@ -28,7 +28,6 @@
         <exclude name="LongVariable" />
         <exclude name="AtLeastOneConstructor" />
         <exclude name="BooleanGetMethodName" />
-        <exclude name="UnnecessaryFullyQualifiedName" />
         <exclude name="FieldDeclarationsShouldBeAtStartOfClass" />
         <exclude name="ConfusingTernary" />
         <exclude name="UseShortArrayInitializer" />
