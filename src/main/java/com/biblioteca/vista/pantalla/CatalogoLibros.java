@@ -372,7 +372,7 @@ public class CatalogoLibros {
                 String autoresTxt = fila[2] != null ? fila[2] : "";
                 String ciclosTxt = fila[3] != null ? fila[3] : "";
                 String editorialTxt = fila[4] != null ? fila[4] : "";
-                int disponiblesNum = 0;
+                int disponiblesNum;
                 try {
                     disponiblesNum = Integer.parseInt(fila[5]);
                 } catch (NumberFormatException ex) {

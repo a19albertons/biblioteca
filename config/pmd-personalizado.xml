@@ -7,7 +7,6 @@
     <!-- Usamos todas las de Best Practices excepto los System.out -->
     <rule ref="category/java/bestpractices.xml">
         <exclude name="SystemPrintln" />
-        <exclude name="UnusedAssignment" />
         <exclude name="AvoidPrintStackTrace" />
         <exclude name="UnusedFormalParameter" />
         <exclude name="UseVarargs" />

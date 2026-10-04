@@ -78,8 +78,7 @@ public class ControladorEditarEjemplarDialog {
                     System.out.println("No se encontró el ejemplar con id: " + idEjemplar);
                     return false;
                 }
-                boolean estadoActual = true; // Por defecto activo
-                estadoActual = "DISPONIBLE".equals(detalles.getEstado());
+                boolean estadoActual = "DISPONIBLE".equals(detalles.getEstado());
 
                 LocalDate fechaSql = fechaAdquisicion != null ? fechaAdquisicion
                         : LocalDate.now();
